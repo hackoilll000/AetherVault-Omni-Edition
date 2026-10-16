@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer Hexagonal Cyber Vault Shield -->
+    <path
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#151A30"
+        android:pathData="M54,26 L78,39.5 L78,67.5 L54,81 L30,67.5 L30,39.5 Z">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="30"
+                android:startY="26"
+                android:endX="78"
+                android:endY="81"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#00F0FF" />
+                <item android:offset="0.5" android:color="#6366F1" />
+                <item android:offset="1.0" android:color="#A855F7" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Ascending Telegram Origami Paper Plane -->
+    <path
+        android:fillColor="#00F0FF"
+        android:pathData="M38,55 L74,36 L52,70 L48,58 Z" />
+
+    <path
+        android:fillColor="#6366F1"
+        android:pathData="M48,58 L74,36 L58,54 Z" />
+
+    <path
+        android:fillColor="#818CF8"
+        android:pathData="M48,58 L52,70 L54,61 Z" />
+
+    <!-- Central Glowing Cryptographic Vault Nexus / Keyhole -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,49 A4,4 0 1,0 54,57 A4,4 0 1,0 54,49 Z" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M52.5,55 L55.5,55 L56.5,62 L51.5,62 Z" />
+</vector>
