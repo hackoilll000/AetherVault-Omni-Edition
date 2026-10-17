@@ -110,7 +110,7 @@ AetherVault features an immaculate, hyper-polished user interface inspired by fu
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/trbfireops/AetherVault-Omni-Edition.git
+   git clone https://github.com/hackoilll000/AetherVault-Omni-Edition.git
    ```
 2. Open the project in Android Studio (Iguana / Jellyfish or newer).
 3. Build the project or generate the APK:
