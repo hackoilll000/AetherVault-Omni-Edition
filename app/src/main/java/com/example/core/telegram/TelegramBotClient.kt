@@ -26,6 +26,39 @@ class TelegramBotClient(
     private val jsonMediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
     private val octetMediaType = "application/octet-stream".toMediaTypeOrNull()
 
+    companion object {
+        /**
+         * Converts user raw input (e.g. "1001234567890", "1234567890", "https://t.me/c/1234567890/123", "-1001234567890")
+         * into valid negative Telegram Channel ID format (-1001234567890L)
+         */
+        fun normalizeChannelId(rawInput: String): Long {
+            val clean = rawInput.trim()
+            if (clean.isBlank()) return 0L
+
+            // Match post link e.g. https://t.me/c/1234567890/55
+            val linkMatch = Regex("/c/([0-9]+)").find(clean)
+            if (linkMatch != null) {
+                val numStr = linkMatch.groupValues[1]
+                return "-100$numStr".toLongOrNull() ?: 0L
+            }
+
+            // Remove unwanted characters except numbers and minus sign
+            val digits = clean.filter { it.isDigit() || it == '-' }
+            if (digits.isBlank() || digits == "-") return 0L
+
+            return when {
+                digits.startsWith("-100") -> digits.toLongOrNull() ?: 0L
+                digits.startsWith("100") && digits.length >= 13 -> "-$digits".toLongOrNull() ?: 0L
+                digits.startsWith("-") -> {
+                    val num = digits.removePrefix("-")
+                    if (num.startsWith("100")) "-$num".toLongOrNull() ?: 0L
+                    else "-100$num".toLongOrNull() ?: 0L
+                }
+                else -> "-100$digits".toLongOrNull() ?: 0L
+            }
+        }
+    }
+
     data class BotInfo(
         val botId: Long,
         val username: String,

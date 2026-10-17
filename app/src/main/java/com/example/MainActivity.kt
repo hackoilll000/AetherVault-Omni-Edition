@@ -50,6 +50,9 @@ import com.example.ui.components.HudTelemetryBar
 import com.example.ui.theme.AetherVaultTheme
 import com.example.ui.theme.CyanNeon
 
+import androidx.compose.animation.core.*
+import androidx.compose.ui.graphics.Brush
+
 enum class MainNavTab {
     DASHBOARD,
     DRIVE,
@@ -62,6 +65,63 @@ enum class SubScreen {
     NONE,
     APPEARANCE_STUDIO,
     WORKSTATION_VIEWER
+}
+
+@Composable
+fun AuroraBackgroundCanvas() {
+    val infiniteTransition = rememberInfiniteTransition(label = "aurora")
+
+    val phase1 by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(12000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "phase1"
+    )
+
+    val phase2 by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(16000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "phase2"
+    )
+
+    androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+        val width = size.width
+        val height = size.height
+
+        // Orb 1: Cyan (#00F2FE)
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(Color(0x2800F2FE), Color.Transparent),
+                center = androidx.compose.ui.geometry.Offset(width * (0.2f + 0.3f * phase1), height * (0.15f + 0.2f * phase2)),
+                radius = width * 0.75f
+            )
+        )
+
+        // Orb 2: Electric Blue (#4FACFE)
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(Color(0x224FACFE), Color.Transparent),
+                center = androidx.compose.ui.geometry.Offset(width * (0.8f - 0.4f * phase2), height * (0.6f + 0.25f * phase1)),
+                radius = width * 0.85f
+            )
+        )
+
+        // Orb 3: Deep Violet (#7F00FF)
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(Color(0x1E7F00FF), Color.Transparent),
+                center = androidx.compose.ui.geometry.Offset(width * (0.4f + 0.3f * phase2), height * (0.85f - 0.3f * phase1)),
+                radius = width * 0.80f
+            )
+        )
+    }
 }
 
 class MainActivity : ComponentActivity() {
@@ -292,8 +352,11 @@ class MainActivity : ComponentActivity() {
                     }
                 } else {
                     // MAIN LOGGED-IN WORKSPACE
-                    Scaffold(
-                        bottomBar = {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        AuroraBackgroundCanvas()
+                        Scaffold(
+                            containerColor = Color.Transparent,
+                            bottomBar = {
                             if (subScreen == SubScreen.NONE && appearanceConfig.navBarMode != NavBarMode.AUTO_HIDE) {
                                 Column {
                                     // Live Dynamic Transfer Pill
@@ -815,6 +878,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+            }
 
                 // Share Ticket Modal Dialog
                 if (shareTicketUrl != null) {

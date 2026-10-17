@@ -10,6 +10,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.features.studio.ThemePreset
 
+private val LiquidGlassColorScheme = darkColorScheme(
+    primary = LiquidAccentCyan,
+    secondary = LiquidAccentIndigo,
+    tertiary = LiquidAccentViolet,
+    background = LiquidBackground,
+    surface = LiquidSurface,
+    surfaceVariant = LiquidCard,
+    surfaceContainer = LiquidCard,
+    outline = LiquidBorder,
+    onPrimary = Color.Black,
+    onSecondary = Color.White,
+    onBackground = Color(0xFFF8FAFC),
+    onSurface = Color(0xFFF8FAFC),
+    onSurfaceVariant = Color(0xFF94A3B8)
+)
+
 private val OledColorScheme = darkColorScheme(
     primary = OledAccentPrimary,
     secondary = OledAccentSecondary,
@@ -76,7 +92,7 @@ private val AlabasterColorScheme = lightColorScheme(
 
 @Composable
 fun AetherVaultTheme(
-    preset: ThemePreset = ThemePreset.OLED_STEALTH,
+    preset: ThemePreset = ThemePreset.LIQUID_GLASS,
     cornerRadiusDp: Int = 16,
     content: @Composable () -> Unit
 ) {
@@ -84,16 +100,17 @@ fun AetherVaultTheme(
     val darkTheme = isSystemInDarkTheme()
 
     val colorScheme = when (preset) {
+        ThemePreset.LIQUID_GLASS -> LiquidGlassColorScheme
+        ThemePreset.OLED_STEALTH -> OledColorScheme
+        ThemePreset.FROSTED_GLASS -> FrostedGlassColorScheme
+        ThemePreset.DOT_MATRIX -> DotMatrixColorScheme
         ThemePreset.MATERIAL_YOU -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
             } else {
-                OledColorScheme
+                LiquidGlassColorScheme
             }
         }
-        ThemePreset.OLED_STEALTH -> OledColorScheme
-        ThemePreset.FROSTED_GLASS -> FrostedGlassColorScheme
-        ThemePreset.DOT_MATRIX -> DotMatrixColorScheme
         ThemePreset.ALABASTER_CLEAN -> AlabasterColorScheme
     }
 

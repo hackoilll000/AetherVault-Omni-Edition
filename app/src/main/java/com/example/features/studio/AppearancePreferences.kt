@@ -7,10 +7,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 enum class ThemePreset {
-    MATERIAL_YOU,
+    LIQUID_GLASS,
     OLED_STEALTH,
     FROSTED_GLASS,
     DOT_MATRIX,
+    MATERIAL_YOU,
     ALABASTER_CLEAN
 }
 
@@ -31,13 +32,15 @@ enum class AppLanguage {
 }
 
 data class AppearanceConfig(
-    val themePreset: ThemePreset = ThemePreset.OLED_STEALTH,
+    val themePreset: ThemePreset = ThemePreset.LIQUID_GLASS,
     val cornerRadiusDp: Int = 16,
     val gridColumns: Int = 3,
     val aspectRatioMode: AspectRatioMode = AspectRatioMode.SQUARE,
     val navBarMode: NavBarMode = NavBarMode.FLOATING_PILL,
     val showTelemetryOverlay: Boolean = true,
-    val language: AppLanguage = AppLanguage.EN
+    val language: AppLanguage = AppLanguage.EN,
+    val lowMemoryOptimization: Boolean = false,
+    val soundMuted: Boolean = false
 )
 
 class AppearancePreferences(context: Context) {
@@ -47,8 +50,8 @@ class AppearancePreferences(context: Context) {
     val configFlow: StateFlow<AppearanceConfig> = _configFlow.asStateFlow()
 
     private fun loadConfig(): AppearanceConfig {
-        val themeStr = prefs.getString("theme", ThemePreset.OLED_STEALTH.name) ?: ThemePreset.OLED_STEALTH.name
-        val theme = runCatching { ThemePreset.valueOf(themeStr) }.getOrDefault(ThemePreset.OLED_STEALTH)
+        val themeStr = prefs.getString("theme", ThemePreset.LIQUID_GLASS.name) ?: ThemePreset.LIQUID_GLASS.name
+        val theme = runCatching { ThemePreset.valueOf(themeStr) }.getOrDefault(ThemePreset.LIQUID_GLASS)
         val radius = prefs.getInt("cornerRadius", 16)
         val cols = prefs.getInt("gridColumns", 3)
         val aspectStr = prefs.getString("aspectRatio", AspectRatioMode.SQUARE.name) ?: AspectRatioMode.SQUARE.name
@@ -58,6 +61,8 @@ class AppearancePreferences(context: Context) {
         val telemetry = prefs.getBoolean("telemetry", true)
         val langStr = prefs.getString("lang", AppLanguage.EN.name) ?: AppLanguage.EN.name
         val lang = runCatching { AppLanguage.valueOf(langStr) }.getOrDefault(AppLanguage.EN)
+        val lowMem = prefs.getBoolean("low_memory_opt", false)
+        val muted = prefs.getBoolean("sound_muted", false)
 
         return AppearanceConfig(
             themePreset = theme,
@@ -66,7 +71,9 @@ class AppearancePreferences(context: Context) {
             aspectRatioMode = aspect,
             navBarMode = nav,
             showTelemetryOverlay = telemetry,
-            language = lang
+            language = lang,
+            lowMemoryOptimization = lowMem,
+            soundMuted = muted
         )
     }
 
@@ -103,5 +110,15 @@ class AppearancePreferences(context: Context) {
     fun updateLanguage(lang: AppLanguage) {
         prefs.edit().putString("lang", lang.name).apply()
         _configFlow.value = _configFlow.value.copy(language = lang)
+    }
+
+    fun toggleLowMemoryMode(enabled: Boolean) {
+        prefs.edit().putBoolean("low_memory_opt", enabled).apply()
+        _configFlow.value = _configFlow.value.copy(lowMemoryOptimization = enabled)
+    }
+
+    fun toggleSoundMute(muted: Boolean) {
+        prefs.edit().putBoolean("sound_muted", muted).apply()
+        _configFlow.value = _configFlow.value.copy(soundMuted = muted)
     }
 }

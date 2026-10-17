@@ -86,62 +86,6 @@ fun AppearanceStudioScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Live Preview Card
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        1.dp,
-                        CyanNeon.copy(alpha = 0.4f),
-                        RoundedCornerShape(currentConfig.cornerRadiusDp.dp)
-                    ),
-                shape = RoundedCornerShape(currentConfig.cornerRadiusDp.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = if (isHindi) "लाइव थीम प्रिव्यू" else "Live Theme Preview",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    AetherVaultLogo(size = 54.dp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "AetherVault Omni",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        text = if (isHindi) "अनंत क्लाउड • शून्य ज्ञान • आपका हमेशा के लिए"
-                        else "Infinite Cloud • Zero Knowledge • Yours Forever",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(
-                            onClick = {},
-                            shape = RoundedCornerShape(currentConfig.cornerRadiusDp.dp),
-                            modifier = Modifier.height(38.dp)
-                        ) {
-                            Text(if (isHindi) "एक्शन बटन" else "Action Button")
-                        }
-                        OutlinedButton(
-                            onClick = {},
-                            shape = RoundedCornerShape(currentConfig.cornerRadiusDp.dp),
-                            modifier = Modifier.height(38.dp)
-                        ) {
-                            Text(if (isHindi) "आउटलाइन" else "Outlined")
-                        }
-                    }
-                }
-            }
-
             // Theme Presets
             Text(
                 text = if (isHindi) "थीम प्रीसेट्स (5 डिज़ाइन मोड्स)" else "Theme Presets (5 Design Modes)",
@@ -152,7 +96,7 @@ fun AppearanceStudioScreen(
             val presets = listOf(
                 Pair(ThemePreset.OLED_STEALTH, if (isHindi) "OLED पिच-ब्लैक (डिफ़ॉल्ट प्रो)" else "OLED Pitch-Black (Pro)"),
                 Pair(ThemePreset.FROSTED_GLASS, if (isHindi) "फ्रॉस्टेड ग्लासमॉर्फिक HUD" else "Frosted Glassmorphic HUD"),
-                Pair(ThemePreset.DOT_MATRIX, if (isHindi) "नथिंग डॉट-मैट्रिक्स (इंडस्ट्रियल)" else "Nothing Dot-Matrix (Industrial)"),
+                Pair(ThemePreset.DOT_MATRIX, if (isHindi) "नothing डॉट-मैट्रिक्स (इंडस्ट्रियल)" else "Nothing Dot-Matrix (Industrial)"),
                 Pair(ThemePreset.MATERIAL_YOU, if (isHindi) "मटीरियल यू एक्सप्रेसिव (मोनेट)" else "Material You Expressive (Monet)"),
                 Pair(ThemePreset.ALABASTER_CLEAN, if (isHindi) "डे-लाइट अलबास्टर क्लीन" else "Daylight Alabaster Clean")
             )
@@ -259,24 +203,38 @@ fun AppearanceStudioScreen(
                 FilterChip(
                     selected = currentConfig.aspectRatioMode == AspectRatioMode.SQUARE,
                     onClick = { onUpdateAspect(AspectRatioMode.SQUARE) },
-                    label = { Text("1:1 Square Grid") },
+                    label = {
+                        Text(
+                            text = "1:1 Square Grid",
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                            fontSize = 12.sp
+                        )
+                    },
                     leadingIcon = {
                         if (currentConfig.aspectRatioMode == AspectRatioMode.SQUARE) {
                             Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
                         }
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).height(44.dp)
                 )
                 FilterChip(
                     selected = currentConfig.aspectRatioMode == AspectRatioMode.MASONRY,
                     onClick = { onUpdateAspect(AspectRatioMode.MASONRY) },
-                    label = { Text("Original Aspect Masonry") },
+                    label = {
+                        Text(
+                            text = "Original Masonry",
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                            fontSize = 12.sp
+                        )
+                    },
                     leadingIcon = {
                         if (currentConfig.aspectRatioMode == AspectRatioMode.MASONRY) {
                             Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
                         }
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).height(44.dp)
                 )
             }
 

@@ -20,6 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.database.BotSwarmEntity
@@ -83,6 +85,9 @@ fun SettingsScreen(
     // Live Telegram Configuration State
     var configBotToken by remember(masterBotToken) { mutableStateOf(masterBotToken) }
     var configChannelId by remember(channelId) { mutableStateOf(if (channelId != 0L) channelId.toString() else "") }
+    var isBotTokenMasked by remember { mutableStateOf(true) }
+    var isChannelIdMasked by remember { mutableStateOf(true) }
+    var showDebugConsoleDialog by remember { mutableStateOf(false) }
     var isTestingPing by remember { mutableStateOf(false) }
     var pingResultText by remember { mutableStateOf("") }
     var pingSuccess by remember { mutableStateOf<Boolean?>(null) }
@@ -116,64 +121,6 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // App Owner & Architecture Banner
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = CyanNeon.copy(alpha = 0.12f)),
-                shape = RoundedCornerShape(16.dp),
-                border = androidx.compose.foundation.BorderStroke(1.2.dp, CyanNeon)
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(CircleShape)
-                            .background(CyanNeon),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Default.VerifiedUser, contentDescription = null, tint = Color.Black)
-                    }
-                    Spacer(modifier = Modifier.width(14.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "AetherVault Omni Edition",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                            color = CyanNeon
-                        )
-                        Text(
-                            text = if (isHindi) "ओनर व आर्किटेक्ट: आयुष मंडल" else "Owner & Lead Architect: Ayush Mandal (आयुष मंडल)",
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = "Zero-Knowledge Telegram Cloud • Root & Non-Root Compatible",
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedButton(
-                            onClick = { showCreditsDialog = true },
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = CyanNeon),
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier.testTag("open_credits_dialog_button")
-                        ) {
-                            Icon(Icons.Default.Verified, contentDescription = null, modifier = Modifier.size(15.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = if (isHindi) "क्रेडिट, प्ले स्टोर गाइड व नियम" else "Credits, Play Store Guide & Terms",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
-
             // Real Telegram Bot & Channel Connection Configuration
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -182,7 +129,7 @@ fun SettingsScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = if (isHindi) "टेलीग्राम सर्वर कनेक्शन व डायग्नोस्टिक" else "Telegram Server & Channel Settings",
+                        text = if (isHindi) "टेलीग्राम सर्वर कनेक्शन व सेटिंग्स" else "Telegram Server & Channel Settings",
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp
                     )
@@ -198,7 +145,17 @@ fun SettingsScreen(
                         value = configBotToken,
                         onValueChange = { configBotToken = it.trim() },
                         label = { Text("Telegram Bot API Token") },
-                        placeholder = { Text("e.g. 7123456789:AAH_xxx...") },
+                        placeholder = { Text("••••••••••••••••") },
+                        visualTransformation = if (isBotTokenMasked) PasswordVisualTransformation() else VisualTransformation.None,
+                        trailingIcon = {
+                            IconButton(onClick = { isBotTokenMasked = !isBotTokenMasked }) {
+                                Icon(
+                                    imageVector = if (isBotTokenMasked) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                    contentDescription = "Toggle Bot Token Masking",
+                                    tint = CyanNeon
+                                )
+                            }
+                        },
                         modifier = Modifier.fillMaxWidth().testTag("config_bot_token_input"),
                         singleLine = true
                     )
@@ -208,7 +165,17 @@ fun SettingsScreen(
                         value = configChannelId,
                         onValueChange = { configChannelId = it.trim() },
                         label = { Text("Private Channel ID") },
-                        placeholder = { Text("e.g. -1001234567890") },
+                        placeholder = { Text("••••••••••••••••") },
+                        visualTransformation = if (isChannelIdMasked) PasswordVisualTransformation() else VisualTransformation.None,
+                        trailingIcon = {
+                            IconButton(onClick = { isChannelIdMasked = !isChannelIdMasked }) {
+                                Icon(
+                                    imageVector = if (isChannelIdMasked) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                    contentDescription = "Toggle Channel ID Masking",
+                                    tint = CyanNeon
+                                )
+                            }
+                        },
                         modifier = Modifier.fillMaxWidth().testTag("config_channel_id_input"),
                         singleLine = true
                     )
@@ -220,9 +187,11 @@ fun SettingsScreen(
                     ) {
                         Button(
                             onClick = {
-                                val cId = configChannelId.toLongOrNull() ?: channelId
+                                val normId = com.example.core.telegram.TelegramBotClient.normalizeChannelId(configChannelId)
+                                val cId = if (normId != 0L) normId else channelId
+                                if (normId != 0L) configChannelId = normId.toString()
                                 onSaveCredentials(configBotToken, cId)
-                                pingResultText = "Saved credentials locally!"
+                                pingResultText = if (isHindi) "सेटिंग्स सफलतापूर्वक सेव हो गईं!" else "Saved credentials locally!"
                                 pingSuccess = true
                             },
                             modifier = Modifier.weight(1f)
@@ -233,9 +202,11 @@ fun SettingsScreen(
                         OutlinedButton(
                             onClick = {
                                 if (configBotToken.isNotBlank()) {
-                                    val cId = configChannelId.toLongOrNull() ?: channelId
+                                    val normId = com.example.core.telegram.TelegramBotClient.normalizeChannelId(configChannelId)
+                                    val cId = if (normId != 0L) normId else channelId
+                                    if (normId != 0L) configChannelId = normId.toString()
                                     isTestingPing = true
-                                    pingResultText = "Testing ping to Telegram..."
+                                    pingResultText = if (isHindi) "टेलीग्राम सर्वर से कनेक्शन टेस्ट कर रहे हैं..." else "Testing ping to Telegram..."
                                     onTestPing(configBotToken, cId) { ok, msg ->
                                         isTestingPing = false
                                         pingSuccess = ok
@@ -275,7 +246,7 @@ fun SettingsScreen(
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Sync Existing Channel Content Button (Offline View of Server Messages & Uploaded Files)
+                    // Sync Existing Channel Content Button
                     OutlinedButton(
                         onClick = {
                             com.example.core.sensory.SensoryFeedbackEngine.trigger(context, com.example.core.sensory.HapticStyle.LIGHT_TICK)
@@ -298,7 +269,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                         }
                         Text(
-                            text = if (isHindi) "सर्वर की पुरानी फाइलें व टेक्स्ट सिंक करें (Offline View)" else "Sync Existing Server Files & Text (Offline View)",
+                            text = if (isHindi) "सर्वर की पुरानी फाइलें सिंक करें" else "Sync Existing Server Files (Offline View)",
                             fontSize = 12.sp
                         )
                     }
@@ -368,79 +339,6 @@ fun SettingsScreen(
                 }
             }
 
-            // Terms & Conditions Agreement Button
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showTermsDialog = true },
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.Gavel, contentDescription = null, tint = IndigoHyper)
-                    Spacer(modifier = Modifier.width(14.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = if (isHindi) "नियम एवं शर्तें (Terms & Conditions)" else "Terms of Service & License",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
-                        )
-                        Text(
-                            text = "Licensed by Ayush Mandal (आयुष मंडल) • End-to-End Encryption Agreement",
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = CyanNeon, modifier = Modifier.size(20.dp))
-                }
-            }
-
-            // Interactive Voice & Audio Guide Entry
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        com.example.core.sensory.SensoryFeedbackEngine.trigger(context, com.example.core.sensory.HapticStyle.LIGHT_TICK)
-                        showVoiceTutorialDialog = true
-                    },
-                colors = CardDefaults.cardColors(containerColor = CyanNeon.copy(alpha = 0.12f)),
-                shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, CyanNeon.copy(alpha = 0.5f))
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(CyanNeon),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Default.VolumeUp, contentDescription = null, tint = Color.Black, modifier = Modifier.size(22.dp))
-                    }
-                    Spacer(modifier = Modifier.width(14.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = if (isHindi) "इंटरैक्टिव ऑडियो ट्यूटोरियल" else "Interactive Voice Tutorial",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp,
-                            color = CyanNeon
-                        )
-                        Text(
-                            text = if (isHindi) "हिंदी व अंग्रेजी में बोलकर सिखाएगा पूरा ऐप कैसे यूज़ करें" else "Spoken voice guide in Hindi & English with animations",
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Icon(Icons.Default.PlayCircle, contentDescription = null, tint = CyanNeon, modifier = Modifier.size(24.dp))
-                }
-            }
-
             // Bot Migration & Cloud Vault Backup Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -504,7 +402,7 @@ fun SettingsScreen(
                         }
                     }
 
-                    // 1-Tap Instant Migration Code (Instant transfer to new bot / device)
+                    // 1-Tap Instant Migration Code
                     Text(
                         text = if (isHindi) "1-टैप इंस्टेंट बैकअप व माइग्रेशन कोड:" else "Instant Migration & Backup Code:",
                         fontSize = 12.sp,
@@ -690,10 +588,22 @@ fun SettingsScreen(
             ) {
                 Icon(Icons.Default.DeleteSweep, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(if (isHindi) "पुराना कैशे व डमी डेटा पूरी तरह हटाएं" else "Wipe All Cache & Dummy Data")
+                Text(if (isHindi) "लोकल कैशे साफ़ करें" else "Clear Local Cache")
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Clean Single-Line Footer
+            Text(
+                text = "AetherVault Omni v3.0 • Encrypted Telegram Cloud Vault • By AJPM",
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 
@@ -744,10 +654,10 @@ You are the sole custodian of your Master Encryption Password and Telegram Chann
     if (showClearDataConfirm) {
         AlertDialog(
             onDismissRequest = { showClearDataConfirm = false },
-            title = { Text(if (isHindi) "डेटा साफ़ करें?" else "Wipe Vault Cache?") },
+            title = { Text(if (isHindi) "डेटा साफ़ करें?" else "Clear Local Cache?") },
             text = {
                 Text(
-                    if (isHindi) "क्या आप सभी पुराने कैशे फाइलों और डमी रिकॉर्ड्स को डेटाबेस से साफ़ करना चाहते हैं? आपका टेलीग्राम चैनल अप्रभावित रहेगा।"
+                    if (isHindi) "क्या आप सभी पुराने कैशे रिकॉर्ड्स को साफ़ करना चाहते हैं? आपका टेलीग्राम चैनल अप्रभावित रहेगा।"
                     else "This will clear all local SQLite cache records. Your files in the private Telegram channel remain safe."
                 )
             },
@@ -759,7 +669,7 @@ You are the sole custodian of your Master Encryption Password and Telegram Chann
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text(if (isHindi) "साफ़ करें" else "Wipe Clean")
+                    Text(if (isHindi) "साफ़ करें" else "Clear Cache")
                 }
             },
             dismissButton = {
@@ -767,14 +677,6 @@ You are the sole custodian of your Master Encryption Password and Telegram Chann
                     Text(if (isHindi) "रद्द करें" else "Cancel")
                 }
             }
-        )
-    }
-
-    // Voice Interactive Tutorial Dialog
-    if (showVoiceTutorialDialog) {
-        com.example.features.onboarding.VoiceInteractiveTutorialDialog(
-            language = language,
-            onDismiss = { showVoiceTutorialDialog = false }
         )
     }
 
@@ -951,78 +853,6 @@ You are the sole custodian of your Master Encryption Password and Telegram Chann
             dismissButton = {
                 TextButton(onClick = { showEnterMigrationCodeDialog = false }) {
                     Text(if (isHindi) "रद्द करें" else "Cancel")
-                }
-            }
-        )
-    }
-
-    // Credits, Play Store Guide & Terms Dialog
-    if (showCreditsDialog) {
-        AlertDialog(
-            onDismissRequest = { showCreditsDialog = false },
-            title = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.VerifiedUser, contentDescription = null, tint = CyanNeon)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(if (isHindi) "क्रेडिट, प्ले स्टोर गाइड व नियम" else "Credits & Play Store Guide")
-                }
-            },
-            text = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 400.dp)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Surface(
-                        color = CyanNeon.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Text(
-                                text = if (isHindi) "👑 ओनर व मुख्य डेवलपर क्रेडिट:" else "👑 Creator & Lead Developer Credit:",
-                                fontWeight = FontWeight.Bold,
-                                color = CyanNeon,
-                                fontSize = 13.sp
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(text = "Name: AYUSH MONDAL", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            Text(text = "Class 9 in 2026 (16 October)", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(text = "Signature / Brand: By AJPM", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = CyanNeon)
-                            Text(text = "Project: AetherVault Omni Edition (Zero-Knowledge Telegram VFS & Cloud)", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    }
-
-                    Text(
-                        text = if (isHindi) "🚀 प्ले स्टोर और अन्य प्लेटफॉर्म्स पर अप्रूवल गाइड:" else "🚀 Play Store & Platform Approval Guide:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp
-                    )
-                    Text(
-                        text = if (isHindi) "1. गूगल प्ले कंसोल डेवलपर खाता (\$25 शुल्क) बनाएं।\n2. ऐप का 'App Signing' और AAB (Android App Bundle) जनरेट करें।\n3. 'Data Safety' फॉर्म में स्पष्ट करें कि ऐप यूज़र के स्वयं के Telegram Bot Token का उपयोग क्लाउड स्टोरेज के लिए करता है और कोई थर्ड-पार्टी सर्वर या डेटा शेयरिंग नहीं होती है।\n4. एपीआई लेवल और 64-बिट अनुपालन सुनिश्चित करें।\n5. ऐप की प्राइवेसी पॉलिसी (Privacy Policy) URL प्रदान करें।"
-                        else "1. Register a Google Play Console Developer Account (\$25 one-time fee).\n2. Generate a signed release AAB (Android App Bundle) with Play App Signing.\n3. In Google Play Console Data Safety form, declare that the app communicates strictly with the user's configured Telegram Bot API for decentralized private storage, collecting zero user telemetry or external ads.\n4. Ensure compliance with target API requirements and 64-bit architecture.\n5. Provide a valid Privacy Policy link hosted on GitHub Pages or a personal website.",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Text(
-                        text = if (isHindi) "⚖️ नियम व शर्तें, कॉपीराइट और डिस्क्लेमर:" else "⚖️ Terms & Conditions, Copyright & Disclaimers:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp
-                    )
-                    Text(
-                        text = if (isHindi) "• कॉपीराइट © 2026 आयुष मंडल (AJPM)। सर्वाधिकार सुरक्षित।\n• उपयोग की शर्तें: यह ऐप एक ओपन-क्लाइंट यूटिलिटी है जो Telegram Bot API के माध्यम से यूज़र के निजी क्लाउड सर्वर से संवाद करती है।\n• डिस्क्लेमर: डेवलपर (आयुष मंडल / AJPM) टेलीग्राम सेवा या यूज़र द्वारा अपलोड किए गए डेटा की सुरक्षा, उपलब्धता या टेलीग्राम नियमों के अनुपालन के लिए ज़िम्मेदार नहीं है। यूज़र अपने बॉट और चैनल की सुरक्षा के लिए स्वयं ज़िम्मेदार है।"
-                        else "• Copyright © 2026 Ayush Mondal (AJPM). All rights reserved.\n• Terms of Use: AetherVault is an open client utility interacting with the Telegram Bot API using credentials supplied exclusively by the user. Users must comply with Telegram's Terms of Service.\n• Disclaimer: The developer (Ayush Mondal / AJPM) assumes no liability for Telegram server uptime, third-party API limits, or user-managed data security. Use at your own discretion.",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            },
-            confirmButton = {
-                Button(onClick = { showCreditsDialog = false }) {
-                    Text(if (isHindi) "समझ गया (Close)" else "Got It")
                 }
             }
         )

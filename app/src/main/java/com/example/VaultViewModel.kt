@@ -184,15 +184,32 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun testSendPing(botToken: String, channelId: Long, onResult: (Boolean, String) -> Unit) {
+        val cleanToken = botToken.trim()
+        val cId = channelId
         viewModelScope.launch(Dispatchers.IO) {
-            val sendRes = client.sendMessage(botToken.trim(), channelId, "🔒 AetherVault Live Diagnostic Ping by Ayush Mandal (आयुष मंडल)")
+            val botRes = client.getMe(cleanToken)
+            if (botRes.isFailure) {
+                onResult(false, "✗ Error: Invalid Bot Token (${botRes.exceptionOrNull()?.message})\nPlease check your Bot Token from @BotFather!")
+                return@launch
+            }
+            val botInfo = botRes.getOrThrow()
+
+            if (cId == 0L) {
+                onResult(false, "✗ Error: Channel ID is missing or invalid!\nChannel ID must be in -100... format (e.g. -1001234567890)")
+                return@launch
+            }
+
+            val sendRes = client.sendMessage(cleanToken, cId, "🔒 AetherVault Live Connection Ping\nBot: @${botInfo.username}\nChannel: $cId")
             if (sendRes.isSuccess) {
                 val msgId = sendRes.getOrThrow()
-                client.deleteMessage(botToken.trim(), channelId, msgId)
-                onResult(true, "Ping sent to Telegram Channel successfully! (Message ID #$msgId verified & cleaned)")
+                client.deleteMessage(cleanToken, cId, msgId)
+                onResult(true, "✓ Connected successfully to @${botInfo.username} & Channel $cId!\n(Message ID #$msgId verified & cleaned)")
             } else {
                 val err = sendRes.exceptionOrNull()?.message ?: "Failed to reach channel"
-                onResult(false, "Telegram Error: $err\nMake sure the Bot is added as Administrator to the channel with Post rights!")
+                onResult(
+                    false,
+                    "✗ Connection Failed: $err\n\n📌 Quick Fix Checklist:\n1. Open your Telegram Channel -> Channel Settings -> Administrators\n2. Add @${botInfo.username} as Administrator\n3. Ensure 'Post Messages' & 'Delete Messages' rights are ON\n4. Double-check Channel ID starts with -100 (e.g. -1001234567890)"
+                )
             }
         }
     }
@@ -220,14 +237,35 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         _isUnlocked.value = false
     }
 
-    fun createFolder(name: String, colorHex: String) {
+    fun createFolder(name: String, colorHex: String, parentId: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             val folder = VirtualFolder(
                 id = UUID.randomUUID().toString(),
+                parentId = if (parentId == "root") null else parentId,
                 name = name,
                 colorHex = colorHex
             )
             database.folderDao().insertFolder(folder)
+        }
+    }
+
+    fun renameFolder(folderId: String, newName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val existing = database.folderDao().getFolderById(folderId)
+            if (existing != null) {
+                database.folderDao().updateFolder(existing.copy(name = newName, updatedAt = System.currentTimeMillis()))
+            }
+        }
+    }
+
+    fun deleteFolder(folderId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // Reassign files in this folder to root
+            val inFolder = database.fileDao().getFilesInFolder(folderId).firstOrNull() ?: emptyList()
+            inFolder.forEach { file ->
+                database.fileDao().updateFile(file.copy(folderId = "root"))
+            }
+            database.folderDao().deleteFolder(folderId)
         }
     }
 
@@ -244,10 +282,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun deleteFile(file: VaultFile) {
-        viewModelScope.launch(Dispatchers.IO) {
-            // Move to Trash for 30-day safety net
-            database.fileDao().moveToTrash(file.id)
-        }
+        permanentDeleteFile(file)
     }
 
     fun restoreFromTrash(file: VaultFile) {
@@ -264,7 +299,26 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
 
     fun permanentDeleteFile(file: VaultFile) {
         viewModelScope.launch(Dispatchers.IO) {
-            database.fileDao().permanentDelete(file.id)
+            val db = database
+            val chunks = db.chunkDao().getChunksForFile(file.id)
+            val storedToken = prefs.getString("master_bot_token", "") ?: ""
+            val cId = _channelId.value
+
+            // 1. Delete from Room DB
+            db.fileDao().permanentDelete(file.id)
+            db.chunkDao().deleteChunksForFile(file.id)
+
+            // 2. Delete Telegram messages in background if credentials configured
+            if (storedToken.isNotBlank() && cId != 0L) {
+                for (chunk in chunks) {
+                    if (chunk.telegramMessageId > 0) {
+                        client.deleteMessage(storedToken, cId, chunk.telegramMessageId)
+                    }
+                }
+                if (file.thumbMsgId > 0) {
+                    client.deleteMessage(storedToken, cId, file.thumbMsgId)
+                }
+            }
         }
     }
 
@@ -540,7 +594,23 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
 
     fun deleteMultipleFiles(fileIds: List<String>) {
         viewModelScope.launch(Dispatchers.IO) {
-            database.fileDao().moveMultipleToTrash(fileIds)
+            val db = database
+            val storedToken = prefs.getString("master_bot_token", "") ?: ""
+            val cId = _channelId.value
+
+            fileIds.forEach { id ->
+                val chunks = db.chunkDao().getChunksForFile(id)
+                val file = db.fileDao().getFileById(id)
+                db.fileDao().permanentDelete(id)
+                db.chunkDao().deleteChunksForFile(id)
+
+                if (storedToken.isNotBlank() && cId != 0L) {
+                    chunks.forEach { chunk ->
+                        if (chunk.telegramMessageId > 0) client.deleteMessage(storedToken, cId, chunk.telegramMessageId)
+                    }
+                    if (file != null && file.thumbMsgId > 0) client.deleteMessage(storedToken, cId, file.thumbMsgId)
+                }
+            }
         }
     }
 

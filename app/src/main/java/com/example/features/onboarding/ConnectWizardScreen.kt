@@ -54,12 +54,14 @@ fun ConnectWizardScreen(
     // Step 1: Bots
     val botTokens = remember { mutableStateListOf<String>() }
     var currentTokenInput by remember { mutableStateOf("") }
+    var isTokenMasked by remember { mutableStateOf(true) }
     var isVerifyingBot by remember { mutableStateOf(false) }
     var botVerifyMessage by remember { mutableStateOf("") }
     var detectedClipboardToken by remember { mutableStateOf<String?>(null) }
 
     // Step 2: Channel
     var channelIdInput by remember { mutableStateOf("") }
+    var isChannelMasked by remember { mutableStateOf(true) }
     var channelTitle by remember { mutableStateOf("") }
     var isListeningConnect by remember { mutableStateOf(false) }
     var connectStatusText by remember { mutableStateOf("") }
@@ -363,6 +365,16 @@ fun ConnectWizardScreen(
                     value = currentTokenInput,
                     onValueChange = { currentTokenInput = it.trim() },
                     label = { Text("HTTP API Bot Token (e.g. 7123456789:AAH...)") },
+                    visualTransformation = if (isTokenMasked) PasswordVisualTransformation() else VisualTransformation.None,
+                    trailingIcon = {
+                        IconButton(onClick = { isTokenMasked = !isTokenMasked }) {
+                            Icon(
+                                imageVector = if (isTokenMasked) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                contentDescription = "Toggle Token Masking",
+                                tint = CyanNeon
+                            )
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("bot_token_input"),
@@ -540,7 +552,17 @@ fun ConnectWizardScreen(
                 OutlinedTextField(
                     value = channelIdInput,
                     onValueChange = { channelIdInput = it.trim() },
-                    label = { Text("Channel ID (e.g. -1001234567890)") },
+                    label = { Text("Private Channel ID (e.g. -1001234567890)") },
+                    visualTransformation = if (isChannelMasked) PasswordVisualTransformation() else VisualTransformation.None,
+                    trailingIcon = {
+                        IconButton(onClick = { isChannelMasked = !isChannelMasked }) {
+                            Icon(
+                                imageVector = if (isChannelMasked) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                contentDescription = "Toggle Channel ID Masking",
+                                tint = CyanNeon
+                            )
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -561,8 +583,12 @@ fun ConnectWizardScreen(
                         Text(if (isHindi) "पीछे" else "Back")
                     }
                     Button(
-                        onClick = { currentStep = 3 },
-                        enabled = channelIdInput.startsWith("-100") || channelIdInput.toLongOrNull() != null,
+                        onClick = {
+                            val norm = TelegramBotClient.normalizeChannelId(channelIdInput)
+                            if (norm != 0L) channelIdInput = norm.toString()
+                            currentStep = 3
+                        },
+                        enabled = channelIdInput.isNotBlank(),
                         modifier = Modifier
                             .weight(1f)
                             .testTag("step2_next_button")
@@ -580,7 +606,7 @@ fun ConnectWizardScreen(
                     fontWeight = FontWeight.Bold
                 )
 
-                val cId = channelIdInput.toLongOrNull() ?: 0L
+                val cId = TelegramBotClient.normalizeChannelId(channelIdInput)
                 val tok = botTokens.firstOrNull() ?: ""
 
                 LaunchedEffect(Unit) {
