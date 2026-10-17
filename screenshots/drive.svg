@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090A0F"/>
+      <stop offset="50%" stop-color="#12151F"/>
+      <stop offset="100%" stop-color="#050608"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1F2C" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#121620" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F2FE"/>
+      <stop offset="100%" stop-color="#4FACFE"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="url(#bg)"/>
+
+  <!-- Top Bar -->
+  <text x="640" y="45" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.5">AETHERVAULT OMNI • ENCRYPTED DRIVE &amp; FOLDERS</text>
+  <rect x="490" y="55" width="300" height="3" fill="url(#cyanGlow)" rx="1.5"/>
+
+  <!-- Breadcrumbs & Search -->
+  <rect x="80" y="85" width="1120" height="54" rx="14" fill="url(#cardGrad)" stroke="#2B374D" stroke-width="1.5"/>
+  <text x="110" y="118" font-family="sans-serif" font-size="14" font-weight="700" fill="#00F2FE">📁 Root Vault</text>
+  <text x="210" y="118" font-family="sans-serif" font-size="14" fill="#6C7A89"> / Private Documents / 2026</text>
+  <text x="1020" y="118" font-family="sans-serif" font-size="14" fill="#A0AEC0">🔍 Search 248 files</text>
+
+  <!-- Folder Grid Section Title -->
+  <text x="80" y="175" font-family="sans-serif" font-size="16" font-weight="700" fill="#8E9EAF">VIRTUAL FOLDERS</text>
+
+  <!-- Folder Cards Row -->
+  <rect x="80" y="195" width="350" height="90" rx="16" fill="url(#cardGrad)" stroke="#00F2FE" stroke-width="1.5"/>
+  <text x="130" y="235" font-family="sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">📁 Personal Documents</text>
+  <text x="130" y="258" font-family="sans-serif" font-size="12" fill="#00F2FE">42 files • AES-256</text>
+
+  <rect x="465" y="195" width="350" height="90" rx="16" fill="url(#cardGrad)" stroke="#2B374D" stroke-width="1.5"/>
+  <text x="515" y="235" font-family="sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">📁 Raw Media &amp; 4K Videos</text>
+  <text x="515" y="258" font-family="sans-serif" font-size="12" fill="#A0AEC0">128 files • Sharded</text>
+
+  <rect x="850" y="195" width="350" height="90" rx="16" fill="url(#cardGrad)" stroke="#2B374D" stroke-width="1.5"/>
+  <text x="900" y="235" font-family="sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">📁 Secure Code &amp; Keys</text>
+  <text x="900" y="258" font-family="sans-serif" font-size="12" fill="#A0AEC0">78 files • Zero-Knowledge</text>
+
+  <!-- Files Section Title -->
+  <text x="80" y="325" font-family="sans-serif" font-size="16" font-weight="700" fill="#8E9EAF">ENCRYPTED FILES &amp; CHUNKS</text>
+
+  <!-- File Row 1 -->
+  <rect x="80" y="345" width="1120" height="75" rx="14" fill="url(#cardGrad)" stroke="#2B374D" stroke-width="1.5"/>
+  <circle cx="125" cy="382" r="22" fill="#1E293B"/>
+  <text x="117" y="389" font-family="sans-serif" font-size="16" fill="#00F2FE">📄</text>
+  <text x="170" y="375" font-family="sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Financial_Portfolio_2026.pdf</text>
+  <text x="170" y="398" font-family="sans-serif" font-size="12" fill="#8E9EAF">14.2 MB • Encrypted 19MB Chunks • Telegram Channel ID: -1004191</text>
+  <rect x="1030" y="362" width="130" height="40" rx="10" fill="#1E293B" stroke="#00F2FE" stroke-width="1"/>
+  <text x="1095" y="387" font-family="sans-serif" font-size="13" font-weight="700" fill="#00F2FE" text-anchor="middle">Decrypt &amp; View</text>
+
+  <!-- File Row 2 -->
+  <rect x="80" y="435" width="1120" height="75" rx="14" fill="url(#cardGrad)" stroke="#2B374D" stroke-width="1.5"/>
+  <circle cx="125" cy="472" r="22" fill="#1E293B"/>
+  <text x="117" y="479" font-family="sans-serif" font-size="16" fill="#00F2FE">🖼️</text>
+  <text x="170" y="465" font-family="sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Master_Backup_Archive.zip</text>
+  <text x="170" y="488" font-family="sans-serif" font-size="12" fill="#8E9EAF">1.2 GB • 64 Telegram Chunks • SHA-256 Verified</text>
+  <rect x="1030" y="452" width="130" height="40" rx="10" fill="#1E293B" stroke="#2B374D" stroke-width="1"/>
+  <text x="1095" y="477" font-family="sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">Manage File</text>
+
+  <!-- File Row 3 -->
+  <rect x="80" y="525" width="1120" height="75" rx="14" fill="url(#cardGrad)" stroke="#2B374D" stroke-width="1.5"/>
+  <circle cx="125" cy="562" r="22" fill="#1E293B"/>
+  <text x="117" y="569" font-family="sans-serif" font-size="16" fill="#00F2FE">🎥</text>
+  <text x="170" y="555" font-family="sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Project_Cinematic_4K.mp4</text>
+  <text x="170" y="578" font-family="sans-serif" font-size="12" fill="#8E9EAF">850 MB • Streamable AES-256 Chunk Reader</text>
+  <rect x="1030" y="542" width="130" height="40" rx="10" fill="#1E293B" stroke="#2B374D" stroke-width="1"/>
+  <text x="1095" y="567" font-family="sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">Stream File</text>
+
+</svg>

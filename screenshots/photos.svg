@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090A0F"/>
+      <stop offset="50%" stop-color="#12151F"/>
+      <stop offset="100%" stop-color="#050608"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1F2C" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#121620" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F2FE"/>
+      <stop offset="100%" stop-color="#4FACFE"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="url(#bg)"/>
+
+  <!-- Top Bar -->
+  <text x="640" y="45" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.5">AETHERVAULT OMNI • PHOTOS TIMELINE &amp; INTEGRITY</text>
+  <rect x="440" y="55" width="400" height="3" fill="url(#cyanGlow)" rx="1.5"/>
+
+  <!-- Storage Cleanup Banner -->
+  <rect x="80" y="85" width="1120" height="70" rx="16" fill="url(#cardGrad)" stroke="#00FF88" stroke-width="1.5"/>
+  <text x="120" y="127" font-family="sans-serif" font-size="15" font-weight="700" fill="#00FF88">🛡️ SHA-256 Cloud Verified: 3.4 GB local device storage ready to be freed up safely.</text>
+  <rect x="980" y="100" width="180" height="40" rx="10" fill="#00FF88"/>
+  <text x="1070" y="125" font-family="sans-serif" font-size="13" font-weight="800" fill="#090A0F" text-anchor="middle">Free Up Space Now</text>
+
+  <!-- Timeline Section Header -->
+  <text x="80" y="195" font-family="sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">October 2026 • Encrypted Cloud Stream</text>
+
+  <!-- Photo Grid Row 1 -->
+  <rect x="80" y="220" width="260" height="210" rx="16" fill="#1E293B" stroke="#2B374D" stroke-width="1.5"/>
+  <text x="210" y="325" font-family="sans-serif" font-size="36" text-anchor="middle">🌄</text>
+  <text x="105" y="405" font-family="sans-serif" font-size="12" fill="#00F2FE">✓ Verified • 19MB Chunk #1</text>
+
+  <rect x="370" y="220" width="260" height="210" rx="16" fill="#1E293B" stroke="#2B374D" stroke-width="1.5"/>
+  <text x="500" y="325" font-family="sans-serif" font-size="36" text-anchor="middle">🏙️</text>
+  <text x="395" y="405" font-family="sans-serif" font-size="12" fill="#00F2FE">✓ Verified • 19MB Chunk #2</text>
+
+  <rect x="660" y="220" width="260" height="210" rx="16" fill="#1E293B" stroke="#2B374D" stroke-width="1.5"/>
+  <text x="790" y="325" font-family="sans-serif" font-size="36" text-anchor="middle">🚗</text>
+  <text x="685" y="405" font-family="sans-serif" font-size="12" fill="#00F2FE">✓ Verified • 19MB Chunk #3</text>
+
+  <rect x="950" y="220" width="250" height="210" rx="16" fill="#1E293B" stroke="#2B374D" stroke-width="1.5"/>
+  <text x="1075" y="325" font-family="sans-serif" font-size="36" text-anchor="middle">☕</text>
+  <text x="975" y="405" font-family="sans-serif" font-size="12" fill="#00F2FE">✓ Verified • 19MB Chunk #4</text>
+
+  <!-- Timeline Section Header 2 -->
+  <text x="80" y="465" font-family="sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">September 2026 • Secure Archive</text>
+
+  <!-- Photo Grid Row 2 -->
+  <rect x="80" y="490" width="260" height="190" rx="16" fill="#1E293B" stroke="#2B374D" stroke-width="1.5"/>
+  <text x="210" y="590" font-family="sans-serif" font-size="36" text-anchor="middle">🎨</text>
+  <text x="105" y="660" font-family="sans-serif" font-size="12" fill="#00F2FE">✓ Verified • AES-256</text>
+
+  <rect x="370" y="490" width="260" height="190" rx="16" fill="#1E293B" stroke="#2B374D" stroke-width="1.5"/>
+  <text x="500" y="590" font-family="sans-serif" font-size="36" text-anchor="middle">💻</text>
+  <text x="395" y="660" font-family="sans-serif" font-size="12" fill="#00F2FE">✓ Verified • AES-256</text>
+
+  <rect x="660" y="490" width="260" height="190" rx="16" fill="#1E293B" stroke="#2B374D" stroke-width="1.5"/>
+  <text x="790" y="590" font-family="sans-serif" font-size="36" text-anchor="middle">✈️</text>
+  <text x="685" y="660" font-family="sans-serif" font-size="12" fill="#00F2FE">✓ Verified • AES-256</text>
+
+  <rect x="950" y="490" width="250" height="190" rx="16" fill="#1E293B" stroke="#2B374D" stroke-width="1.5"/>
+  <text x="1075" y="590" font-family="sans-serif" font-size="36" text-anchor="middle">🏔️</text>
+  <text x="975" y="660" font-family="sans-serif" font-size="12" fill="#00F2FE">✓ Verified • AES-256</text>
+
+</svg>
