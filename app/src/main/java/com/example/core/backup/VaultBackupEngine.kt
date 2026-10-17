@@ -15,7 +15,7 @@ data class VaultBackupSummary(
     val fileCount: Int,
     val chunkCount: Int,
     val folderCount: Int = 0,
-    val owner: String = "Ayush Mandal (आयुष मंडल)"
+    val owner: String = "TRB FireOps (@trbfireops)"
 )
 
 object VaultBackupEngine {
@@ -46,7 +46,7 @@ object VaultBackupEngine {
         val rootJson = JSONObject()
         rootJson.put("format", "AETHER_VAULT_BACKUP_V2")
         rootJson.put("app", "AetherVault Omni Edition")
-        rootJson.put("owner", "Ayush Mandal (आयुष मंडल)")
+        rootJson.put("owner", "TRB FireOps (@trbfireops)")
         rootJson.put("exportedAt", System.currentTimeMillis())
         rootJson.put("channelId", channelId)
         rootJson.put("botTokenMasked", if (masterBotTokenMasked.length > 8) masterBotTokenMasked.take(6) + "..." else "")
@@ -146,7 +146,7 @@ object VaultBackupEngine {
             val root = JSONObject(jsonString)
             val exportedAt = root.optLong("exportedAt", System.currentTimeMillis())
             val channelId = root.optLong("channelId", 0L)
-            val owner = root.optString("owner", "Ayush Mandal (आयुष मंडल)")
+            val owner = root.optString("owner", "TRB FireOps (@trbfireops)")
 
             // Restore virtual folders if present
             val restoredFolders = mutableListOf<VirtualFolder>()

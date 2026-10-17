@@ -181,7 +181,7 @@ fun VoiceInteractiveTutorialDialog(
                                 fontSize = 16.sp
                             )
                             Text(
-                                text = "By Ayush Mandal (आयुष मंडल)",
+                                text = "By TRB FireOps (@trbfireops)",
                                 fontSize = 11.sp,
                                 color = CyanNeon,
                                 fontWeight = FontWeight.Medium

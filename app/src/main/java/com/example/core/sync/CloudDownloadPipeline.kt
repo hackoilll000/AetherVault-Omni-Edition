@@ -85,7 +85,7 @@ object CloudDownloadPipeline {
                 "• Telegram Message ID: #${firstChunk.telegramMessageId}\n" +
                 "• Total Chunks: ${chunks.size} (AES-256-GCM Encrypted)\n" +
                 "• File Size: ${file.totalSizeBytes} bytes\n" +
-                "• App Owner: Ayush Mandal (आयुष मंडल)\n" +
+                "• Creator: TRB FireOps (@trbfireops)\n" +
                 "• Cloud Status: Live & Stored on Telegram Private Cloud"
 
         Result.success(verifiedMsg)

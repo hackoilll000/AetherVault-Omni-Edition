@@ -60,8 +60,8 @@ fun TermsAgreementScreen(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (isHindi) "मैंने ओनर आयुष मंडल के नियम एवं शर्तें ध्यानपूर्वक पढ़ लिए हैं और सहमत हूँ।"
-                            else "I have read, understood, and agree to the Terms of Service & Ownership by Ayush Mandal (आयुष मंडल).",
+                            text = if (isHindi) "मैंने TRB FireOps (@trbfireops) के नियम एवं शर्तें ध्यानपूर्वक पढ़ लिए हैं और सहमत हूँ।"
+                            else "I have read, understood, and agree to the Terms of Service & Ownership by TRB FireOps (@trbfireops).",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onSurface
@@ -141,7 +141,7 @@ fun TermsAgreementScreen(
                     Spacer(modifier = Modifier.width(14.dp))
                     Column {
                         Text(
-                            text = if (isHindi) "ओनर व आर्किटेक्ट: आयुष मंडल" else "Owner & Lead Architect: Ayush Mandal (आयुष मंडल)",
+                            text = if (isHindi) "क्रिएटर: TRB FireOps (@trbfireops)" else "Creator: TRB FireOps (@trbfireops)",
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
                             color = CyanNeon
@@ -257,7 +257,7 @@ You can verify at any time whether each chunk is safely stored in your Telegram 
                     Text(
                         text = """
 1. OWNERSHIP:
-AetherVault is created and owned by Ayush Mandal (आयुष मंडल). All rights reserved.
+AetherVault is created and owned by TRB FireOps (@trbfireops). YouTube: https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0. All rights reserved.
 
 2. ZERO SUBSCRIPTION & ZERO TRACKING:
 This software operates without recurring fees, advertisements, or telemetry collection. All cryptographic keys are derived locally on your device.

@@ -28,14 +28,14 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     private val _channelId = MutableStateFlow(prefs.getLong("channel_id", 0L))
     val channelId: StateFlow<Long> = _channelId.asStateFlow()
 
-    private val _isTermsAgreed = MutableStateFlow(prefs.getBoolean("terms_agreed_ayush_mandal", false))
+    private val _isTermsAgreed = MutableStateFlow(prefs.getBoolean("terms_agreed_trbfireops", false))
     val isTermsAgreed: StateFlow<Boolean> = _isTermsAgreed.asStateFlow()
 
     private val _uploadErrorNotification = MutableStateFlow<String?>(null)
     val uploadErrorNotification: StateFlow<String?> = _uploadErrorNotification.asStateFlow()
 
     fun acceptTerms() {
-        prefs.edit().putBoolean("terms_agreed_ayush_mandal", true).apply()
+        prefs.edit().putBoolean("terms_agreed_trbfireops", true).apply()
         _isTermsAgreed.value = true
     }
 
@@ -682,7 +682,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
                     val pingRes = client.sendMessage(
                         cleanToken,
                         currentChanId,
-                        "🔄 AetherVault Bot Re-bound Successfully by Ayush Mandal (आयुष मंडल)!\nNew Bot: @${botInfo.username}"
+                        "🔄 AetherVault Bot Re-bound Successfully by TRB FireOps (@trbfireops)!\nNew Bot: @${botInfo.username}"
                     )
                     if (pingRes.isSuccess) {
                         onResult(true, "Re-bound to @${botInfo.username} & channel verified successfully!")

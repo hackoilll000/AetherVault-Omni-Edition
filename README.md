@@ -4,6 +4,7 @@
 [![Android CI](https://img.shields.io/badge/Android-Kotlin_%26_Jetpack_Compose-blue?style=for-the-badge&logo=android)](https://developer.android.com)
 [![Encryption](https://img.shields.io/badge/Encryption-AES--256--GCM-success?style=for-the-badge&logo=shield)](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
 [![Backend](https://img.shields.io/badge/Backend-Telegram_Bot_Swarm-blueviolet?style=for-the-badge&logo=telegram)](https://core.telegram.org/bots/api)
+[![YouTube Channel](https://img.shields.io/badge/YouTube-TRB_FireOps-red?style=for-the-badge&logo=youtube)](https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0)
 [![Release APK](https://img.shields.io/badge/Download-Release_APK-orange?style=for-the-badge&logo=android)](releases/AetherVault-Omni-v1.0.0-Debug.apk)
 
 ---
@@ -73,6 +74,12 @@ All files (documents, media, archives, code snippets) are encrypted **locally on
 
 ---
 
+## 🎥 Connect & Follow
+
+- **YouTube Channel:** [TRB FireOps (@trbfireops)](https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0)
+
+---
+
 ## 🛠️ Architecture & Tech Stack
 
 - **Language:** 100% Kotlin (Coroutines & Flows)
@@ -87,7 +94,7 @@ All files (documents, media, archives, code snippets) are encrypted **locally on
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/AetherVault-Omni-Edition.git
+   git clone https://github.com/trbfireops/AetherVault-Omni-Edition.git
    ```
 2. Open the project in Android Studio (Iguana / Jellyfish or newer).
 3. Build the project or generate the APK:
@@ -102,4 +109,4 @@ All files (documents, media, archives, code snippets) are encrypted **locally on
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-*Built with precision engineering and high-end design aesthetics.*
+*Created by TRB FireOps (@trbfireops).*

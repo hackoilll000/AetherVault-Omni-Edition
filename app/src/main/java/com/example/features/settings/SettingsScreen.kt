@@ -617,7 +617,7 @@ fun SettingsScreen(
             text = {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     Text(
-                        text = "Owner & Lead Architect: Ayush Mandal (आयुष मंडल)",
+                        text = "Creator & Architect: TRB FireOps (@trbfireops)\nYouTube: https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0",
                         fontWeight = FontWeight.Bold,
                         color = CyanNeon,
                         fontSize = 13.sp
@@ -626,7 +626,7 @@ fun SettingsScreen(
                     Text(
                         text = """
 1. ARCHITECTURE & ZERO SUBSCRIPTION:
-AetherVault is an autonomous, serverless personal cloud system authored by Ayush Mandal (आयुष मंडल). It leverages official Telegram Bot API swarms and your own private Telegram Channel as encrypted storage.
+AetherVault is an autonomous, serverless personal cloud system authored by TRB FireOps (@trbfireops). It leverages official Telegram Bot API swarms and your own private Telegram Channel as encrypted storage.
 
 2. ZERO-KNOWLEDGE CRYPTOGRAPHY:
 Every file chunk is split deterministically into 19MB frames and encrypted on-device via AES-256-GCM. Plaintext filenames, contents, or metadata are never visible to Telegram servers.

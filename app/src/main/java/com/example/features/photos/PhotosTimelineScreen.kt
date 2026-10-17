@@ -98,7 +98,7 @@ fun PhotosTimelineScreen(
                 PhotoMemory(if (isHindi) "कुल फ़ाइलें" else "Total Vault Items", "${photos.size} real files", CyanNeon),
                 PhotoMemory(if (isHindi) "क्लाउड स्टोरेज" else "Storage Used", String.format("%.1f MB Encrypted", totalMb), IndigoHyper),
                 PhotoMemory(if (isHindi) "पसंदीदा" else "Favorites", "$starredCount items", Color(0xFFF59E0B)),
-                PhotoMemory("Owner: Ayush Mandal", "आयुष मंडल • AES-256", Color(0xFF10B981))
+                PhotoMemory("Creator: TRB FireOps", "@trbfireops • AES-256", Color(0xFF10B981))
             )
         }
     }

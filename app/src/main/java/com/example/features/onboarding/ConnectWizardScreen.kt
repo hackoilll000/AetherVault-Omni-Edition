@@ -170,7 +170,7 @@ fun ConnectWizardScreen(
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
-                            text = if (isHindi) "ऐप ओनर व आर्किटेक्ट: आयुष मंडल" else "Owner & Lead Architect: Ayush Mandal (आयुष मंडल)",
+                            text = if (isHindi) "क्रिएटर: TRB FireOps (@trbfireops)" else "Creator: TRB FireOps (@trbfireops)",
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp,
                             color = CyanNeon

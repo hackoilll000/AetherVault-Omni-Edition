@@ -240,7 +240,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (!isTermsAgreed) {
-                    // Terms & Conditions Agreement screen by Owner Ayush Mandal
+                    // Terms & Conditions Agreement screen by Creator TRB FireOps
                     TermsAgreementScreen(
                         language = appearanceConfig.language,
                         onAcceptTerms = { viewModel.acceptTerms() }
