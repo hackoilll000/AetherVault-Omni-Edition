@@ -96,6 +96,8 @@ fun ConnectWizardScreen(
     }
 
     var showVoiceTutorial by remember { mutableStateOf(false) }
+    var showRestoreCodeDialog by remember { mutableStateOf(false) }
+    var restoreCodeInput by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -196,6 +198,46 @@ fun ConnectWizardScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
+                // Restore from Migration / Backup Code Card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = CyanNeon.copy(alpha = 0.1f)),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, CyanNeon.copy(alpha = 0.5f))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = if (isHindi) "पुराने बॉट का बैकअप कोड है?" else "Have a Migration / Backup Code?",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                color = CyanNeon
+                            )
+                            Text(
+                                text = if (isHindi) "कोड डालें और सारा पुराना डेटा तुरंत वापस लाएं"
+                                else "Paste your AVCODE to instantly restore all files & settings",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Button(
+                            onClick = { showRestoreCodeDialog = true },
+                            colors = ButtonDefaults.buttonColors(containerColor = CyanNeon, contentColor = Color.Black),
+                            shape = RoundedCornerShape(8.dp),
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                        ) {
+                            Icon(Icons.Default.ContentPaste, contentDescription = null, modifier = Modifier.size(15.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(if (isHindi) "कोड डालें" else "Enter Code", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+
                 // 1-Tap BotFather Deep link
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -279,42 +321,39 @@ fun ConnectWizardScreen(
                     }
                 }
 
-                // Configured Preset Option
-                Card(
+                // Restore Vault Option from Migration Code
+                Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, CyanNeon.copy(alpha = 0.4f))
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = if (isHindi) "⚡ प्री-कॉन्फिगर टेस्ट बॉट (@Test_tg_private_bot)" else "⚡ Configured Bot Preset (@Test_tg_private_bot)",
+                                text = if (isHindi) "🔄 क्या आपके पास बैकअप / माइग्रेशन कोड है?" else "🔄 Have a Vault Backup / Migration Code?",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "8831612040:AAGcto... | -1004348906769",
-                                fontSize = 11.sp,
-                                fontFamily = FontFamily.Monospace,
+                                text = if (isHindi) "1-टैप में पिछले बॉट/सर्वर का सारा डेटा रीस्टोर करें" else "Instantly restore all files & folders from backup code",
+                                fontSize = 10.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Button(
-                            onClick = {
-                                com.example.core.sensory.SensoryFeedbackEngine.trigger(context, com.example.core.sensory.HapticStyle.LIGHT_TICK)
-                                currentTokenInput = "8831612040:AAGctofcNgGHnXoUEvFvwKHNsf3zek8T924"
-                                channelIdInput = "-1004348906769"
-                                channelTitle = "Private cloud storage"
-                            },
-                            modifier = Modifier.testTag("use_test_bot_preset")
+                            onClick = { showRestoreCodeDialog = true },
+                            colors = ButtonDefaults.buttonColors(containerColor = CyanNeon, contentColor = Color.Black),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                         ) {
-                            Text(if (isHindi) "उपयोग करें" else "Fill")
+                            Text(if (isHindi) "रीस्टोर करें" else "Restore", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -506,26 +545,13 @@ fun ConnectWizardScreen(
                     singleLine = true
                 )
 
-                // Quick preset button for verified channel
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = if (isHindi) "सुझाव:" else "Suggestion:",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    SuggestionChip(
-                        onClick = {
-                            com.example.core.sensory.SensoryFeedbackEngine.trigger(context, com.example.core.sensory.HapticStyle.LIGHT_TICK)
-                            channelIdInput = "-1004348906769"
-                            channelTitle = "Private cloud storage"
-                        },
-                        label = { Text("-1004348906769 (Private cloud storage)", fontSize = 11.sp) }
-                    )
-                }
+                // Helper guidance for Channel ID
+                Text(
+                    text = if (isHindi) "💡 चैनल ID आमतौर पर -100 से शुरू होती है (उदा. -1001234567890)। अपने चैनल के फॉरवर्ड मैसेज या @userinfobot से आईडी पाएं।"
+                    else "💡 Channel IDs start with -100 (e.g. -1001234567890). Forward any post to @userinfobot to find your channel ID.",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     OutlinedButton(
@@ -774,6 +800,56 @@ fun ConnectWizardScreen(
         VoiceInteractiveTutorialDialog(
             language = language,
             onDismiss = { showVoiceTutorial = false }
+        )
+    }
+
+    if (showRestoreCodeDialog) {
+        AlertDialog(
+            onDismissRequest = { showRestoreCodeDialog = false },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Key, contentDescription = null, tint = CyanNeon)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (isHindi) "बैकअप कोड से रिस्टोर करें" else "Restore via Backup Code")
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = if (isHindi) "पुराने बॉट से मिला AVCODE-... यहाँ पेस्ट करें:"
+                        else "Paste your AVCODE-... migration code below:",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    OutlinedTextField(
+                        value = restoreCodeInput,
+                        onValueChange = { restoreCodeInput = it },
+                        placeholder = { Text("AVCODE-...") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp),
+                        maxLines = 5
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (restoreCodeInput.isNotBlank()) {
+                            onLinkViaQrCode(restoreCodeInput.trim())
+                            showRestoreCodeDialog = false
+                        }
+                    },
+                    enabled = restoreCodeInput.isNotBlank()
+                ) {
+                    Text(if (isHindi) "रिस्टोर करें" else "Restore")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRestoreCodeDialog = false }) {
+                    Text(if (isHindi) "रद्द करें" else "Cancel")
+                }
+            }
         )
     }
 }

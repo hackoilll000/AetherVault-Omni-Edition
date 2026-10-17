@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -46,6 +47,9 @@ fun SettingsScreen(
     onExportBackup: ((Boolean, String, java.io.File?) -> Unit) -> Unit = {},
     onImportBackup: (String, (Boolean, String) -> Unit) -> Unit = { _, _ -> },
     onRebindBot: (String, (Boolean, String) -> Unit) -> Unit = { _, _ -> },
+    onGenerateMigrationCode: ((String) -> Unit) -> Unit = {},
+    onRestoreFromCode: (String, (Boolean, String) -> Unit) -> Unit = { _, _ -> },
+    onSyncExistingServer: ((Boolean, String) -> Unit) -> Unit = {},
     onClearAllData: () -> Unit,
     onLockVault: () -> Unit
 ) {
@@ -53,8 +57,8 @@ fun SettingsScreen(
     val isHindi = language == AppLanguage.HI
     var webDavEnabled by remember { mutableStateOf(true) }
     var showTermsDialog by remember { mutableStateOf(false) }
+    var showCreditsDialog by remember { mutableStateOf(false) }
     var showVoiceTutorialDialog by remember { mutableStateOf(false) }
-    var termsAgreed by remember { mutableStateOf(true) }
 
     // Backup & Migration state
     var showImportDialog by remember { mutableStateOf(false) }
@@ -64,9 +68,21 @@ fun SettingsScreen(
     var newBotTokenInput by remember { mutableStateOf("") }
     var isRebindingBot by remember { mutableStateOf(false) }
 
+    // Instant Migration Code state
+    var generatedMigrationCode by remember { mutableStateOf<String?>(null) }
+    var showMigrationCodeDialog by remember { mutableStateOf(false) }
+    var isGeneratingCode by remember { mutableStateOf(false) }
+    var showEnterMigrationCodeDialog by remember { mutableStateOf(false) }
+    var enterMigrationCodeInput by remember { mutableStateOf("") }
+    var isRestoringCode by remember { mutableStateOf(false) }
+
+    // Server Content Sync state
+    var isSyncingServer by remember { mutableStateOf(false) }
+    var serverSyncResult by remember { mutableStateOf("") }
+
     // Live Telegram Configuration State
     var configBotToken by remember(masterBotToken) { mutableStateOf(masterBotToken) }
-    var configChannelId by remember(channelId) { mutableStateOf(channelId.toString()) }
+    var configChannelId by remember(channelId) { mutableStateOf(if (channelId != 0L) channelId.toString() else "") }
     var isTestingPing by remember { mutableStateOf(false) }
     var pingResultText by remember { mutableStateOf("") }
     var pingSuccess by remember { mutableStateOf<Boolean?>(null) }
@@ -139,6 +155,21 @@ fun SettingsScreen(
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = { showCreditsDialog = true },
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = CyanNeon),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.testTag("open_credits_dialog_button")
+                        ) {
+                            Icon(Icons.Default.Verified, contentDescription = null, modifier = Modifier.size(15.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (isHindi) "क्रेडिट, प्ले स्टोर गाइड व नियम" else "Credits, Play Store Guide & Terms",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }
@@ -237,6 +268,52 @@ fun SettingsScreen(
                                 fontSize = 11.sp,
                                 fontFamily = FontFamily.Monospace,
                                 color = if (pingSuccess == true) CyanNeon else MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Sync Existing Channel Content Button (Offline View of Server Messages & Uploaded Files)
+                    OutlinedButton(
+                        onClick = {
+                            com.example.core.sensory.SensoryFeedbackEngine.trigger(context, com.example.core.sensory.HapticStyle.LIGHT_TICK)
+                            isSyncingServer = true
+                            serverSyncResult = if (isHindi) "सर्वर से फाइलें व टेक्स्ट खोजे जा रहे हैं..." else "Scanning existing server messages & files..."
+                            onSyncExistingServer { ok, msg ->
+                                isSyncingServer = false
+                                serverSyncResult = msg
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isSyncingServer && (configBotToken.isNotBlank() || masterBotToken.isNotBlank()),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        if (isSyncingServer) {
+                            CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = CyanNeon)
+                            Spacer(modifier = Modifier.width(8.dp))
+                        } else {
+                            Icon(Icons.Default.CloudSync, contentDescription = null, modifier = Modifier.size(16.dp), tint = CyanNeon)
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+                        Text(
+                            text = if (isHindi) "सर्वर की पुरानी फाइलें व टेक्स्ट सिंक करें (Offline View)" else "Sync Existing Server Files & Text (Offline View)",
+                            fontSize = 12.sp
+                        )
+                    }
+
+                    if (serverSyncResult.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Surface(
+                            color = CyanNeon.copy(alpha = 0.12f),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = serverSyncResult,
+                                fontSize = 11.sp,
+                                color = CyanNeon,
                                 modifier = Modifier.padding(10.dp)
                             )
                         }
@@ -390,7 +467,7 @@ fun SettingsScreen(
                         }
                     }
 
-                    // Export & Import Buttons
+                    // Export & Import JSON Buttons
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -410,7 +487,7 @@ fun SettingsScreen(
                         ) {
                             Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(if (isHindi) "बैकअप लें" else "Export Backup", fontSize = 12.sp)
+                            Text(if (isHindi) "JSON बैकअप" else "JSON Export", fontSize = 12.sp)
                         }
 
                         OutlinedButton(
@@ -423,7 +500,57 @@ fun SettingsScreen(
                         ) {
                             Icon(Icons.Default.Upload, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(if (isHindi) "रिस्टोर करें" else "Restore Backup", fontSize = 12.sp)
+                            Text(if (isHindi) "JSON रिस्टोर" else "JSON Restore", fontSize = 12.sp)
+                        }
+                    }
+
+                    // 1-Tap Instant Migration Code (Instant transfer to new bot / device)
+                    Text(
+                        text = if (isHindi) "1-टैप इंस्टेंट बैकअप व माइग्रेशन कोड:" else "Instant Migration & Backup Code:",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = CyanNeon
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                com.example.core.sensory.SensoryFeedbackEngine.trigger(context, com.example.core.sensory.HapticStyle.LIGHT_TICK)
+                                isGeneratingCode = true
+                                onGenerateMigrationCode { code ->
+                                    isGeneratingCode = false
+                                    generatedMigrationCode = code
+                                    showMigrationCodeDialog = true
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = CyanNeon, contentColor = Color.Black),
+                            shape = RoundedCornerShape(10.dp),
+                            enabled = !isGeneratingCode
+                        ) {
+                            if (isGeneratingCode) {
+                                CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                            } else {
+                                Icon(Icons.Default.Key, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(if (isHindi) "कोड बनाएं" else "Generate Code", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            }
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                com.example.core.sensory.SensoryFeedbackEngine.trigger(context, com.example.core.sensory.HapticStyle.LIGHT_TICK)
+                                showEnterMigrationCodeDialog = true
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Icon(Icons.Default.ContentPaste, contentDescription = null, modifier = Modifier.size(16.dp), tint = CyanNeon)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(if (isHindi) "कोड पेस्ट करें" else "Enter Code", fontSize = 12.sp)
                         }
                     }
 
@@ -699,6 +826,203 @@ You are the sole custodian of your Master Encryption Password and Telegram Chann
             dismissButton = {
                 TextButton(onClick = { showImportDialog = false }) {
                     Text(if (isHindi) "रद्द करें" else "Cancel")
+                }
+            }
+        )
+    }
+
+    // Display Generated Migration Code Dialog
+    if (showMigrationCodeDialog && generatedMigrationCode != null) {
+        val codeToShare = generatedMigrationCode ?: ""
+        AlertDialog(
+            onDismissRequest = { showMigrationCodeDialog = false },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Key, contentDescription = null, tint = CyanNeon)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (isHindi) "इंस्टेंट माइग्रेशन कोड तैयार है" else "Migration Code Generated")
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        text = if (isHindi) "इस कोड को कॉपी करें। जब आप किसी नए बॉट या नए फ़ोन में AetherVault सेटअप करें, तो यह कोड पेस्ट कर दें। आपका सारा क्लाउड डेटा तुरंत आ जाएगा:"
+                        else "Copy this code. When setting up a new bot or device, paste this code to instantly restore all files, folders, and channel state:",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        SelectionContainer {
+                            Text(
+                                text = codeToShare,
+                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace,
+                                color = CyanNeon,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+                        clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("Vault Migration Code", codeToShare))
+                        backupStatusSuccess = true
+                        backupStatusText = if (isHindi) "माइग्रेशन कोड क्लिपबोर्ड पर कॉपी हो गया!" else "Migration code copied to clipboard!"
+                        showMigrationCodeDialog = false
+                    }
+                ) {
+                    Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(if (isHindi) "कोड कॉपी करें" else "Copy Code")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showMigrationCodeDialog = false }) {
+                    Text(if (isHindi) "बंद करें" else "Close")
+                }
+            }
+        )
+    }
+
+    // Enter Migration Code Dialog
+    if (showEnterMigrationCodeDialog) {
+        AlertDialog(
+            onDismissRequest = { showEnterMigrationCodeDialog = false },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.ContentPaste, contentDescription = null, tint = CyanNeon)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (isHindi) "माइग्रेशन कोड से डेटा रिस्टोर करें" else "Restore via Migration Code")
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        text = if (isHindi) "पुराने बॉट या डिवाइस से जनरेट किया गया 'AVCODE-...' कोड यहाँ पेस्ट करें:"
+                        else "Paste the 'AVCODE-...' migration code from your previous bot or device:",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    OutlinedTextField(
+                        value = enterMigrationCodeInput,
+                        onValueChange = { enterMigrationCodeInput = it },
+                        placeholder = { Text("AVCODE-...") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(130.dp),
+                        maxLines = 5
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (enterMigrationCodeInput.isNotBlank()) {
+                            isRestoringCode = true
+                            onRestoreFromCode(enterMigrationCodeInput.trim()) { ok, msg ->
+                                isRestoringCode = false
+                                backupStatusSuccess = ok
+                                backupStatusText = msg
+                                if (ok) {
+                                    showEnterMigrationCodeDialog = false
+                                    enterMigrationCodeInput = ""
+                                }
+                            }
+                        }
+                    },
+                    enabled = !isRestoringCode && enterMigrationCodeInput.isNotBlank()
+                ) {
+                    if (isRestoringCode) {
+                        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text(if (isHindi) "डेटा लोड करें" else "Load Data")
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEnterMigrationCodeDialog = false }) {
+                    Text(if (isHindi) "रद्द करें" else "Cancel")
+                }
+            }
+        )
+    }
+
+    // Credits, Play Store Guide & Terms Dialog
+    if (showCreditsDialog) {
+        AlertDialog(
+            onDismissRequest = { showCreditsDialog = false },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.VerifiedUser, contentDescription = null, tint = CyanNeon)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (isHindi) "क्रेडिट, प्ले स्टोर गाइड व नियम" else "Credits & Play Store Guide")
+                }
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 400.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Surface(
+                        color = CyanNeon.copy(alpha = 0.15f),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                text = if (isHindi) "👑 ओनर व मुख्य डेवलपर क्रेडिट:" else "👑 Creator & Lead Developer Credit:",
+                                fontWeight = FontWeight.Bold,
+                                color = CyanNeon,
+                                fontSize = 13.sp
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(text = "Name: AYUSH MONDAL", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(text = "Class 9 in 2026 (16 October)", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(text = "Signature / Brand: By AJPM", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = CyanNeon)
+                            Text(text = "Project: AetherVault Omni Edition (Zero-Knowledge Telegram VFS & Cloud)", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+
+                    Text(
+                        text = if (isHindi) "🚀 प्ले स्टोर और अन्य प्लेटफॉर्म्स पर अप्रूवल गाइड:" else "🚀 Play Store & Platform Approval Guide:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                    Text(
+                        text = if (isHindi) "1. गूगल प्ले कंसोल डेवलपर खाता (\$25 शुल्क) बनाएं।\n2. ऐप का 'App Signing' और AAB (Android App Bundle) जनरेट करें।\n3. 'Data Safety' फॉर्म में स्पष्ट करें कि ऐप यूज़र के स्वयं के Telegram Bot Token का उपयोग क्लाउड स्टोरेज के लिए करता है और कोई थर्ड-पार्टी सर्वर या डेटा शेयरिंग नहीं होती है।\n4. एपीआई लेवल और 64-बिट अनुपालन सुनिश्चित करें।\n5. ऐप की प्राइवेसी पॉलिसी (Privacy Policy) URL प्रदान करें।"
+                        else "1. Register a Google Play Console Developer Account (\$25 one-time fee).\n2. Generate a signed release AAB (Android App Bundle) with Play App Signing.\n3. In Google Play Console Data Safety form, declare that the app communicates strictly with the user's configured Telegram Bot API for decentralized private storage, collecting zero user telemetry or external ads.\n4. Ensure compliance with target API requirements and 64-bit architecture.\n5. Provide a valid Privacy Policy link hosted on GitHub Pages or a personal website.",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Text(
+                        text = if (isHindi) "⚖️ नियम व शर्तें, कॉपीराइट और डिस्क्लेमर:" else "⚖️ Terms & Conditions, Copyright & Disclaimers:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                    Text(
+                        text = if (isHindi) "• कॉपीराइट © 2026 आयुष मंडल (AJPM)। सर्वाधिकार सुरक्षित।\n• उपयोग की शर्तें: यह ऐप एक ओपन-क्लाइंट यूटिलिटी है जो Telegram Bot API के माध्यम से यूज़र के निजी क्लाउड सर्वर से संवाद करती है।\n• डिस्क्लेमर: डेवलपर (आयुष मंडल / AJPM) टेलीग्राम सेवा या यूज़र द्वारा अपलोड किए गए डेटा की सुरक्षा, उपलब्धता या टेलीग्राम नियमों के अनुपालन के लिए ज़िम्मेदार नहीं है। यूज़र अपने बॉट और चैनल की सुरक्षा के लिए स्वयं ज़िम्मेदार है।"
+                        else "• Copyright © 2026 Ayush Mondal (AJPM). All rights reserved.\n• Terms of Use: AetherVault is an open client utility interacting with the Telegram Bot API using credentials supplied exclusively by the user. Users must comply with Telegram's Terms of Service.\n• Disclaimer: The developer (Ayush Mondal / AJPM) assumes no liability for Telegram server uptime, third-party API limits, or user-managed data security. Use at your own discretion.",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = { showCreditsDialog = false }) {
+                    Text(if (isHindi) "समझ गया (Close)" else "Got It")
                 }
             }
         )

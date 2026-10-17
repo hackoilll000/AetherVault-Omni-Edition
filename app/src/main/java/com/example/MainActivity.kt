@@ -3,6 +3,7 @@ package com.example
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -32,6 +33,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.core.crypto.AesGcmChunkCipher
 import com.example.core.database.VaultFile
+import com.example.core.crash.VaultCrashHandler
+import com.example.core.sync.TelegramSyncForegroundService
 import com.example.features.drive.DriveExplorerScreen
 import com.example.features.onboarding.ConnectWizardScreen
 import com.example.features.onboarding.TermsAgreementScreen
@@ -69,6 +72,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         appearancePrefs = AppearancePreferences(this)
+        VaultCrashHandler.init(this)
+        runCatching {
+            val serviceIntent = Intent(this, TelegramSyncForegroundService::class.java)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent)
+            } else {
+                startService(serviceIntent)
+            }
+        }
 
         setContent {
             val appearanceConfig by appearancePrefs.configFlow.collectAsStateWithLifecycle()
@@ -181,8 +193,16 @@ class MainActivity : ComponentActivity() {
                             viewModel.completeSetup(bots, chId, pass, decoy)
                         },
                         onLinkViaQrCode = { qrData ->
-                            // Fast link
-                            viewModel.completeSetup(listOf("7123456789:AAH_QR_LINKED_TOKEN"), -1002345678901L, "123456", null)
+                            val cleanData = qrData.trim()
+                            if (cleanData.startsWith("AVCODE-") || cleanData.startsWith("{")) {
+                                viewModel.restoreFromMigrationCode(cleanData) { ok, msg ->
+                                    if (ok) {
+                                        restorationNotification = msg
+                                    }
+                                }
+                            } else if (cleanData.contains(":")) {
+                                viewModel.completeSetup(listOf(cleanData), 0L, "123456", null)
+                            }
                         }
                     )
                 } else if (!isUnlocked) {
@@ -551,7 +571,12 @@ class MainActivity : ComponentActivity() {
                                                         onMoveToTrash = { viewModel.deleteFile(it) },
                                                         onRestoreFromTrash = { viewModel.restoreFromTrash(it) },
                                                         onPermanentDelete = { viewModel.permanentDeleteFile(it) },
-                                                        onEmptyTrash = { viewModel.emptyTrash() }
+                                                        onEmptyTrash = { viewModel.emptyTrash() },
+                                                        onSyncChannel = {
+                                                            viewModel.scanExistingChannelHistory(context) { ok, msg ->
+                                                                restorationNotification = msg
+                                                            }
+                                                        }
                                                     )
                                                 }
                                                 MainNavTab.PHOTOS -> {
@@ -696,6 +721,34 @@ class MainActivity : ComponentActivity() {
                                                                     }
                                                                 }
                                                             )
+                                                        },
+                                                        onBatchDownload = { filesToDownload ->
+                                                            isRestoringDownload = true
+                                                            restoreProgressText = "Downloading ${filesToDownload.size} files to device..."
+                                                            viewModel.downloadMultipleFilesToDevice(
+                                                                context = context,
+                                                                files = filesToDownload,
+                                                                onProgress = { done, total ->
+                                                                    restoreProgressText = "Downloaded $done of $total files..."
+                                                                },
+                                                                onComplete = { count ->
+                                                                    isRestoringDownload = false
+                                                                    restorationNotification = "Successfully downloaded $count files to device storage!"
+                                                                }
+                                                            )
+                                                        },
+                                                        onBatchDelete = { fileIds ->
+                                                            viewModel.deleteMultipleFiles(fileIds)
+                                                            restorationNotification = "Moved ${fileIds.size} files to trash!"
+                                                        },
+                                                        onBatchMoveToFolder = { fileIds, targetFolderId ->
+                                                            viewModel.moveMultipleFilesToFolder(fileIds, targetFolderId)
+                                                            restorationNotification = "Moved ${fileIds.size} files to folder!"
+                                                        },
+                                                        onSyncChannel = {
+                                                            viewModel.scanExistingChannelHistory(context) { ok, msg ->
+                                                                restorationNotification = msg
+                                                            }
                                                         }
                                                     )
                                                 }
@@ -738,6 +791,15 @@ class MainActivity : ComponentActivity() {
                                                         },
                                                         onRebindBot = { token, cb ->
                                                             viewModel.rebindBotToken(token, cb)
+                                                        },
+                                                        onGenerateMigrationCode = { cb ->
+                                                            viewModel.generateMigrationCode(cb)
+                                                        },
+                                                        onRestoreFromCode = { code, cb ->
+                                                            viewModel.restoreFromMigrationCode(code, cb)
+                                                        },
+                                                        onSyncExistingServer = { cb ->
+                                                            viewModel.scanExistingChannelHistory(this@MainActivity, cb)
                                                         },
                                                         onClearAllData = {
                                                             viewModel.clearAllVaultData()

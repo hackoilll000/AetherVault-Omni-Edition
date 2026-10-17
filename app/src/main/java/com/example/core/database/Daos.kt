@@ -26,6 +26,12 @@ interface FolderDao {
     @Query("UPDATE virtual_folders SET isTrashed = 1 WHERE id = :id")
     suspend fun trashFolder(id: String)
 
+    @Query("SELECT * FROM virtual_folders")
+    suspend fun getAllFoldersList(): List<VirtualFolder>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFolders(folders: List<VirtualFolder>)
+
     @Query("DELETE FROM virtual_folders WHERE id = :id")
     suspend fun deleteFolder(id: String)
 }
@@ -82,6 +88,15 @@ interface FileDao {
 
     @Query("DELETE FROM files WHERE isTrashed = 1")
     suspend fun emptyTrash()
+
+    @Query("UPDATE files SET folderId = :targetFolderId WHERE id IN (:fileIds)")
+    suspend fun moveFilesToFolder(fileIds: List<String>, targetFolderId: String)
+
+    @Query("UPDATE files SET isTrashed = 1, trashedAt = :timestamp WHERE id IN (:fileIds)")
+    suspend fun moveMultipleToTrash(fileIds: List<String>, timestamp: Long = System.currentTimeMillis())
+
+    @Query("DELETE FROM files WHERE id IN (:fileIds)")
+    suspend fun permanentDeleteMultiple(fileIds: List<String>)
 
     @Query("DELETE FROM files WHERE isTrashed = 1 AND trashedAt < :cutoffTimestamp")
     suspend fun purgeExpiredTrash(cutoffTimestamp: Long)
@@ -163,6 +178,9 @@ interface TransferDao {
 interface BotDao {
     @Query("SELECT * FROM bot_swarm ORDER BY botId ASC")
     fun getAllBots(): Flow<List<BotSwarmEntity>>
+
+    @Query("SELECT * FROM bot_swarm ORDER BY botId ASC")
+    suspend fun getAllBotsList(): List<BotSwarmEntity>
 
     @Query("SELECT * FROM bot_swarm WHERE isHealthy = 1 AND cooldownUntil <= :now ORDER BY rpmCount ASC")
     suspend fun getHealthyBots(now: Long = System.currentTimeMillis()): List<BotSwarmEntity>

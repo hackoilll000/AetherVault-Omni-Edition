@@ -74,7 +74,8 @@ fun VaultDashboardScreen(
     onMoveToTrash: (VaultFile) -> Unit,
     onRestoreFromTrash: (VaultFile) -> Unit,
     onPermanentDelete: (VaultFile) -> Unit,
-    onEmptyTrash: () -> Unit
+    onEmptyTrash: () -> Unit,
+    onSyncChannel: () -> Unit = {}
 ) {
     val isHindi = language == AppLanguage.HI
     val context = LocalContext.current
@@ -148,25 +149,39 @@ fun VaultDashboardScreen(
                         }
                     }
 
-                    // Trash Bin Action with Badge
-                    IconButton(
-                        onClick = { showTrashDialog = true },
-                        modifier = Modifier.testTag("dashboard_trash_button")
-                    ) {
-                        BadgedBox(
-                            badge = {
-                                if (trashedFiles.isNotEmpty()) {
-                                    Badge(containerColor = MaterialTheme.colorScheme.error) {
-                                        Text("${trashedFiles.size}")
-                                    }
-                                }
-                            }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // Sync Existing Server Files & Text Button
+                        IconButton(
+                            onClick = onSyncChannel,
+                            modifier = Modifier.testTag("dashboard_sync_channel_button")
                         ) {
                             Icon(
-                                imageVector = Icons.Default.DeleteOutline,
-                                contentDescription = "Trash Bin",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                imageVector = Icons.Default.Sync,
+                                contentDescription = "Sync Channel Content",
+                                tint = CyanNeon
                             )
+                        }
+
+                        // Trash Bin Action with Badge
+                        IconButton(
+                            onClick = { showTrashDialog = true },
+                            modifier = Modifier.testTag("dashboard_trash_button")
+                        ) {
+                            BadgedBox(
+                                badge = {
+                                    if (trashedFiles.isNotEmpty()) {
+                                        Badge(containerColor = MaterialTheme.colorScheme.error) {
+                                            Text("${trashedFiles.size}")
+                                        }
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.DeleteOutline,
+                                    contentDescription = "Trash Bin",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }

@@ -25,7 +25,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     private val _isDecoy = MutableStateFlow(false)
     val isDecoy: StateFlow<Boolean> = _isDecoy.asStateFlow()
 
-    private val _channelId = MutableStateFlow(prefs.getLong("channel_id", -1002345678901L))
+    private val _channelId = MutableStateFlow(prefs.getLong("channel_id", 0L))
     val channelId: StateFlow<Long> = _channelId.asStateFlow()
 
     private val _isTermsAgreed = MutableStateFlow(prefs.getBoolean("terms_agreed_ayush_mandal", false))
@@ -89,6 +89,27 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
             db.fileDao().permanentDelete("demo_doc_1")
             db.fileDao().permanentDelete("demo_zip_1")
             db.transferDao().deleteTransfer("task_sync_drone")
+
+            // Clean up any test/demo bot tokens or channel IDs from sharedPreferences
+            val storedToken = prefs.getString("master_bot_token", "") ?: ""
+            if (storedToken.contains("AAH_QR") || storedToken.contains("7123456789") || storedToken.contains("DEMO")) {
+                prefs.edit().remove("master_bot_token").apply()
+                _masterBotToken.value = ""
+            }
+            val storedChan = prefs.getLong("channel_id", 0L)
+            if (storedChan == -1002345678901L) {
+                prefs.edit().remove("channel_id").apply()
+                _channelId.value = 0L
+            }
+
+            // Remove test bots from Room
+            val bots = db.botDao().getAllBotsList()
+            for (b in bots) {
+                if (b.token.contains("DEMO") || b.token.contains("AAH_QR") || b.token.contains("7123456789") || b.botId == 7000000000L) {
+                    db.botDao().deleteBot(b.botId)
+                }
+            }
+
             // 30-day auto-purge for trashed files
             val thirtyDaysAgo = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000L)
             db.fileDao().purgeExpiredTrash(thirtyDaysAgo)
@@ -454,19 +475,103 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun importVaultBackup(context: Context, backupJson: String, onResult: (Boolean, String) -> Unit) {
+    fun generateMigrationCode(onResult: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val res = com.example.core.backup.VaultBackupEngine.restoreFromJson(database, backupJson)
+            val masterToken = prefs.getString("master_bot_token", "") ?: ""
+            val code = com.example.core.backup.VaultBackupEngine.generateMigrationCode(
+                database = database,
+                channelId = _channelId.value,
+                masterBotTokenMasked = masterToken
+            )
+            onResult(code)
+        }
+    }
+
+    fun restoreFromMigrationCode(inputCode: String, onResult: (Boolean, String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val res = com.example.core.backup.VaultBackupEngine.restoreFromCode(database, inputCode)
             if (res.isSuccess) {
                 val summary = res.getOrThrow()
-                if (summary.channelId != 0L && _channelId.value == 0L) {
+                if (summary.channelId != 0L) {
                     _channelId.value = summary.channelId
-                    prefs.edit().putLong("vault_channel_id", summary.channelId).apply()
+                    prefs.edit().putLong("channel_id", summary.channelId).apply()
                 }
-                onResult(true, "Restored ${summary.fileCount} files and ${summary.chunkCount} cloud chunks successfully!")
+                _isConfigured.value = true
+                _isUnlocked.value = true
+                prefs.edit().putBoolean("is_configured", true).apply()
+                onResult(true, "Restored ${summary.fileCount} files, ${summary.folderCount} folders & ${summary.chunkCount} cloud references!")
             } else {
                 onResult(false, "Restore failed: ${res.exceptionOrNull()?.message}")
             }
+        }
+    }
+
+    fun importVaultBackup(context: Context, jsonText: String, onResult: (Boolean, String) -> Unit) {
+        restoreFromMigrationCode(jsonText, onResult)
+    }
+
+    fun scanExistingChannelHistory(context: Context, onResult: (Boolean, String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val bots = database.botDao().getHealthyBots()
+            val storedToken = prefs.getString("master_bot_token", "") ?: ""
+            val token = storedToken.ifBlank { bots.firstOrNull()?.token ?: "" }
+            val cId = _channelId.value
+
+            if (token.isBlank() || cId == 0L) {
+                onResult(false, "Bot Token or Channel ID is missing. Please configure in Settings.")
+                return@launch
+            }
+
+            val res = client.scanExistingChannelContent(token, cId, database, context)
+            if (res.isSuccess) {
+                val count = res.getOrThrow()
+                onResult(true, "Successfully scanned and indexed $count pre-existing files & texts from private channel!")
+            } else {
+                onResult(false, "Scan failed: ${res.exceptionOrNull()?.message}")
+            }
+        }
+    }
+
+    fun moveMultipleFilesToFolder(fileIds: List<String>, folderId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            database.fileDao().moveFilesToFolder(fileIds, folderId)
+        }
+    }
+
+    fun deleteMultipleFiles(fileIds: List<String>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            database.fileDao().moveMultipleToTrash(fileIds)
+        }
+    }
+
+    fun downloadMultipleFilesToDevice(
+        context: Context,
+        files: List<VaultFile>,
+        onProgress: (Int, Int) -> Unit,
+        onComplete: (Int) -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            var successCount = 0
+            val bots = database.botDao().getHealthyBots()
+            val storedToken = prefs.getString("master_bot_token", "") ?: ""
+            val tokens = mutableListOf<String>()
+            if (storedToken.isNotBlank()) tokens.add(storedToken)
+            tokens.addAll(bots.map { it.token }.filter { it.isNotBlank() && !it.contains("DEMO") })
+
+            files.forEachIndexed { index, file ->
+                onProgress(index + 1, files.size)
+                val res = com.example.core.sync.FileRestorationService.restoreFile(
+                    context = context,
+                    file = file,
+                    botTokens = tokens.distinct(),
+                    channelId = _channelId.value,
+                    database = database,
+                    target = com.example.core.sync.RestorationTarget.DownloadsFolder,
+                    client = client
+                )
+                if (res.success) successCount++
+            }
+            onComplete(successCount)
         }
     }
 

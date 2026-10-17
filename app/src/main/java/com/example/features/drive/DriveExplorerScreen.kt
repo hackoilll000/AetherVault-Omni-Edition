@@ -52,7 +52,11 @@ fun DriveExplorerScreen(
     onVerifyTelegram: (VaultFile) -> Unit = {},
     onDownloadToDevice: (VaultFile) -> Unit = {},
     onSaveToGallery: (VaultFile) -> Unit = {},
-    onShareDecrypted: (VaultFile) -> Unit = {}
+    onShareDecrypted: (VaultFile) -> Unit = {},
+    onBatchDownload: (List<VaultFile>) -> Unit = {},
+    onBatchDelete: (List<String>) -> Unit = {},
+    onBatchMoveToFolder: (fileIds: List<String>, targetFolderId: String) -> Unit = { _, _ -> },
+    onSyncChannel: () -> Unit = {}
 ) {
     val isHindi = language == AppLanguage.HI
 
@@ -64,6 +68,11 @@ fun DriveExplorerScreen(
     var newDocTitle by remember { mutableStateOf("") }
     var newDocContent by remember { mutableStateOf("") }
     var showFabSpeedDial by remember { mutableStateOf(false) }
+
+    // Multi-Selection State
+    var isSelectionMode by remember { mutableStateOf(false) }
+    val selectedFileIds = remember { mutableStateListOf<String>() }
+    var showMoveToFolderDialog by remember { mutableStateOf(false) }
 
     // Dynamic breadcrumb path stack
     val breadcrumbs = remember(currentFolderId, folders) {
@@ -93,12 +102,51 @@ fun DriveExplorerScreen(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
-                    Row {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // Direct Create Folder Button
+                        IconButton(
+                            onClick = { showCreateFolderDialog = true },
+                            modifier = Modifier.testTag("create_folder_top_button")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CreateNewFolder,
+                                contentDescription = "Create Folder",
+                                tint = CyanNeon
+                            )
+                        }
+
+                        // Multi-Select Toggle Button
+                        IconButton(
+                            onClick = {
+                                isSelectionMode = !isSelectionMode
+                                if (!isSelectionMode) selectedFileIds.clear()
+                            },
+                            modifier = Modifier.testTag("multi_select_toggle_button")
+                        ) {
+                            Icon(
+                                imageVector = if (isSelectionMode) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
+                                contentDescription = "Select Files",
+                                tint = if (isSelectionMode) CyanNeon else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        // Sync Channel Content Button
+                        IconButton(
+                            onClick = onSyncChannel,
+                            modifier = Modifier.testTag("sync_channel_button")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Sync,
+                                contentDescription = "Sync Server",
+                                tint = CyanNeon
+                            )
+                        }
+
                         IconButton(onClick = { isGridView = !isGridView }) {
                             Icon(
                                 imageVector = if (isGridView) Icons.Default.ViewList else Icons.Default.GridView,
                                 contentDescription = "Toggle Grid/List",
-                                tint = CyanNeon
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -136,7 +184,124 @@ fun DriveExplorerScreen(
                         }
                     }
                 }
+
+                // Multi-selection helper bar
+                AnimatedVisibility(visible = isSelectionMode) {
+                    Surface(
+                        color = CyanNeon.copy(alpha = 0.12f),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = if (isHindi) "${selectedFileIds.size} फ़ाइलें चुनी गईं" else "${selectedFileIds.size} files selected",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = CyanNeon
+                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                TextButton(
+                                    onClick = {
+                                        selectedFileIds.clear()
+                                        selectedFileIds.addAll(files.map { it.id })
+                                    },
+                                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                                ) {
+                                    Text(if (isHindi) "सभी चुनें" else "Select All", fontSize = 11.sp, color = CyanNeon)
+                                }
+                                TextButton(
+                                    onClick = {
+                                        isSelectionMode = false
+                                        selectedFileIds.clear()
+                                    },
+                                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                                ) {
+                                    Text(if (isHindi) "रद्द करें" else "Cancel", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                        }
+                    }
+                }
                 HorizontalDivider(modifier = Modifier.padding(top = 4.dp))
+            }
+        },
+        bottomBar = {
+            AnimatedVisibility(
+                visible = isSelectionMode && selectedFileIds.isNotEmpty(),
+                enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+                exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    tonalElevation = 8.dp,
+                    shadowElevation = 8.dp,
+                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Download multiple files
+                        Button(
+                            onClick = {
+                                val selectedFiles = files.filter { it.id in selectedFileIds }
+                                onBatchDownload(selectedFiles)
+                                isSelectionMode = false
+                                selectedFileIds.clear()
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = CyanNeon, contentColor = Color.Black),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.testTag("batch_download_button")
+                        ) {
+                            Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (isHindi) "डाउनलोड (${selectedFileIds.size})" else "Download (${selectedFileIds.size})",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
+                            )
+                        }
+
+                        // Move to folder
+                        OutlinedButton(
+                            onClick = { showMoveToFolderDialog = true },
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.testTag("batch_move_folder_button")
+                        ) {
+                            Icon(Icons.Default.DriveFileMove, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(if (isHindi) "फ़ोल्डर में" else "Move", fontSize = 12.sp)
+                        }
+
+                        // Batch delete
+                        Button(
+                            onClick = {
+                                onBatchDelete(selectedFileIds.toList())
+                                isSelectionMode = false
+                                selectedFileIds.clear()
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.testTag("batch_delete_button")
+                        ) {
+                            Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (isHindi) "डिलीट (${selectedFileIds.size})" else "Delete (${selectedFileIds.size})",
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
             }
         },
         floatingActionButton = {
@@ -212,17 +377,56 @@ fun DriveExplorerScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Folders Section
-            if (folders.isNotEmpty()) {
-                item {
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = if (isHindi) "फ़ोल्डर्स" else "Folders",
+                        text = if (isHindi) "फ़ोल्डर्स (${folders.size})" else "Folders (${folders.size})",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(vertical = 4.dp)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    TextButton(
+                        onClick = { showCreateFolderDialog = true },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                        modifier = Modifier.testTag("inline_create_folder_button")
+                    ) {
+                        Icon(Icons.Default.CreateNewFolder, contentDescription = null, modifier = Modifier.size(15.dp), tint = CyanNeon)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(if (isHindi) "+ नया फ़ोल्डर" else "+ New Folder", fontSize = 12.sp, color = CyanNeon, fontWeight = FontWeight.Bold)
+                    }
                 }
+            }
 
+            if (folders.isEmpty()) {
+                item {
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showCreateFolderDialog = true }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.CreateNewFolder, contentDescription = null, tint = CyanNeon, modifier = Modifier.size(20.dp))
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = if (isHindi) "कोई फ़ोल्डर नहीं है — नया फ़ोल्डर बनाने के लिए टैप करें" else "No folders yet — Tap to create your first folder",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            } else {
                 items(folders) { folder ->
                     Card(
                         modifier = Modifier
@@ -292,12 +496,23 @@ fun DriveExplorerScreen(
             } else {
                 items(files) { file ->
                     var showVersionSheet by remember { mutableStateOf(false) }
+                    val isSelected = file.id in selectedFileIds
 
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onFileClick(file) },
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                            .clickable {
+                                if (isSelectionMode) {
+                                    if (isSelected) selectedFileIds.remove(file.id)
+                                    else selectedFileIds.add(file.id)
+                                } else {
+                                    onFileClick(file)
+                                }
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isSelected) CyanNeon.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                        border = if (isSelected) androidx.compose.foundation.BorderStroke(1.5.dp, CyanNeon) else null,
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(
@@ -306,6 +521,17 @@ fun DriveExplorerScreen(
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            if (isSelectionMode) {
+                                Checkbox(
+                                    checked = isSelected,
+                                    onCheckedChange = { checked ->
+                                        if (checked) selectedFileIds.add(file.id)
+                                        else selectedFileIds.remove(file.id)
+                                    },
+                                    colors = CheckboxDefaults.colors(checkedColor = CyanNeon)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                            }
                             // File Type Icon
                             val iconVector = when {
                                 file.mimeType.startsWith("video/") -> Icons.Default.VideoFile
@@ -505,6 +731,84 @@ fun DriveExplorerScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showCreateDocDialog = false }) {
+                    Text(if (isHindi) "रद्द करें" else "Cancel")
+                }
+            }
+        )
+    }
+
+    // Move Selected Files to Folder Dialog
+    if (showMoveToFolderDialog) {
+        AlertDialog(
+            onDismissRequest = { showMoveToFolderDialog = false },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.DriveFileMove, contentDescription = null, tint = CyanNeon)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (isHindi) "फ़ाइलें फ़ोल्डर में डालें" else "Move Files to Folder")
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = if (isHindi) "${selectedFileIds.size} चुनी गई फ़ाइलों को किस फ़ोल्डर में डालना चाहते हैं?"
+                        else "Select destination folder for ${selectedFileIds.size} files:",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    // Root option
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onBatchMoveToFolder(selectedFileIds.toList(), "root")
+                                showMoveToFolderDialog = false
+                                isSelectionMode = false
+                                selectedFileIds.clear()
+                            },
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.FolderSpecial, contentDescription = null, tint = CyanNeon)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(if (isHindi) "मुख्य वॉल्ट (Root Vault)" else "Root Vault", fontWeight = FontWeight.Bold)
+                        }
+                    }
+
+                    // Available folders
+                    folders.forEach { f ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onBatchMoveToFolder(selectedFileIds.toList(), f.id)
+                                    showMoveToFolderDialog = false
+                                    isSelectionMode = false
+                                    selectedFileIds.clear()
+                                },
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(28.dp)
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(runCatching { Color(android.graphics.Color.parseColor(f.colorHex)) }.getOrDefault(CyanNeon)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Default.Folder, contentDescription = null, tint = Color.Black, modifier = Modifier.size(16.dp))
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(f.name, fontWeight = FontWeight.SemiBold)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showMoveToFolderDialog = false }) {
                     Text(if (isHindi) "रद्द करें" else "Cancel")
                 }
             }
