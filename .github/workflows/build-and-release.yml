@@ -1,0 +1,54 @@
+name: Build & Release AetherVault APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant Execute Permission for Gradle
+        run: chmod +x gradlew || true
+
+      - name: Build Debug APK
+        run: gradle assembleDebug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AetherVault-Omni-v1.0.0-Debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app/build/outputs/apk/debug/app-debug.apk
+          name: AetherVault Omni Edition ${{ github.ref_name }}
+          body: |
+            ## 🚀 AetherVault Omni Edition Release
+            - **Developer:** Ayush Mondal (AJPM)
+            - **YouTube:** [TRB FireOps (@trbfireops)](https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0)
+            - **Features:** Encrypted Telegram Cloud Vault, Bot Swarm, Zero-Knowledge AES-256-GCM, Liquid Glass UI.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
