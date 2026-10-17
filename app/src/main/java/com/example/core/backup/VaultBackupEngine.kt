@@ -15,7 +15,7 @@ data class VaultBackupSummary(
     val fileCount: Int,
     val chunkCount: Int,
     val folderCount: Int = 0,
-    val owner: String = "TRB FireOps (@trbfireops)"
+    val owner: String = "Ayush Mondal (AJPM - Creator & Lead Architect)"
 )
 
 object VaultBackupEngine {
@@ -46,7 +46,7 @@ object VaultBackupEngine {
         val rootJson = JSONObject()
         rootJson.put("format", "AETHER_VAULT_BACKUP_V2")
         rootJson.put("app", "AetherVault Omni Edition")
-        rootJson.put("owner", "TRB FireOps (@trbfireops)")
+        rootJson.put("owner", "Ayush Mondal (AJPM - Creator & Lead Architect)")
         rootJson.put("exportedAt", System.currentTimeMillis())
         rootJson.put("channelId", channelId)
         rootJson.put("botTokenMasked", if (masterBotTokenMasked.length > 8) masterBotTokenMasked.take(6) + "..." else "")
