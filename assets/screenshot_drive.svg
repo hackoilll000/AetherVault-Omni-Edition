@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090A0F"/>
+      <stop offset="50%" stop-color="#121622"/>
+      <stop offset="100%" stop-color="#1A102F"/>
+    </linearGradient>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.08)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.02)"/>
+    </linearGradient>
+    <filter id="blurFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="60"/>
+    </filter>
+  </defs>
+  <!-- Background with Aurora Orbs -->
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <circle cx="800" cy="200" r="220" fill="#00F2FE" opacity="0.12" filter="url(#blurFilter)"/>
+  <circle cx="300" cy="600" r="260" fill="#7F00FF" opacity="0.15" filter="url(#blurFilter)"/>
+
+  <!-- Top App Bar & Breadcrumb -->
+  <rect x="60" y="40" width="1160" height="70" rx="20" fill="url(#cardBg)" stroke="rgba(0,242,254,0.3)" stroke-width="1.5"/>
+  <text x="100" y="85" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#00F2FE">Home / Encrypted Drive / Media Vault</text>
+  <rect x="1040" y="55" width="140" height="40" rx="12" fill="#00F2FE" opacity="0.2"/>
+  <text x="1070" y="81" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="#00F2FE">+ NEW FOLDER</text>
+
+  <!-- Virtual Folders Grid -->
+  <text x="60" y="150" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#FFFFFF">Virtual Folders</text>
+  
+  <rect x="60" y="170" width="360" height="110" rx="16" fill="url(#cardBg)" stroke="rgba(0,242,254,0.4)" stroke-width="1"/>
+  <text x="110" y="220" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#FFFFFF">🔒 Cyber Security Docs</text>
+  <text x="110" y="250" font-family="system-ui, sans-serif" font-size="14" fill="rgba(255,255,255,0.6)">14 Files • 420 MB</text>
+
+  <rect x="460" y="170" width="360" height="110" rx="16" fill="url(#cardBg)" stroke="rgba(127,0,255,0.4)" stroke-width="1"/>
+  <text x="510" y="220" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#FFFFFF">📂 Project Archives</text>
+  <text x="510" y="250" font-family="system-ui, sans-serif" font-size="14" fill="rgba(255,255,255,0.6)">8 Files • 1.1 GB</text>
+
+  <rect x="860" y="170" width="360" height="110" rx="16" fill="url(#cardBg)" stroke="rgba(0,255,102,0.4)" stroke-width="1"/>
+  <text x="910" y="220" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#FFFFFF">🖼️ Raw Photos &amp; Video</text>
+  <text x="910" y="250" font-family="system-ui, sans-serif" font-size="14" fill="rgba(255,255,255,0.6)">32 Files • 860 MB</text>
+
+  <!-- Files List Section -->
+  <text x="60" y="330" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#FFFFFF">Encrypted Files in Folder</text>
+
+  <rect x="60" y="360" width="1160" height="80" rx="16" fill="url(#cardBg)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="110" y="406" font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">payload_exploit_analysis.enc</text>
+  <text x="600" y="406" font-family="system-ui, sans-serif" font-size="14" fill="#00F2FE">AES-256-GCM • 19.4 MB</text>
+  <rect x="1020" y="380" width="160" height="40" rx="10" fill="rgba(255,0,0,0.15)" stroke="#FF4D4D" stroke-width="1"/>
+  <text x="1065" y="406" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#FF4D4D">DELETE CLOUD</text>
+
+  <rect x="60" y="460" width="1160" height="80" rx="16" fill="url(#cardBg)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="110" y="506" font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">firmware_backup_v2.bin</text>
+  <text x="600" y="506" font-family="system-ui, sans-serif" font-size="14" fill="#00F2FE">AES-256-GCM • 48.2 MB</text>
+  <rect x="1020" y="480" width="160" height="40" rx="10" fill="rgba(255,0,0,0.15)" stroke="#FF4D4D" stroke-width="1"/>
+  <text x="1065" y="506" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#FF4D4D">DELETE CLOUD</text>
+
+  <rect x="60" y="560" width="1160" height="80" rx="16" fill="url(#cardBg)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="110" y="606" font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">network_capture_pcap.enc</text>
+  <text x="600" y="606" font-family="system-ui, sans-serif" font-size="14" fill="#00F2FE">AES-256-GCM • 12.8 MB</text>
+  <rect x="1020" y="580" width="160" height="40" rx="10" fill="rgba(255,0,0,0.15)" stroke="#FF4D4D" stroke-width="1"/>
+  <text x="1065" y="606" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#FF4D4D">DELETE CLOUD</text>
+</svg>

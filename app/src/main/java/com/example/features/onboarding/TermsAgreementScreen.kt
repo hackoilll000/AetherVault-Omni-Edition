@@ -272,6 +272,48 @@ Users are responsible for maintaining the confidentiality of their Master Encryp
                 }
             }
 
+            // Prominent Legal Disclaimer Card (महत्वपूर्ण डिस्क्लेमर)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
+                shape = RoundedCornerShape(14.dp),
+                border = androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFFE65100))
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFE65100), modifier = Modifier.size(24.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = if (isHindi) "⚠️ महत्वपूर्ण कानूनी डिस्क्लेमर (Legal Disclaimer)" else "⚠️ Important Legal Disclaimer",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = Color(0xFF4E2600)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = if (isHindi) """
+यह ऐप सिर्फ और सिर्फ पर्सनल यूज़ और एजुकेशनल डेमो के लिए बनाया गया है। हमने यह ऐप केवल सीखने और फन (Fun-Fun) के उद्देश्य से बनाया है ताकि यह दिखाया जा सके कि मोबाइल से टेलीग्राम बॉट को सर्वर की तरह कैसे ऑपरेट किया जा सकता है।
+
+हम किसी भी प्रकार से टेलीग्राम (Telegram) की नीतियों या गाइडलाइंस का उल्लंघन नहीं करते हैं। 
+
+इस ऐप का किसी भी प्रकार से गलत, गैर-कानूनी या अनुचित इस्तेमाल करने पर हमारी कोई जिम्मेदारी या दोष नहीं होगा। इस ऐप को उपयोग करने की संपूर्ण जिम्मेदारी पूर्णतः उपयोगकर्ता (User) की होगी। यदि कोई इसका गलत इस्तेमाल करता है तो डेवलपर्स किसी भी प्रकार से उत्तरदायी नहीं होंगे।
+                        """.trimIndent()
+                        else """
+This application has been developed strictly for PERSONAL USE, research, and educational demonstration purposes. It was created for learning and experimental exploration to demonstrate how serverless bots can be operated directly from a mobile device.
+
+We do NOT violate or encourage the violation of any Telegram API terms of service or guidelines.
+
+The developers assume NO LIABILITY or responsibility for any misuse, improper usage, or unlawful activities conducted with this application. Use of this application is entirely at your own risk and responsibility.
+                        """.trimIndent(),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        lineHeight = 18.sp,
+                        color = Color(0xFF4E2600)
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
         }
     }

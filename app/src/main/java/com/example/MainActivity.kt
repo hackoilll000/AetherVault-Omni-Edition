@@ -43,13 +43,10 @@ import com.example.features.settings.SettingsScreen
 import com.example.features.studio.*
 import com.example.features.teledrop.TeleDropScreen
 import com.example.features.workstation.WorkstationViewerScreen
-import com.example.ui.components.AetherVaultLogo
-import com.example.ui.components.DynamicTransferPill
 import com.example.features.dashboard.VaultDashboardScreen
-import com.example.ui.components.HudTelemetryBar
-import com.example.ui.theme.AetherVaultTheme
-import com.example.ui.theme.CyanNeon
-
+import com.example.ui.components.*
+import com.example.ui.theme.*
+import kotlinx.coroutines.launch
 import androidx.compose.animation.core.*
 import androidx.compose.ui.graphics.Brush
 
@@ -352,98 +349,115 @@ class MainActivity : ComponentActivity() {
                     }
                 } else {
                     // MAIN LOGGED-IN WORKSPACE
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        AuroraBackgroundCanvas()
-                        Scaffold(
-                            containerColor = Color.Transparent,
-                            bottomBar = {
-                            if (subScreen == SubScreen.NONE && appearanceConfig.navBarMode != NavBarMode.AUTO_HIDE) {
-                                Column {
-                                    // Live Dynamic Transfer Pill
-                                    DynamicTransferPill(
-                                        activeTasks = transfers,
-                                        onCancelTask = { viewModel.cancelTransfer(it) }
-                                    )
+                    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+                    val coroutineScope = rememberCoroutineScope()
+                    var subTabIndex by remember { mutableIntStateOf(0) }
+                    var searchQuery by remember { mutableStateOf("") }
+                    var showOutofSyncToast by remember { mutableStateOf(true) }
 
-                                    // Navigation Bar (Floating Glass Pill or Standard Docked)
-                                    val navModifier = if (appearanceConfig.navBarMode == NavBarMode.FLOATING_PILL) {
-                                        Modifier
-                                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                                            .clip(RoundedCornerShape(appearanceConfig.cornerRadiusDp.dp))
-                                    } else {
-                                        Modifier
+                    ModalNavigationDrawer(
+                        drawerState = drawerState,
+                        gesturesEnabled = subScreen == SubScreen.NONE,
+                        drawerContent = {
+                            M3NavigationDrawerContent(
+                                mbUsedText = "${totalStorage / (1024 * 1024)} MB of Unlimited Telegram Cloud",
+                                onSelectMenu = { menu: String ->
+                                    coroutineScope.launch { drawerState.close() }
+                                    when (menu) {
+                                        "Recent" -> activeTab = MainNavTab.DASHBOARD
+                                        "Uploads" -> activeTab = MainNavTab.DRIVE
+                                        "Offline" -> activeTab = MainNavTab.DRIVE
+                                        "Settings" -> activeTab = MainNavTab.SETTINGS
                                     }
+                                },
+                                onConfigureBot = {
+                                    coroutineScope.launch { drawerState.close() }
+                                    activeTab = MainNavTab.SETTINGS
+                                }
+                            )
+                        }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(M3Background)
+                        ) {
+                            Scaffold(
+                                containerColor = Color.Transparent,
+                                topBar = {
+                                    if (subScreen == SubScreen.NONE) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .background(M3Background)
+                                        ) {
+                                            if (activeTab == MainNavTab.PHOTOS) {
+                                                M3CollectionsHeader(
+                                                    syncStatusText = if (botSwarm.any { it.isHealthy }) "Bot Connected" else "Backup paused",
+                                                    isBotHealthy = botSwarm.any { it.isHealthy },
+                                                    onOpenDrawer = { coroutineScope.launch { drawerState.open() } },
+                                                    onQuickUpload = { filePickerLauncher.launch(arrayOf("*/*")) },
+                                                    onNotificationsClick = { activeTab = MainNavTab.DASHBOARD },
+                                                    onProfileClick = { activeTab = MainNavTab.SETTINGS }
+                                                )
+                                            } else {
+                                                M3DriveSearchBar(
+                                                    searchQuery = searchQuery,
+                                                    onSearchQueryChange = { searchQuery = it },
+                                                    onOpenDrawer = { coroutineScope.launch { drawerState.open() } },
+                                                    onProfileClick = { activeTab = MainNavTab.SETTINGS },
+                                                    isBotHealthy = botSwarm.any { it.isHealthy },
+                                                    placeholderText = if (activeTab == MainNavTab.DRIVE) "Search in Tele Drive" else "Search in Drive"
+                                                )
 
-                                    NavigationBar(
-                                        modifier = navModifier,
-                                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                        tonalElevation = 6.dp
-                                    ) {
-                                        NavigationBarItem(
-                                            selected = activeTab == MainNavTab.DASHBOARD,
-                                            onClick = { activeTab = MainNavTab.DASHBOARD },
-                                            icon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.Dashboard,
-                                                    contentDescription = "Dashboard"
+                                                // Secondary Sub-Tabs
+                                                val subTabs = if (activeTab == MainNavTab.DRIVE) listOf("My Drive", "Channels") else listOf("Suggested", "Activity")
+                                                M3SecondarySubTabs(
+                                                    selectedTabIndex = subTabIndex,
+                                                    tabs = subTabs,
+                                                    onTabSelected = { subTabIndex = it }
                                                 )
-                                            },
-                                            label = { Text(if (isHindi) "डैशबोर्ड" else "Dashboard", fontSize = 10.sp) },
-                                            modifier = Modifier.testTag("nav_dashboard")
-                                        )
-                                        NavigationBarItem(
-                                            selected = activeTab == MainNavTab.PHOTOS,
-                                            onClick = { activeTab = MainNavTab.PHOTOS },
-                                            icon = {
-                                                Icon(
-                                                    imageVector = if (activeTab == MainNavTab.PHOTOS) Icons.Default.PhotoLibrary else Icons.Default.PhotoLibrary,
-                                                    contentDescription = "Photos"
+                                            }
+                                        }
+                                    }
+                                },
+                                bottomBar = {
+                                    if (subScreen == SubScreen.NONE) {
+                                        Column {
+                                            if (showOutofSyncToast) {
+                                                M3SyncToastBanner(
+                                                    messageText = "Review out-of-sync changes",
+                                                    onDismiss = { showOutofSyncToast = false }
                                                 )
-                                            },
-                                            label = { Text(if (isHindi) "फोटो" else "Photos", fontSize = 11.sp) },
-                                            modifier = Modifier.testTag("nav_photos")
-                                        )
-                                        NavigationBarItem(
-                                            selected = activeTab == MainNavTab.DRIVE,
-                                            onClick = { activeTab = MainNavTab.DRIVE },
-                                            icon = {
-                                                Icon(
-                                                    imageVector = if (activeTab == MainNavTab.DRIVE) Icons.Default.Folder else Icons.Default.FolderOpen,
-                                                    contentDescription = "Drive"
-                                                )
-                                            },
-                                            label = { Text(if (isHindi) "ड्राइव" else "Drive", fontSize = 11.sp) },
-                                            modifier = Modifier.testTag("nav_drive")
-                                        )
-                                        NavigationBarItem(
-                                            selected = activeTab == MainNavTab.TELEDROP,
-                                            onClick = { activeTab = MainNavTab.TELEDROP },
-                                            icon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.Bolt,
-                                                    contentDescription = "TeleDrop"
-                                                )
-                                            },
-                                            label = { Text("TeleDrop", fontSize = 11.sp) },
-                                            modifier = Modifier.testTag("nav_teledrop")
-                                        )
-                                        NavigationBarItem(
-                                            selected = activeTab == MainNavTab.SETTINGS,
-                                            onClick = { activeTab = MainNavTab.SETTINGS },
-                                            icon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.Tune,
-                                                    contentDescription = "Settings"
-                                                )
-                                            },
-                                            label = { Text(if (isHindi) "कंट्रोल" else "Settings", fontSize = 11.sp) },
-                                            modifier = Modifier.testTag("nav_settings")
-                                        )
+                                            }
+
+                                            DynamicTransferPill(
+                                                activeTasks = transfers,
+                                                onCancelTask = { viewModel.cancelTransfer(it) }
+                                            )
+
+                                            M3BottomNavigationBar(
+                                                selectedTabOrdinal = when (activeTab) {
+                                                    MainNavTab.DASHBOARD -> 0
+                                                    MainNavTab.PHOTOS -> 1
+                                                    MainNavTab.TELEDROP -> 2
+                                                    MainNavTab.DRIVE -> 3
+                                                    else -> 0
+                                                },
+                                                onSelectTab = { idx: Int ->
+                                                    activeTab = when (idx) {
+                                                        0 -> MainNavTab.DASHBOARD
+                                                        1 -> MainNavTab.PHOTOS
+                                                        2 -> MainNavTab.TELEDROP
+                                                        3 -> MainNavTab.DRIVE
+                                                        else -> MainNavTab.DASHBOARD
+                                                    }
+                                                }
+                                            )
+                                        }
                                     }
                                 }
-                            }
-                        }
-                    ) { innerPadding ->
+                            ) { innerPadding ->
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -875,10 +889,22 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
+
+                            // Stacked Material 3 Squircle FABs (Bottom Right)
+                            if (subScreen == SubScreen.NONE) {
+                                M3StackedFabs(
+                                    onPrimaryFabClick = { filePickerLauncher.launch(arrayOf("*/*")) },
+                                    onSecondaryFabClick = { mediaPickerLauncher.launch(arrayOf("image/*", "video/*")) },
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(bottom = 16.dp, end = 16.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
+        }
 
                 // Share Ticket Modal Dialog
                 if (shareTicketUrl != null) {

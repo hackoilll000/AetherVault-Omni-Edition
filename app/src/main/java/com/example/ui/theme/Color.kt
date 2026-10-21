@@ -2,6 +2,24 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+// =========================================================
+// Material You (Material Design 3) - Google Drive / Photos Palette
+// =========================================================
+val M3Background = Color(0xFFF8FAFD)           // Outer App Framing (Cool Alabaster)
+val M3Surface = Color(0xFFFFFFFF)              // Pure White Surface
+val M3TonalSurface = Color(0xFFF0F4F9)         // Soft Ice Grey-Blue for Cards & Search
+val M3SearchBarBg = Color(0xFFEEF2F8)          // Drive Pill Search Bar
+val M3ActivePill = Color(0xFFD3E3FD)           // Soft Material Blue Active Pill
+val M3ActivePillText = Color(0xFF041E49)       // Deep Navy for Active Pill Text & Icons
+val M3PrimaryBlue = Color(0xFF0B57D0)          // Primary Google Blue Indicator
+val M3SecondaryFab = Color(0xFFF8D8FE)         // Soft Pastel Lilac Secondary FAB
+val M3SecondaryFabIcon = Color(0xFF3B0944)     // Deep Plum Icon for Secondary FAB
+val M3BottomBarBg = Color(0xFFF3F6FC)          // Material 3 Bottom Nav Background
+val M3TextPrimary = Color(0xFF1F1F1F)          // Crisp Dark Grey Heading Text
+val M3TextMuted = Color(0xFF444746)            // Muted Slate Subtitle Text
+val M3TextSubtle = Color(0xFF5E5E5E)           // Metadata Muted Text
+val M3BorderSubtle = Color(0xFFE1E3E1)         // Subtle Drawer / Card Divider
+
 // Brand Accents
 val CyanNeon = Color(0xFF00F0FF)
 val IndigoHyper = Color(0xFF6366F1)
@@ -34,11 +52,11 @@ val GlassCard = Color(0xB0172036)
 val GlassBorder = Color(0x33FFFFFF)
 val GlassAccent = Color(0xFF38BDF8)
 
-// Dot Matrix / Nothing Industrial
+// Dot Matrix / Industrial
 val DotMatrixBackground = Color(0xFF0D0D0D)
 val DotMatrixSurface = Color(0xFF111113)
 val DotMatrixCard = Color(0xFF18181B)
-val DotMatrixAccent = Color(0xFFE11D48) // Signature Crimson Red
+val DotMatrixAccent = Color(0xFFE11D48)
 val DotMatrixText = Color(0xFFFFFFFF)
 val DotMatrixTextMuted = Color(0xFF888888)
 

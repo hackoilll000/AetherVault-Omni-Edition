@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090A0F"/>
+      <stop offset="50%" stop-color="#121622"/>
+      <stop offset="100%" stop-color="#1A102F"/>
+    </linearGradient>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.08)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.02)"/>
+    </linearGradient>
+    <filter id="blurFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="60"/>
+    </filter>
+  </defs>
+  <!-- Background with Aurora Orbs -->
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <circle cx="200" cy="150" r="220" fill="#00F2FE" opacity="0.15" filter="url(#blurFilter)"/>
+  <circle cx="1050" cy="550" r="260" fill="#7F00FF" opacity="0.18" filter="url(#blurFilter)"/>
+
+  <!-- Top App Bar -->
+  <rect x="60" y="40" width="1160" height="70" rx="20" fill="url(#cardBg)" stroke="rgba(0,242,254,0.3)" stroke-width="1.5"/>
+  <text x="100" y="85" font-family="system-ui, sans-serif" font-size="24" font-weight="bold" fill="#FFFFFF">AetherVault Omni</text>
+  <circle cx="1120" cy="75" r="8" fill="#00FF66"/>
+  <text x="1140" y="82" font-family="system-ui, sans-serif" font-size="14" fill="#00FF66" font-weight="600">CONNECTED</text>
+
+  <!-- Dashboard Cards Grid -->
+  <!-- Card 1: Bot Swarm HUD -->
+  <rect x="60" y="140" width="560" height="240" rx="24" fill="url(#cardBg)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <text x="100" y="195" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" fill="#00F2FE">Bot Swarm Telemetry HUD</text>
+  <text x="100" y="235" font-family="system-ui, sans-serif" font-size="15" fill="rgba(255,255,255,0.7)">Active Bots: 3 Nodes • Latency: 24ms</text>
+  <text x="100" y="270" font-family="system-ui, sans-serif" font-size="15" fill="rgba(255,255,255,0.7)">Channel ID: -10098492019 • AES-256-GCM Active</text>
+  <rect x="100" y="300" width="160" height="40" rx="12" fill="#00F2FE" opacity="0.2"/>
+  <text x="135" y="326" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="#00F2FE">TEST PING</text>
+
+  <!-- Card 2: Storage Ring Meter -->
+  <rect x="660" y="140" width="560" height="240" rx="24" fill="url(#cardBg)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <text x="700" y="195" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF">Cloud Storage Capacity</text>
+  <text x="700" y="235" font-family="system-ui, sans-serif" font-size="15" fill="rgba(255,255,255,0.7)">Used: 1.42 GB / Unlimited Telegram Cloud</text>
+  <rect x="700" y="270" width="480" height="16" rx="8" fill="rgba(255,255,255,0.1)"/>
+  <rect x="700" y="270" width="280" height="16" rx="8" fill="url(#cyanGrad)"/>
+
+  <!-- Card 3: Quick Vault Actions -->
+  <rect x="60" y="410" width="1160" height="260" rx="24" fill="url(#cardBg)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <text x="100" y="465" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF">Quick Vault Actions</text>
+  
+  <rect x="100" y="500" width="340" height="120" rx="16" fill="rgba(0,242,254,0.08)" stroke="#00F2FE" stroke-width="1"/>
+  <text x="140" y="555" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#00F2FE">Upload Encrypted File</text>
+  <text x="140" y="585" font-family="system-ui, sans-serif" font-size="13" fill="rgba(255,255,255,0.6)">AES-256-GCM Chunking &amp; Telegram Sync</text>
+
+  <rect x="470" y="500" width="340" height="120" rx="16" fill="rgba(127,0,255,0.08)" stroke="#7F00FF" stroke-width="1"/>
+  <text x="510" y="555" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#C77DFF">Create Virtual Folder</text>
+  <text x="510" y="585" font-family="system-ui, sans-serif" font-size="13" fill="rgba(255,255,255,0.6)">Hierarchical Folders &amp; Breadcrumbs</text>
+
+  <rect x="840" y="500" width="340" height="120" rx="16" fill="rgba(0,255,102,0.08)" stroke="#00FF66" stroke-width="1"/>
+  <text x="880" y="555" font-family="system-ui, sans-serif" font-size="18" font-weight="bold" fill="#00FF66">TeleDrop Snippets</text>
+  <text x="880" y="585" font-family="system-ui, sans-serif" font-size="13" fill="rgba(255,255,255,0.6)">Instant Clipboard P2P Sync Drop Zone</text>
+</svg>

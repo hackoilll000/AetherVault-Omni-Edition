@@ -346,6 +346,14 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
                 createdAt = System.currentTimeMillis()
             )
             database.teleDropDao().insertItem(item)
+
+            val storedToken = prefs.getString("master_bot_token", "") ?: ""
+            val cId = _channelId.value
+            if (storedToken.isNotBlank() && cId != 0L) {
+                runCatching {
+                    client.sendMessage(storedToken, cId, content)
+                }
+            }
         }
     }
 
