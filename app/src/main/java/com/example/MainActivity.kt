@@ -12,6 +12,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -176,6 +178,7 @@ class MainActivity : ComponentActivity() {
             val uploadError by viewModel.uploadErrorNotification.collectAsStateWithLifecycle()
             var verifyResultDialog by remember { mutableStateOf<Pair<Boolean, String>?>(null) }
             var isVerifyingTelegram by remember { mutableStateOf(false) }
+            var showLegalDisclaimerDialog by remember { mutableStateOf(false) }
 
             // Automatic Storage Permission requester on startup for both Root and Non-Root devices
             val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
@@ -365,8 +368,10 @@ class MainActivity : ComponentActivity() {
                                     coroutineScope.launch { drawerState.close() }
                                     when (menu) {
                                         "Recent" -> activeTab = MainNavTab.DASHBOARD
+                                        "TelegramChat" -> activeTab = MainNavTab.TELEDROP
                                         "Uploads" -> activeTab = MainNavTab.DRIVE
                                         "Offline" -> activeTab = MainNavTab.DRIVE
+                                        "LegalDisclaimer" -> showLegalDisclaimerDialog = true
                                         "Settings" -> activeTab = MainNavTab.SETTINGS
                                     }
                                 },
@@ -836,7 +841,14 @@ class MainActivity : ComponentActivity() {
                                                         onSendSnippet = { content, type ->
                                                             viewModel.sendTeleDropSnippet(content, type)
                                                         },
-                                                        onDeleteItem = { viewModel.deleteTeleDropItem(it) }
+                                                        onDeleteItem = { viewModel.deleteTeleDropItem(it) },
+                                                        onSyncChannel = {
+                                                            viewModel.scanExistingChannelHistory(context) { ok, msg ->
+                                                                restorationNotification = msg
+                                                            }
+                                                        },
+                                                        channelId = channelId,
+                                                        botHealthy = botSwarm.any { it.isHealthy }
                                                     )
                                                 }
                                                 MainNavTab.SETTINGS -> {
@@ -1133,6 +1145,51 @@ class MainActivity : ComponentActivity() {
                         confirmButton = {
                             Button(onClick = { restorationNotification = null }) {
                                 Text(if (isHindi) "ठीक है" else "Done")
+                            }
+                        }
+                    )
+                }
+
+                // Dedicated Legal Disclaimer Dialog
+                if (showLegalDisclaimerDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showLegalDisclaimerDialog = false },
+                        title = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFE65100))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(if (isHindi) "महत्वपूर्ण कानूनी डिस्क्लेमर" else "Legal Disclaimer & Policy Notice")
+                            }
+                        },
+                        text = {
+                            Column(modifier = Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())) {
+                                Text(
+                                    text = if (isHindi) """
+यह ऐप सिर्फ और सिर्फ पर्सनल यूज़ और एजुकेशनल डेमो के लिए बनाया गया है। हमने यह ऐप केवल सीखने और फन-फन के उद्देश्य से बनाया है ताकि यह दिखाया जा सके कि मोबाइल से टेलीग्राम सर्वर बॉट को कैसे ऑपरेट किया जा सकता है।
+
+हम किसी भी प्रकार से टेलीग्राम की नीतियों या गाइडलाइंस का उल्लंघन नहीं करते हैं।
+
+इस ऐप का किसी भी प्रकार से गलत, गैर-कानूनी या अनुचित इस्तेमाल करने पर हमारी कोई जिम्मेदारी या दोष नहीं होगा। इस ऐप को उपयोग करने की संपूर्ण जिम्मेदारी यूजर की है।
+                                    """.trimIndent()
+                                    else """
+This application has been developed strictly for PERSONAL USE, research, and educational demonstration purposes. It was created for learning and experimental exploration to demonstrate how serverless bots can be operated directly from a mobile device.
+
+We do NOT violate or encourage the violation of any Telegram API terms of service or guidelines.
+
+The developers (Ayush Mondal / AJPM / TRB FireOps) assume NO LIABILITY or responsibility for any misuse, improper usage, or unlawful activities conducted with this application. Use of this application is entirely at your own risk and responsibility.
+                                    """.trimIndent(),
+                                    fontSize = 13.sp,
+                                    lineHeight = 18.sp,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = { showLegalDisclaimerDialog = false },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE65100), contentColor = Color.White)
+                            ) {
+                                Text(if (isHindi) "मैंने पढ़ लिया और सहमत हूँ" else "I Understand & Agree")
                             }
                         }
                     )

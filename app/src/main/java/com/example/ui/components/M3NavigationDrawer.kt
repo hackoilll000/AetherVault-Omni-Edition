@@ -70,10 +70,11 @@ fun M3NavigationDrawerContent(
             // Menu Items
             val menuItems = listOf(
                 M3DrawerMenuItem("Recent", Icons.Outlined.Schedule) { onSelectMenu("Recent") },
+                M3DrawerMenuItem("Telegram Sync & Chat", Icons.Outlined.Forum) { onSelectMenu("TelegramChat") },
                 M3DrawerMenuItem("Uploads", Icons.Outlined.CloudUpload) { onSelectMenu("Uploads") },
                 M3DrawerMenuItem("Offline", Icons.Outlined.OfflinePin) { onSelectMenu("Offline") },
                 M3DrawerMenuItem("Bin", Icons.Outlined.Delete) { onSelectMenu("Bin") },
-                M3DrawerMenuItem("Spam", Icons.Outlined.Report) { onSelectMenu("Spam") },
+                M3DrawerMenuItem("Legal Disclaimer", Icons.Outlined.Gavel) { onSelectMenu("LegalDisclaimer") },
                 M3DrawerMenuItem("Settings", Icons.Outlined.Settings) { onSelectMenu("Settings") },
                 M3DrawerMenuItem("Help and feedback", Icons.Outlined.HelpOutline) { onSelectMenu("Help") }
             )
@@ -167,6 +168,29 @@ fun M3NavigationDrawerContent(
                         fontWeight = FontWeight.Medium,
                         color = M3PrimaryBlue
                     )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Surface(
+                    color = M3TonalSurface,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(10.dp)) {
+                        Text(
+                            text = "Created by Ayush Mondal",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = M3TextPrimary
+                        )
+                        Text(
+                            text = "Class 9th, 14 years old in 2026 • TRB FireOps",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = M3TextMuted
+                        )
+                    }
                 }
             }
         }

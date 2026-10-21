@@ -3,6 +3,7 @@ package com.example.features.teledrop
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,8 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.database.TeleDropItem
 import com.example.features.studio.AppLanguage
-import com.example.ui.theme.CyanNeon
-import com.example.ui.theme.IndigoHyper
+import com.example.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -39,43 +40,175 @@ fun TeleDropScreen(
     items: List<TeleDropItem>,
     language: AppLanguage,
     onSendSnippet: (content: String, type: String) -> Unit,
-    onDeleteItem: (String) -> Unit
+    onDeleteItem: (String) -> Unit,
+    onSyncChannel: (() -> Unit)? = null,
+    isSyncing: Boolean = false,
+    channelId: Long = 0L,
+    botHealthy: Boolean = true
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     val isHindi = language == AppLanguage.HI
 
     var inputSnippetText by remember { mutableStateOf("") }
-    var selectedType by remember { mutableStateOf("TEXT") }
+    var selectedFilter by remember { mutableStateOf("ALL") }
     var copiedNotice by remember { mutableStateOf<String?>(null) }
+    var showDisclaimerDetails by remember { mutableStateOf(false) }
+
+    val filteredItems = remember(items, selectedFilter) {
+        when (selectedFilter) {
+            "TEXT" -> items.filter { it.type == "TEXT" }
+            "LINK_CODE" -> items.filter { it.type == "LINK" || it.type == "CODE" }
+            "CHANNEL" -> items.filter { it.sourceDevice.contains("Telegram", ignoreCase = true) }
+            else -> items
+        }
+    }
 
     Scaffold(
+        containerColor = M3Background,
         topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(CyanNeon),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.Bolt, contentDescription = null, tint = Color.Black, modifier = Modifier.size(18.dp))
+            Surface(
+                color = M3Surface,
+                tonalElevation = 2.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .background(M3ActivePill),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.SendToMobile,
+                                    contentDescription = null,
+                                    tint = M3ActivePillText,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text(
+                                    text = if (isHindi) "टेलीग्राम चैट और क्लाउड सिंक" else "Telegram Chat & Cloud Sync",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 17.sp,
+                                    color = M3TextPrimary
+                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(7.dp)
+                                            .clip(CircleShape)
+                                            .background(if (botHealthy) Color(0xFF1B873F) else Color(0xFFD93025))
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(
+                                        text = if (channelId != 0L) "Channel: #$channelId" else "Bot Swarm Active",
+                                        fontSize = 12.sp,
+                                        color = M3TextMuted
+                                    )
+                                }
+                            }
                         }
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Column {
-                            Text("TeleDrop Instant Beam", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                            Text(
-                                text = if (isHindi) "फोन ↔ PC लाइव बीम (<1 सेकंड)" else "Phone ↔ PC Live Beam (<1s)",
-                                fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+
+                        // Sync Telegram History Button
+                        if (onSyncChannel != null) {
+                            FilledTonalButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onSyncChannel()
+                                },
+                                enabled = !isSyncing,
+                                colors = ButtonDefaults.filledTonalButtonColors(
+                                    containerColor = M3ActivePill,
+                                    contentColor = M3ActivePillText
+                                ),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                                shape = RoundedCornerShape(9999.dp),
+                                modifier = Modifier.testTag("sync_telegram_history_button")
+                            ) {
+                                if (isSyncing) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp,
+                                        color = M3ActivePillText
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Default.Sync,
+                                        contentDescription = "Sync",
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = if (isHindi) "सिंक करें" else "Sync History",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
                         }
                     }
-                },
-                actions = {
-                    // Quick Paste from Clipboard
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Filter Chips Row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilterChip(
+                            selected = selectedFilter == "ALL",
+                            onClick = { selectedFilter = "ALL" },
+                            label = { Text(if (isHindi) "सभी (${items.size})" else "All (${items.size})", fontSize = 12.sp) },
+                            shape = RoundedCornerShape(9999.dp)
+                        )
+                        FilterChip(
+                            selected = selectedFilter == "TEXT",
+                            onClick = { selectedFilter = "TEXT" },
+                            label = { Text(if (isHindi) "चैट / टेक्स्ट" else "Chat & Text", fontSize = 12.sp) },
+                            shape = RoundedCornerShape(9999.dp)
+                        )
+                        FilterChip(
+                            selected = selectedFilter == "LINK_CODE",
+                            onClick = { selectedFilter = "LINK_CODE" },
+                            label = { Text("Links & Code", fontSize = 12.sp) },
+                            shape = RoundedCornerShape(9999.dp)
+                        )
+                        FilterChip(
+                            selected = selectedFilter == "CHANNEL",
+                            onClick = { selectedFilter = "CHANNEL" },
+                            label = { Text("Channel Posts", fontSize = 12.sp) },
+                            shape = RoundedCornerShape(9999.dp)
+                        )
+                    }
+                }
+            }
+        },
+        bottomBar = {
+            Surface(
+                color = M3Surface,
+                tonalElevation = 4.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Quick paste from clipboard
                     IconButton(
                         onClick = {
                             val clipMgr = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -89,38 +222,35 @@ fun TeleDropScreen(
                             }
                         }
                     ) {
-                        Icon(Icons.Default.ContentPaste, contentDescription = "Paste Clipboard", tint = CyanNeon)
+                        Icon(
+                            imageVector = Icons.Default.ContentPaste,
+                            contentDescription = "Paste Clipboard",
+                            tint = M3PrimaryBlue
+                        )
                     }
-                }
-            )
-        },
-        bottomBar = {
-            Surface(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                tonalElevation = 6.dp,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+
                     OutlinedTextField(
                         value = inputSnippetText,
                         onValueChange = { inputSnippetText = it },
                         placeholder = {
                             Text(
-                                if (isHindi) "टेक्स्ट, लिंक, कोड या OTP टाइप करें..."
-                                else "Drop text, link, code, or OTP...",
-                                fontSize = 13.sp
+                                if (isHindi) "टेलीग्राम चैनल में संदेश / लिंक भेजें..."
+                                else "Send message to Telegram Channel...",
+                                fontSize = 13.sp,
+                                color = M3TextMuted
                             )
                         },
                         modifier = Modifier
                             .weight(1f)
                             .testTag("teledrop_input"),
                         shape = RoundedCornerShape(24.dp),
-                        maxLines = 3
+                        maxLines = 3,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = M3SearchBarBg,
+                            unfocusedContainerColor = M3SearchBarBg,
+                            focusedBorderColor = M3PrimaryBlue,
+                            unfocusedBorderColor = Color.Transparent
+                        )
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(
@@ -137,12 +267,12 @@ fun TeleDropScreen(
                             }
                         },
                         modifier = Modifier
-                            .size(48.dp)
+                            .size(44.dp)
                             .clip(CircleShape)
-                            .background(CyanNeon)
+                            .background(M3PrimaryBlue)
                             .testTag("teledrop_send_button")
                     ) {
-                        Icon(Icons.Default.Send, contentDescription = "Beam", tint = Color.Black)
+                        Icon(Icons.Default.Send, contentDescription = "Send", tint = Color.White, modifier = Modifier.size(18.dp))
                     }
                 }
             }
@@ -154,66 +284,184 @@ fun TeleDropScreen(
                 .padding(padding)
                 .padding(horizontal = 16.dp)
         ) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Prominent Legal Disclaimer Banner
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showDisclaimerDetails = !showDisclaimerDetails },
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
+                shape = RoundedCornerShape(12.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFFB74D))
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = null,
+                                tint = Color(0xFFE65100),
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = if (isHindi) "महत्वपूर्ण कानूनी डिस्क्लेमर (कानूनी नोटिस)" else "Legal Disclaimer & Compliance Notice",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFE65100)
+                            )
+                        }
+                        Icon(
+                            imageVector = if (showDisclaimerDetails) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            contentDescription = "Toggle",
+                            tint = Color(0xFFE65100),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    Text(
+                        text = if (isHindi) "यह ऐप सिर्फ पर्सनल यूज़ और बॉट ऑपरेशन डेमो के लिए है। किसी भी दुरुपयोग की जिम्मेदारी यूजर की है।"
+                        else "Strictly for educational demonstration and personal use. Developers assume no liability for misuse.",
+                        fontSize = 11.sp,
+                        color = Color(0xFF5D4037),
+                        lineHeight = 15.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+
+                    if (showDisclaimerDetails) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        HorizontalDivider(color = Color(0xFFFFCC80), thickness = 0.8.dp)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = if (isHindi) """
+• हमने यह ऐप सिर्फ और सिर्फ फन-फन में सीखने के लिए बनाया है कि मोबाइल से सर्वर बॉट कैसे ऑपरेट कर सकते हैं।
+• हम किसी भी प्रकार से टेलीग्राम (Telegram) की नीतियों या गाइडलाइंस का उल्लंघन नहीं करते हैं।
+• इस ऐप को यूज़ करना पूर्णतः आपकी जिम्मेदारी है; डेवलपर्स (Ayush Mondal / AJPM / TRB FireOps) किसी भी गलत इस्तेमाल के लिए उत्तरदायी नहीं हैं।
+                            """.trimIndent()
+                            else """
+• Built strictly as an architectural experiment demonstrating how to operate serverless bots from a mobile device.
+• Does not violate, bypass, or advocate breach of Telegram Terms of Service or API policies.
+• End users bear sole responsibility for all activities; developers accept zero liability.
+                            """.trimIndent(),
+                            fontSize = 10.5.sp,
+                            color = Color(0xFF4E342E),
+                            lineHeight = 15.sp
+                        )
+                    }
+                }
+            }
+
             if (copiedNotice != null) {
+                Spacer(modifier = Modifier.height(6.dp))
                 Surface(
-                    color = CyanNeon.copy(alpha = 0.2f),
+                    color = M3ActivePill,
                     shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = copiedNotice ?: "",
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = CyanNeon,
+                        fontWeight = FontWeight.SemiBold,
+                        color = M3ActivePillText,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                     )
                 }
             }
 
-            if (items.isEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (filteredItems.isEmpty()) {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Default.SendToMobile, contentDescription = null, tint = IndigoHyper, modifier = Modifier.size(54.dp))
-                        Spacer(modifier = Modifier.height(12.dp))
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(24.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clip(CircleShape)
+                                .background(M3TonalSurface),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Outlined.Forum,
+                                contentDescription = null,
+                                tint = M3PrimaryBlue,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(14.dp))
                         Text(
-                            text = if (isHindi) "कोई TeleDrop आइटम नहीं" else "TeleDrop Stream is Empty",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
+                            text = if (isHindi) "कोई टेलीग्राम संदेश या सिंक आइटम नहीं" else "No Telegram Messages or Synced Items",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp,
+                            color = M3TextPrimary
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = if (isHindi) "फोन या कंप्यूटर से कुछ भी बीम करें"
-                            else "Beam links, code snippets or text between Phone and PC",
+                            text = if (isHindi) "अपने चैनल की पुरानी चैट और फाइलों को सिंक करने के लिए नीचे टैप करें"
+                            else "Tap below to synchronize past channel messages, texts, and posts via Bot",
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = M3TextMuted,
+                            lineHeight = 16.sp
                         )
+
+                        if (onSyncChannel != null) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = onSyncChannel,
+                                enabled = !isSyncing,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = M3PrimaryBlue,
+                                    contentColor = Color.White
+                                ),
+                                shape = RoundedCornerShape(9999.dp)
+                            ) {
+                                Icon(Icons.Default.CloudSync, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = if (isHindi) "टेलीग्राम हिस्ट्री सिंक करें" else "Synchronize Telegram History",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
                     }
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    contentPadding = PaddingValues(vertical = 12.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp)
                 ) {
-                    items(items, key = { it.itemId }) { item ->
+                    items(filteredItems, key = { it.itemId }) { item ->
+                        val isChannelPost = item.sourceDevice.contains("Telegram", ignoreCase = true)
+                        val isPcBeam = item.sourceDevice.contains("PC", ignoreCase = true)
+
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(
-                                containerColor = if (item.sourceDevice.contains("PC", ignoreCase = true)) {
-                                    IndigoHyper.copy(alpha = 0.15f)
-                                } else {
-                                    MaterialTheme.colorScheme.surfaceVariant
-                                }
+                                containerColor = if (isChannelPost) M3TonalSurface else M3Surface
                             ),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(14.dp),
                             border = androidx.compose.foundation.BorderStroke(
-                                0.8.dp,
-                                if (item.sourceDevice.contains("PC", ignoreCase = true)) IndigoHyper.copy(alpha = 0.4f)
-                                else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                                1.dp,
+                                if (isChannelPost) M3ActivePill.copy(alpha = 0.5f) else M3BorderSubtle
                             )
                         ) {
                             Column(modifier = Modifier.padding(14.dp)) {
@@ -223,58 +471,95 @@ fun TeleDropScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = if (item.sourceDevice.contains("PC", ignoreCase = true)) Icons.Default.Computer
-                                            else Icons.Default.Smartphone,
-                                            contentDescription = null,
-                                            tint = CyanNeon,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Box(
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .clip(CircleShape)
+                                                .background(
+                                                    when {
+                                                        isChannelPost -> Color(0xFF2AABEE)
+                                                        isPcBeam -> Color(0xFF673AB7)
+                                                        else -> M3PrimaryBlue
+                                                    }
+                                                ),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = when {
+                                                    isChannelPost -> Icons.Default.Cloud
+                                                    isPcBeam -> Icons.Default.Computer
+                                                    else -> Icons.Default.Smartphone
+                                                },
+                                                contentDescription = null,
+                                                tint = Color.White,
+                                                modifier = Modifier.size(13.dp)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(8.dp))
                                         Text(
                                             text = item.sourceDevice,
-                                            fontWeight = FontWeight.Bold,
+                                            fontWeight = FontWeight.SemiBold,
                                             fontSize = 12.sp,
-                                            color = CyanNeon
+                                            color = M3TextPrimary
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(item.createdAt)),
-                                            fontSize = 10.sp,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            text = SimpleDateFormat("MMM d, HH:mm", Locale.getDefault()).format(Date(item.createdAt)),
+                                            fontSize = 11.sp,
+                                            color = M3TextMuted
                                         )
                                     }
 
                                     Row {
-                                        // 1-Tap Copy
+                                        // 1-Tap Copy Button
                                         IconButton(
                                             onClick = {
                                                 val clipMgr = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                                clipMgr.setPrimaryClip(ClipData.newPlainText("teledrop", item.content))
+                                                clipMgr.setPrimaryClip(ClipData.newPlainText("telegram_msg", item.content))
                                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                                 copiedNotice = "Copied to clipboard!"
                                             },
-                                            modifier = Modifier.size(28.dp)
+                                            modifier = Modifier.size(30.dp)
                                         ) {
-                                            Icon(Icons.Default.ContentCopy, contentDescription = "Copy", tint = CyanNeon, modifier = Modifier.size(16.dp))
+                                            Icon(
+                                                Icons.Default.ContentCopy,
+                                                contentDescription = "Copy",
+                                                tint = M3TextMuted,
+                                                modifier = Modifier.size(16.dp)
+                                            )
                                         }
 
+                                        // 1-Tap Delete Button
                                         IconButton(
                                             onClick = { onDeleteItem(item.itemId) },
-                                            modifier = Modifier.size(28.dp)
+                                            modifier = Modifier.size(30.dp)
                                         ) {
-                                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Gray, modifier = Modifier.size(16.dp))
+                                            Icon(
+                                                Icons.Default.DeleteOutline,
+                                                contentDescription = "Delete",
+                                                tint = M3TextMuted,
+                                                modifier = Modifier.size(16.dp)
+                                            )
                                         }
                                     }
                                 }
 
                                 Spacer(modifier = Modifier.height(6.dp))
-                                Text(
-                                    text = item.content,
-                                    fontSize = 13.sp,
-                                    fontFamily = if (item.type == "CODE") FontFamily.Monospace else FontFamily.Default,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
+
+                                Surface(
+                                    color = if (item.type == "CODE") Color(0xFF263238) else Color.Transparent,
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = item.content,
+                                        fontSize = 13.sp,
+                                        lineHeight = 18.sp,
+                                        fontFamily = if (item.type == "CODE") FontFamily.Monospace else FontFamily.Default,
+                                        color = if (item.type == "CODE") Color(0xFF80CBC4) else M3TextPrimary,
+                                        modifier = if (item.type == "CODE") Modifier.padding(10.dp) else Modifier
+                                    )
+                                }
                             }
                         }
                     }

@@ -593,12 +593,40 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Legal Disclaimer & Creator Credits Action Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                OutlinedButton(
+                    onClick = { showTermsDialog = true },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Default.Gavel, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(if (isHindi) "कानूनी डिस्क्लेमर" else "Legal Disclaimer", fontSize = 12.sp)
+                }
+
+                OutlinedButton(
+                    onClick = { showCreditsDialog = true },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(if (isHindi) "निर्माता (Creator)" else "Creator Credits", fontSize = 12.sp)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Clean Single-Line Footer
             Text(
-                text = "AetherVault Omni v3.0 • Encrypted Telegram Cloud Vault • By AJPM",
+                text = "AetherVault Omni v3.0 • Creator: Ayush Mondal (Class 9th, 14 years old in 2026) • TRB FireOps",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
@@ -607,44 +635,133 @@ fun SettingsScreen(
         }
     }
 
-    // Terms & Conditions Dialog
+    // Terms & Conditions / Full Legal Disclaimer Dialog
     if (showTermsDialog) {
         AlertDialog(
             onDismissRequest = { showTermsDialog = false },
             title = {
-                Text("Terms & Conditions — AetherVault")
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Gavel, contentDescription = null, tint = CyanNeon)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (isHindi) "महत्वपूर्ण कानूनी डिस्क्लेमर व शर्तें" else "Legal Disclaimer & Telegram Terms")
+                }
             },
             text = {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = if (isHindi) {
+                                "⚠️ चेतावनी व कानूनी डिस्क्लेमर (Personal Use Only):\n" +
+                                "इस ऐप को सिर्फ पर्सनल यूज़ (Personal Use) के लिए बनाया गया है। इसका गलत इस्तेमाल करना हमारे ऊपर कोई भी दोष नहीं है और इस ऐप को यूज़ करना पूरी तरह से आपकी अपनी रिस्पॉन्सिबिलिटी (Sole Responsibility) है। हमने तो यह ऐप बस फन-फन में और शैक्षणिक प्रयोग के लिए बना दिया।\n\n" +
+                                "हम लोग किसी भी तरीके का टेलीग्राम का गाइडलाइंस हिट नहीं कर रहे हैं, बल्कि हम तो सिर्फ बॉट के लिए बॉट कैसे ऑपरेट कर सकते हैं मोबाइल से, सर्वर बॉट, इसका बस एक डेमो ऐप बना रहे थे। मगर गलती से अगर कोई इसका गलत इस्तेमाल कर रहा है तो इसका रिस्पॉन्सिबिलिटी हम नहीं लेंगे।"
+                            } else {
+                                "⚠️ IMPORTANT LEGAL DISCLAIMER (Personal Use Only):\n" +
+                                "This application is developed strictly for personal, non-commercial use and educational demonstration. Any misuse or violation is solely the user's responsibility; the developers/authors bear zero liability. This project was built for fun and technical exploration.\n\n" +
+                                "We DO NOT violate any Telegram guidelines or Terms of Service. This app is purely a mobile client demo demonstrating how to operate a self-hosted Telegram server bot. If anyone misuses this software, the authors disclaim all responsibility."
+                            },
+                            fontSize = 12.sp,
+                            lineHeight = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            modifier = Modifier.padding(12.dp)
+                        )
+                    }
+
                     Text(
-                        text = "Creator & Architect: TRB FireOps (@trbfireops)\nYouTube: https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0",
+                        text = "Creator & Architect: Ayush Mondal (Class 9th, 14 years old in 2026)\nTeam: TRB FireOps (@trbfireops)\nYouTube: https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0",
                         fontWeight = FontWeight.Bold,
                         color = CyanNeon,
-                        fontSize = 13.sp
+                        fontSize = 12.sp
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+
                     Text(
                         text = """
-1. ARCHITECTURE & ZERO SUBSCRIPTION:
-AetherVault is an autonomous, serverless personal cloud system authored by TRB FireOps (@trbfireops). It leverages official Telegram Bot API swarms and your own private Telegram Channel as encrypted storage.
-
-2. ZERO-KNOWLEDGE CRYPTOGRAPHY:
+1. ZERO-KNOWLEDGE CRYPTOGRAPHY:
 Every file chunk is split deterministically into 19MB frames and encrypted on-device via AES-256-GCM. Plaintext filenames, contents, or metadata are never visible to Telegram servers.
 
-3. DEVICE COMPATIBILITY:
+2. DEVICE COMPATIBILITY:
 Designed for universal compatibility on both Rooted and Non-Rooted Android devices (Android 7.0 through Android 16+) utilizing standard Storage Access Framework (SAF).
 
-4. USER RESPONSIBILITY:
-You are the sole custodian of your Master Encryption Password and Telegram Channel access keys.
+3. USER RESPONSIBILITY:
+You are the sole custodian of your Master Encryption Password and Telegram Channel access keys. Keep your bot tokens confidential.
                         """.trimIndent(),
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             },
             confirmButton = {
                 Button(onClick = { showTermsDialog = false }) {
-                    Text("I Agree & Accept")
+                    Text(if (isHindi) "मैं समझ गया और सहमत हूँ" else "I Understand & Accept")
+                }
+            }
+        )
+    }
+
+    // Creator & Architect Credits Dialog
+    if (showCreditsDialog) {
+        AlertDialog(
+            onDismissRequest = { showCreditsDialog = false },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Verified, contentDescription = null, tint = CyanNeon)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (isHindi) "निर्माता व श्रेय (Credits)" else "Creator & Credits")
+                }
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(14.dp)) {
+                            Text(
+                                text = "AYUSH MONDAL",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            Text(
+                                text = "Class 9th, 14 years old in 2026",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "Lead Creator & Architect of AetherVault Omni Edition / Tele Drive",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = "Organization: TRB FireOps (@trbfireops)\nYouTube: https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0\nGitHub: https://github.com/hackoilll000/AetherVault-Omni-Edition.git",
+                        fontSize = 12.sp,
+                        lineHeight = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = { showCreditsDialog = false }) {
+                    Text(if (isHindi) "धन्यवाद" else "Close")
                 }
             }
         )

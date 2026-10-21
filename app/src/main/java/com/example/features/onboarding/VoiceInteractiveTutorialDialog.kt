@@ -3,6 +3,7 @@ package com.example.features.onboarding
 import android.content.Context
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,7 +19,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -33,8 +33,30 @@ import com.example.core.sensory.SensoryFeedbackEngine
 import com.example.core.sensory.VoiceNarratorEngine
 import com.example.features.studio.AppLanguage
 import com.example.ui.components.AetherVaultLogo
-import com.example.ui.theme.CyanNeon
-import com.example.ui.theme.IndigoHyper
+
+/**
+ * WCAG 2.1 AA Compliant Color Tokens for Light Theme Mode:
+ * - Background: #FFFFFF (Pure White)
+ * - Card Container: #EDF2F7 (Soft Gray) with #E2E8F0 subtle 1px border
+ * - Main Header: #1A202C (Rich Charcoal Black, contrast 16.5:1)
+ * - Subheadings / Step Badges: #0A6C7A (Deep Teal / Slate Blue, contrast >= 5.8:1)
+ * - Body Text: #4A5568 (Dark Slate Gray, fully opaque, contrast 6.2:1)
+ * - Primary Action Button: #007A8A with #FFFFFF text (contrast 4.6:1)
+ * - Replay Button: Solid #0A6C7A border, icon & text
+ * - Free & Serverless Badge: #E6FFFA background fill with #006D77 text (contrast 6.0:1)
+ * - Voice Guide Alert Box: #EDF2F7 / #EBF8FF with #1A365D dark blue text (contrast 11.2:1)
+ */
+private val WcagPrimaryBg = Color(0xFFFFFFFF)
+private val WcagCardContainer = Color(0xFFEDF2F7)
+private val WcagCardBorder = Color(0xFFE2E8F0)
+private val WcagHeader = Color(0xFF1A202C)
+private val WcagSubheading = Color(0xFF0A6C7A)
+private val WcagBodyText = Color(0xFF4A5568)
+private val WcagBtnPrimary = Color(0xFF007A8A)
+private val WcagBtnText = Color(0xFFFFFFFF)
+private val WcagBadgeBg = Color(0xFFE6FFFA)
+private val WcagBadgeText = Color(0xFF006D77)
+private val WcagAlertText = Color(0xFF1A365D)
 
 data class TutorialStepItem(
     val stepNumber: Int,
@@ -153,12 +175,14 @@ fun VoiceInteractiveTutorialDialog(
                 .fillMaxHeight(0.88f)
                 .clip(RoundedCornerShape(24.dp))
                 .border(
-                    width = 1.2.dp,
-                    brush = Brush.linearGradient(listOf(CyanNeon.copy(alpha = 0.8f), IndigoHyper.copy(alpha = 0.5f))),
+                    width = 1.dp,
+                    color = WcagCardBorder,
                     shape = RoundedCornerShape(24.dp)
-                ),
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f),
-            tonalElevation = 16.dp
+                )
+                .testTag("voice_tutorial_dialog"),
+            color = WcagPrimaryBg,
+            shadowElevation = 10.dp,
+            tonalElevation = 2.dp
         ) {
             Column(
                 modifier = Modifier
@@ -171,20 +195,24 @@ fun VoiceInteractiveTutorialDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        AetherVaultLogo(size = 32.dp, isPulsing = narrator.isSpeaking)
-                        Spacer(modifier = Modifier.width(10.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AetherVaultLogo(size = 36.dp, isPulsing = narrator.isSpeaking)
+                        Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
                                 text = if (isHindi) "AetherVault ऑडियो ट्यूटोरियल" else "Interactive Voice Tutorial",
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp
+                                fontSize = 17.sp,
+                                color = WcagHeader
                             )
                             Text(
-                                text = "By TRB FireOps (@trbfireops)",
+                                text = "By Ayush Mondal (Class 9th, 14y in 2026) • TRB FireOps",
                                 fontSize = 11.sp,
-                                color = CyanNeon,
-                                fontWeight = FontWeight.Medium
+                                color = WcagSubheading,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     }
@@ -202,16 +230,17 @@ fun VoiceInteractiveTutorialDialog(
                             }
                         },
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(42.dp)
                             .clip(CircleShape)
-                            .background(if (narrator.isSpeaking) CyanNeon.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant)
+                            .background(if (narrator.isSpeaking) WcagBadgeBg else WcagCardContainer)
+                            .border(1.dp, if (narrator.isSpeaking) WcagBtnPrimary else WcagCardBorder, CircleShape)
                     ) {
                         Icon(
                             imageVector = if (narrator.isMuted) Icons.Default.VolumeOff
                             else if (narrator.isSpeaking) Icons.Default.VolumeUp
                             else Icons.Default.VolumeDown,
                             contentDescription = "Voice Guide Toggle",
-                            tint = if (narrator.isSpeaking) CyanNeon else MaterialTheme.colorScheme.onSurface
+                            tint = if (narrator.isSpeaking) WcagBtnPrimary else WcagSubheading
                         )
                     }
                 }
@@ -228,12 +257,12 @@ fun VoiceInteractiveTutorialDialog(
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .height(4.dp)
-                                .clip(RoundedCornerShape(2.dp))
+                                .height(5.dp)
+                                .clip(RoundedCornerShape(3.dp))
                                 .background(
-                                    if (i == currentStepIndex) CyanNeon
-                                    else if (i < currentStepIndex) IndigoHyper
-                                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f)
+                                    if (i == currentStepIndex) WcagBtnPrimary
+                                    else if (i < currentStepIndex) WcagSubheading
+                                    else WcagCardBorder
                                 )
                         )
                     }
@@ -252,52 +281,55 @@ fun VoiceInteractiveTutorialDialog(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+                            containerColor = WcagCardContainer
                         ),
-                        shape = RoundedCornerShape(16.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, CyanNeon.copy(alpha = 0.3f))
+                        shape = RoundedCornerShape(18.dp),
+                        border = BorderStroke(1.dp, WcagCardBorder)
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Column(modifier = Modifier.padding(18.dp)) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                // 100% Free & Serverless Badge
                                 Surface(
-                                    color = CyanNeon.copy(alpha = 0.2f),
-                                    shape = RoundedCornerShape(8.dp)
+                                    color = WcagBadgeBg,
+                                    shape = RoundedCornerShape(8.dp),
+                                    border = BorderStroke(1.dp, WcagBadgeText.copy(alpha = 0.25f))
                                 ) {
                                     Text(
                                         text = if (isHindi) currentStep.tipBadgeHi else currentStep.tipBadgeEn,
-                                        color = CyanNeon,
+                                        color = WcagBadgeText,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                                     )
                                 }
 
                                 Text(
                                     text = "${currentStep.stepNumber} / ${steps.size}",
                                     fontFamily = FontFamily.Monospace,
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = WcagSubheading
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(14.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(
                                     modifier = Modifier
                                         .size(52.dp)
                                         .clip(CircleShape)
-                                        .background(Brush.linearGradient(listOf(CyanNeon, IndigoHyper))),
+                                        .background(WcagBtnPrimary),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         imageVector = currentStep.icon,
                                         contentDescription = null,
-                                        tint = Color.Black,
+                                        tint = WcagBtnText,
                                         modifier = Modifier.size(28.dp)
                                     )
                                 }
@@ -309,23 +341,26 @@ fun VoiceInteractiveTutorialDialog(
                                         text = if (isHindi) currentStep.titleHi else currentStep.titleEn,
                                         fontSize = 17.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        color = WcagHeader
                                     )
                                     Text(
                                         text = if (isHindi) "स्टेप ${currentStep.stepNumber}" else "Step ${currentStep.stepNumber}",
-                                        fontSize = 12.sp,
-                                        color = CyanNeon
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = WcagSubheading
                                     )
                                 }
                             }
 
                             Spacer(modifier = Modifier.height(14.dp))
 
+                            // High-contrast, fully opaque body text
                             Text(
                                 text = if (isHindi) currentStep.descHi else currentStep.descEn,
-                                fontSize = 13.sp,
-                                lineHeight = 20.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                fontSize = 14.sp,
+                                lineHeight = 22.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = WcagBodyText
                             )
                         }
                     }
@@ -334,19 +369,18 @@ fun VoiceInteractiveTutorialDialog(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = if (narrator.isSpeaking) CyanNeon.copy(alpha = 0.12f)
-                            else MaterialTheme.colorScheme.surfaceVariant
+                            containerColor = if (narrator.isSpeaking) WcagBadgeBg else WcagCardContainer
                         ),
-                        shape = RoundedCornerShape(14.dp),
-                        border = androidx.compose.foundation.BorderStroke(
+                        shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(
                             1.dp,
-                            if (narrator.isSpeaking) CyanNeon else Color.Transparent
+                            if (narrator.isSpeaking) WcagBtnPrimary else WcagCardBorder
                         )
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp),
+                                .padding(14.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -354,8 +388,8 @@ fun VoiceInteractiveTutorialDialog(
                                 Icon(
                                     imageVector = if (narrator.isSpeaking) Icons.Default.GraphicEq else Icons.Default.Headphones,
                                     contentDescription = null,
-                                    tint = CyanNeon,
-                                    modifier = Modifier.size(22.dp)
+                                    tint = WcagSubheading,
+                                    modifier = Modifier.size(24.dp)
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Column {
@@ -365,34 +399,42 @@ fun VoiceInteractiveTutorialDialog(
                                         } else {
                                             if (isHindi) "वॉइस गाइडेंस सुनें" else "Listen to Audio Guide"
                                         },
-                                        fontSize = 12.sp,
+                                        fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = if (narrator.isSpeaking) CyanNeon else MaterialTheme.colorScheme.onSurface
+                                        color = WcagAlertText
                                     )
                                     Text(
-                                        text = if (isHindi) "हिंदी व अंग्रेजी में वॉइस ऑडियो" else "Spoken voice in Hindi & English",
-                                        fontSize = 10.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        text = if (isHindi) "हिंदी व अंग्रेजी में स्पष्ट वॉइस ऑडियो" else "Spoken voice in Hindi & English",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = WcagBodyText
                                     )
                                 }
                             }
 
-                            Button(
+                            // Replay Button: clean outlined style with solid dark teal border, text, and icon
+                            OutlinedButton(
                                 onClick = {
                                     SensoryFeedbackEngine.trigger(context, HapticStyle.LIGHT_TICK)
                                     val script = if (isHindi) currentStep.voiceScriptHi else currentStep.voiceScriptEn
                                     narrator.speak(script, isHindi)
                                 },
-                                shape = RoundedCornerShape(8.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = CyanNeon,
-                                    contentColor = Color.Black
+                                shape = RoundedCornerShape(10.dp),
+                                border = BorderStroke(1.5.dp, WcagSubheading),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = Color.Transparent,
+                                    contentColor = WcagSubheading
                                 ),
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
                             ) {
-                                Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp), tint = WcagSubheading)
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(if (isHindi) "दोबारा सुनें" else "Replay", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text(
+                                    text = if (isHindi) "दोबारा सुनें" else "Replay",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = WcagSubheading
+                                )
                             }
                         }
                     }
@@ -400,10 +442,10 @@ fun VoiceInteractiveTutorialDialog(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // Navigation Buttons (Back & Next / Finish)
+                // Navigation Buttons (Back & Next Step / Finish)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (currentStepIndex > 0) {
@@ -412,15 +454,26 @@ fun VoiceInteractiveTutorialDialog(
                                 SensoryFeedbackEngine.trigger(context, HapticStyle.LIGHT_TICK)
                                 currentStepIndex--
                             },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp)
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.5.dp, WcagSubheading),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = WcagSubheading
+                            )
                         ) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp), tint = WcagSubheading)
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(if (isHindi) "पिछला" else "Back")
+                            Text(
+                                text = if (isHindi) "पिछला" else "Back",
+                                fontWeight = FontWeight.Bold,
+                                color = WcagSubheading
+                            )
                         }
                     }
 
+                    // Next Step Button: solid vibrant blue/teal (#007A8A) with bold white text (#FFFFFF)
                     Button(
                         onClick = {
                             SensoryFeedbackEngine.trigger(context, HapticStyle.SUCCESS_DOUBLE_PULSE)
@@ -431,9 +484,16 @@ fun VoiceInteractiveTutorialDialog(
                                 onDismiss()
                             }
                         },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = CyanNeon, contentColor = Color.Black),
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                            .testTag("tutorial_next_button"),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = WcagBtnPrimary,
+                            contentColor = WcagBtnText
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                     ) {
                         Text(
                             text = if (currentStepIndex < steps.size - 1) {
@@ -441,13 +501,16 @@ fun VoiceInteractiveTutorialDialog(
                             } else {
                                 if (isHindi) "ट्यूटोरियल पूरा हुआ" else "Finish Tutorial"
                             },
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            color = WcagBtnText
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Icon(
                             imageVector = if (currentStepIndex < steps.size - 1) Icons.Default.ArrowForward else Icons.Default.Check,
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(18.dp),
+                            tint = WcagBtnText
                         )
                     }
                 }

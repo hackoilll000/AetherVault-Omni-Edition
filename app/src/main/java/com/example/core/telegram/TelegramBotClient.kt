@@ -544,6 +544,20 @@ class TelegramBotClient(
                                     isOfflinePinned = true
                                 )
                                 database.fileDao().insertFile(vaultFile)
+
+                                val postDate = post.optLong("date", System.currentTimeMillis() / 1000) * 1000L
+                                val teleDrop = com.example.core.database.TeleDropItem(
+                                    itemId = "tg_msg_$msgId",
+                                    type = when {
+                                        text.startsWith("http://") || text.startsWith("https://") -> "LINK"
+                                        text.contains("\n") || text.contains("{") -> "CODE"
+                                        else -> "TEXT"
+                                    },
+                                    content = text,
+                                    sourceDevice = "Telegram Channel (#$msgId)",
+                                    createdAt = postDate
+                                )
+                                database.teleDropDao().insertItem(teleDrop)
                                 discoveredCount++
                             }
                         }
