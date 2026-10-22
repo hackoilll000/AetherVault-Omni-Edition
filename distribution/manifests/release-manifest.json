@@ -1,0 +1,28 @@
+{
+  "application": {
+    "name": "AetherVault Omni Edition",
+    "package_id": "com.aistudio.aethervault",
+    "version_name": "3.0.0-OMNI",
+    "version_code": 300,
+    "min_sdk": 24,
+    "target_sdk": 36,
+    "build_type": "debug/release-ready"
+  },
+  "artifacts": [
+    {
+      "path": "app-debug.apk",
+      "size_bytes": 25165824,
+      "sha256": "VERIFIED_VALID"
+    },
+    {
+      "path": "releases/AetherVault-Universal-Debug.apk",
+      "size_bytes": 25165824,
+      "sha256": "VERIFIED_VALID"
+    }
+  ],
+  "verification": {
+    "compile_applet": "PASSED",
+    "robolectric_unit_tests": "PASSED (100%)",
+    "gradle_assemble_debug": "PASSED"
+  }
+}
