@@ -291,9 +291,9 @@ fun TeleDropScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { showDisclaimerDetails = !showDisclaimerDetails },
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
                 shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFFB74D))
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
                     Row(
@@ -308,7 +308,7 @@ fun TeleDropScreen(
                             Icon(
                                 imageVector = Icons.Default.Warning,
                                 contentDescription = null,
-                                tint = Color(0xFFE65100),
+                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -316,13 +316,13 @@ fun TeleDropScreen(
                                 text = if (isHindi) "महत्वपूर्ण कानूनी डिस्क्लेमर (कानूनी नोटिस)" else "Legal Disclaimer & Compliance Notice",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFFE65100)
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
                             )
                         }
                         Icon(
                             imageVector = if (showDisclaimerDetails) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                             contentDescription = "Toggle",
-                            tint = Color(0xFFE65100),
+                            tint = MaterialTheme.colorScheme.onTertiaryContainer,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -331,14 +331,14 @@ fun TeleDropScreen(
                         text = if (isHindi) "यह ऐप सिर्फ पर्सनल यूज़ और बॉट ऑपरेशन डेमो के लिए है। किसी भी दुरुपयोग की जिम्मेदारी यूजर की है।"
                         else "Strictly for educational demonstration and personal use. Developers assume no liability for misuse.",
                         fontSize = 11.sp,
-                        color = Color(0xFF5D4037),
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
                         lineHeight = 15.sp,
                         modifier = Modifier.padding(top = 4.dp)
                     )
 
                     if (showDisclaimerDetails) {
                         Spacer(modifier = Modifier.height(6.dp))
-                        HorizontalDivider(color = Color(0xFFFFCC80), thickness = 0.8.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.8.dp)
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = if (isHindi) """
@@ -352,7 +352,7 @@ fun TeleDropScreen(
 • End users bear sole responsibility for all activities; developers accept zero liability.
                             """.trimIndent(),
                             fontSize = 10.5.sp,
-                            color = Color(0xFF4E342E),
+                            color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.85f),
                             lineHeight = 15.sp
                         )
                     }
@@ -547,7 +547,7 @@ fun TeleDropScreen(
                                 Spacer(modifier = Modifier.height(6.dp))
 
                                 Surface(
-                                    color = if (item.type == "CODE") Color(0xFF263238) else Color.Transparent,
+                                    color = if (item.type == "CODE") MaterialTheme.colorScheme.surfaceContainerHighest else Color.Transparent,
                                     shape = RoundedCornerShape(8.dp),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
@@ -556,7 +556,7 @@ fun TeleDropScreen(
                                         fontSize = 13.sp,
                                         lineHeight = 18.sp,
                                         fontFamily = if (item.type == "CODE") FontFamily.Monospace else FontFamily.Default,
-                                        color = if (item.type == "CODE") Color(0xFF80CBC4) else M3TextPrimary,
+                                        color = if (item.type == "CODE") MaterialTheme.colorScheme.onSurfaceVariant else M3TextPrimary,
                                         modifier = if (item.type == "CODE") Modifier.padding(10.dp) else Modifier
                                     )
                                 }

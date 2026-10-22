@@ -263,6 +263,7 @@ fun AetherVaultTheme(
         ThemePreset.FROSTED_GLASS -> if (isDark) FrostedGlassColorScheme else M3LightColorScheme
         ThemePreset.DOT_MATRIX -> if (isDark) DotMatrixColorScheme else M3LightColorScheme
         ThemePreset.LIQUID_GLASS -> if (isDark) LiquidGlassColorScheme else M3LightColorScheme
+        ThemePreset.CUSTOM_PALETTE -> if (isDark) M3DarkColorScheme else M3LightColorScheme
     }
 
     val dynamicShapes = Shapes(

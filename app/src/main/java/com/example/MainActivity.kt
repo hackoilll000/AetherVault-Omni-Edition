@@ -37,6 +37,7 @@ import com.example.core.crypto.AesGcmChunkCipher
 import com.example.core.database.VaultFile
 import com.example.core.crash.VaultCrashHandler
 import com.example.core.sync.TelegramSyncForegroundService
+import com.example.features.botstudio.*
 import com.example.features.drive.DriveExplorerScreen
 import com.example.features.onboarding.ConnectWizardScreen
 import com.example.features.onboarding.TermsAgreementScreen
@@ -63,6 +64,7 @@ enum class MainNavTab {
 enum class SubScreen {
     NONE,
     APPEARANCE_STUDIO,
+    BOT_STUDIO,
     WORKSTATION_VIEWER
 }
 
@@ -126,11 +128,13 @@ fun AuroraBackgroundCanvas() {
 class MainActivity : ComponentActivity() {
     private val viewModel: VaultViewModel by viewModels()
     private lateinit var appearancePrefs: AppearancePreferences
+    private lateinit var botProjectManager: BotProjectManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         appearancePrefs = AppearancePreferences(this)
+        botProjectManager = BotProjectManager(this)
         VaultCrashHandler.init(this)
         runCatching {
             val serviceIntent = Intent(this, TelegramSyncForegroundService::class.java)
@@ -488,6 +492,7 @@ class MainActivity : ComponentActivity() {
                                         SubScreen.APPEARANCE_STUDIO -> {
                                             AppearanceStudioScreen(
                                                 currentConfig = appearanceConfig,
+                                                appearancePrefs = appearancePrefs,
                                                 onUpdateTheme = { appearancePrefs.updateTheme(it) },
                                                 onUpdateRadius = { appearancePrefs.updateCornerRadius(it) },
                                                 onUpdateCols = { appearancePrefs.updateGridColumns(it) },
@@ -496,6 +501,12 @@ class MainActivity : ComponentActivity() {
                                                 onToggleTelemetry = { appearancePrefs.toggleTelemetry(it) },
                                                 onUpdateLang = { appearancePrefs.updateLanguage(it) },
                                                 onBack = { subScreen = SubScreen.NONE }
+                                            )
+                                        }
+                                        SubScreen.BOT_STUDIO -> {
+                                            BotStudioScreen(
+                                                manager = botProjectManager,
+                                                language = appearanceConfig.language
                                             )
                                         }
                                         SubScreen.WORKSTATION_VIEWER -> {
@@ -866,6 +877,9 @@ class MainActivity : ComponentActivity() {
                                                         onThemeModeChange = { appearancePrefs.updateThemeMode(it) },
                                                         onOpenAppearanceStudio = {
                                                             subScreen = SubScreen.APPEARANCE_STUDIO
+                                                        },
+                                                        onOpenBotStudio = {
+                                                            subScreen = SubScreen.BOT_STUDIO
                                                         },
                                                         onAddBotToken = { viewModel.addBotWorker(it) },
                                                         onRemoveBot = { viewModel.removeBot(it) },

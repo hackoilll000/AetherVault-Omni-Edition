@@ -43,6 +43,7 @@ fun SettingsScreen(
     currentThemeMode: ThemeMode = ThemeMode.SYSTEM_AUTO,
     onThemeModeChange: (ThemeMode) -> Unit = {},
     onOpenAppearanceStudio: () -> Unit,
+    onOpenBotStudio: () -> Unit = {},
     onAddBotToken: (String) -> Unit,
     onRemoveBot: (Long) -> Unit,
     onToggleWebDav: (Boolean) -> Unit,
@@ -617,12 +618,43 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.width(14.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = if (isHindi) "अपीयरेंस व HUD स्टूडियो" else "Appearance & HUD Studio",
+                            text = if (isHindi) "अपीयरेंस व A-Z कस्टम स्टूडियो" else "A-Z Customization Studio",
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
                         )
                         Text(
-                            text = "5 Themes, Corner Radius, Grid Density & Telemetry",
+                            text = "Palettes, Fonts, Animations, Density & Export Profile",
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray)
+                }
+            }
+
+            // Python Bot Studio Entry
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onOpenBotStudio() }
+                    .testTag("open_bot_studio_button"),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.SmartToy, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
+                    Spacer(modifier = Modifier.width(14.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = if (isHindi) "पायथन बॉट ऑटोमेशन स्टूडियो" else "Python Bot Studio & Termux Deployer",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = "Bot Templates, Python Editor, Termux Scripts & AI Integrations",
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
