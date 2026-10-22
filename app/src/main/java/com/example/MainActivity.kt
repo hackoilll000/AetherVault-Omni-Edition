@@ -38,6 +38,9 @@ import com.example.core.database.VaultFile
 import com.example.core.crash.VaultCrashHandler
 import com.example.core.sync.TelegramSyncForegroundService
 import com.example.features.botstudio.*
+import com.example.features.diagnostics.*
+import com.example.features.media.*
+import com.example.features.remotefetch.*
 import com.example.features.drive.DriveExplorerScreen
 import com.example.features.onboarding.ConnectWizardScreen
 import com.example.features.onboarding.TermsAgreementScreen
@@ -65,6 +68,9 @@ enum class SubScreen {
     NONE,
     APPEARANCE_STUDIO,
     BOT_STUDIO,
+    REMOTE_FETCH,
+    DEBUG_CENTER,
+    MEDIA_PLAYER,
     WORKSTATION_VIEWER
 }
 
@@ -129,12 +135,16 @@ class MainActivity : ComponentActivity() {
     private val viewModel: VaultViewModel by viewModels()
     private lateinit var appearancePrefs: AppearancePreferences
     private lateinit var botProjectManager: BotProjectManager
+    private lateinit var remoteFetchWorker: RemoteFetchWorker
+    private lateinit var diagnosticManager: DiagnosticManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         appearancePrefs = AppearancePreferences(this)
         botProjectManager = BotProjectManager(this)
+        remoteFetchWorker = RemoteFetchWorker(this)
+        diagnosticManager = DiagnosticManager(this)
         VaultCrashHandler.init(this)
         runCatching {
             val serviceIntent = Intent(this, TelegramSyncForegroundService::class.java)
@@ -367,6 +377,11 @@ class MainActivity : ComponentActivity() {
                                         "TelegramChat" -> activeTab = MainNavTab.TELEDROP
                                         "Uploads" -> activeTab = MainNavTab.DRIVE
                                         "Offline" -> activeTab = MainNavTab.DRIVE
+                                        "RemoteFetch" -> subScreen = SubScreen.REMOTE_FETCH
+                                        "BotStudio" -> subScreen = SubScreen.BOT_STUDIO
+                                        "AppearanceStudio" -> subScreen = SubScreen.APPEARANCE_STUDIO
+                                        "DebugCenter" -> subScreen = SubScreen.DEBUG_CENTER
+                                        "MediaPlayer" -> subScreen = SubScreen.MEDIA_PLAYER
                                         "LegalDisclaimer" -> showLegalDisclaimerDialog = true
                                         "Settings" -> activeTab = MainNavTab.SETTINGS
                                     }
@@ -508,6 +523,28 @@ class MainActivity : ComponentActivity() {
                                                 manager = botProjectManager,
                                                 language = appearanceConfig.language
                                             )
+                                        }
+                                        SubScreen.REMOTE_FETCH -> {
+                                            RemoteFetchScreen(
+                                                worker = remoteFetchWorker,
+                                                language = appearanceConfig.language,
+                                                onBack = { subScreen = SubScreen.NONE }
+                                            )
+                                        }
+                                        SubScreen.DEBUG_CENTER -> {
+                                            DebugCenterScreen(
+                                                manager = diagnosticManager,
+                                                language = appearanceConfig.language,
+                                                onBack = { subScreen = SubScreen.NONE }
+                                            )
+                                        }
+                                        SubScreen.MEDIA_PLAYER -> {
+                                            activeViewingFile?.let { mediaFile ->
+                                                MediaPlayerScreen(
+                                                    file = mediaFile,
+                                                    onBack = { subScreen = SubScreen.NONE }
+                                                )
+                                            }
                                         }
                                         SubScreen.WORKSTATION_VIEWER -> {
                                             activeViewingFile?.let { file ->
