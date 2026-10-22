@@ -157,11 +157,13 @@ class MainActivity : ComponentActivity() {
             val fileCount by viewModel.activeFileCount.collectAsStateWithLifecycle()
             val masterBotToken by viewModel.masterBotToken.collectAsStateWithLifecycle()
             val cameraSyncStatus by viewModel.cameraSyncStatus.collectAsStateWithLifecycle()
+            val lockPolicy by viewModel.lockPolicy.collectAsStateWithLifecycle()
 
             var activeTab by remember { mutableStateOf(MainNavTab.DASHBOARD) }
             var subScreen by remember { mutableStateOf(SubScreen.NONE) }
             var activeViewingFile by remember { mutableStateOf<VaultFile?>(null) }
             var activeFolderId by remember { mutableStateOf("root") }
+            var searchQuery by remember { mutableStateOf("") }
 
             // Share ticket and restoration dialog states
             var shareTicketUrl by remember { mutableStateOf<String?>(null) }
@@ -180,32 +182,34 @@ class MainActivity : ComponentActivity() {
             var isVerifyingTelegram by remember { mutableStateOf(false) }
             var showLegalDisclaimerDialog by remember { mutableStateOf(false) }
 
-            // Automatic Storage Permission requester on startup for both Root and Non-Root devices
-            val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
-                contract = androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()
-            ) { /* Handled */ }
+            // Feature Overlays & Dialog States
+            var showFastSearchOverlay by remember { mutableStateOf(false) }
+            var showStorageMetricsDialog by remember { mutableStateOf(false) }
+            var showCommandPaletteDialog by remember { mutableStateOf(false) }
 
-            LaunchedEffect(Unit) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                    permissionLauncher.launch(
-                        arrayOf(
-                            android.Manifest.permission.READ_MEDIA_IMAGES,
-                            android.Manifest.permission.READ_MEDIA_VIDEO,
-                            android.Manifest.permission.READ_MEDIA_AUDIO
-                        )
-                    )
-                } else {
-                    permissionLauncher.launch(
-                        arrayOf(
-                            android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        )
-                    )
-                }
-            }
+            // UI Style & Theme Selection dialog state
+            var showUiStyleChoiceDialog by remember { mutableStateOf(!appearanceConfig.hasChosenUiStyle) }
+
+            // Add File Bottom Sheet & Creation Dialog States
+            var showAddFileBottomSheet by remember { mutableStateOf(false) }
+            var showCreateFolderDialogInMainActivity by remember { mutableStateOf(false) }
+            var newFolderNameInMainActivity by remember { mutableStateOf("") }
+            var showCreateNoteDialogInMainActivity by remember { mutableStateOf(false) }
+            var newNoteTitleInMainActivity by remember { mutableStateOf("") }
+            var newNoteContentInMainActivity by remember { mutableStateOf("") }
 
             val isHindi = appearanceConfig.language == AppLanguage.HI
             val context = LocalContext.current
+
+            // FLAG_SECURE Privacy Preview Effect
+            LaunchedEffect(appearanceConfig.privacyPreviewEnabled) {
+                val activity = context as? android.app.Activity
+                if (appearanceConfig.privacyPreviewEnabled) {
+                    activity?.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+                } else {
+                    activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+                }
+            }
 
             // Native SAF File Picker for real user files from device storage / Downloads / SD Card
             val filePickerLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
@@ -226,6 +230,7 @@ class MainActivity : ComponentActivity() {
             }
 
             AetherVaultTheme(
+                themeMode = appearanceConfig.themeMode,
                 preset = appearanceConfig.themePreset,
                 cornerRadiusDp = appearanceConfig.cornerRadiusDp
             ) {
@@ -261,7 +266,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             } else if (cleanData.contains(":")) {
-                                viewModel.completeSetup(listOf(cleanData), 0L, "123456", null)
+                                restorationNotification = "Bot Token detected in QR code! Please complete the setup wizard with your Master Password."
                             }
                         }
                     )
@@ -336,18 +341,6 @@ class MainActivity : ComponentActivity() {
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(if (isHindi) "वॉल्ट खोलें" else "Unlock Vault")
                             }
-
-                            Spacer(modifier = Modifier.height(12.dp))
-                            TextButton(
-                                onClick = {
-                                    // Quick demo biometric bypass
-                                    viewModel.unlockVault("123456")
-                                }
-                            ) {
-                                Icon(Icons.Default.Fingerprint, contentDescription = null, tint = CyanNeon)
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(if (isHindi) "बायोमेट्रिक से खोलें" else "Quick Biometric Unlock")
-                            }
                         }
                     }
                 } else {
@@ -355,7 +348,6 @@ class MainActivity : ComponentActivity() {
                     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                     val coroutineScope = rememberCoroutineScope()
                     var subTabIndex by remember { mutableIntStateOf(0) }
-                    var searchQuery by remember { mutableStateOf("") }
                     var showOutofSyncToast by remember { mutableStateOf(true) }
 
                     ModalNavigationDrawer(
@@ -385,16 +377,18 @@ class MainActivity : ComponentActivity() {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(M3Background)
+                                .background(MaterialTheme.colorScheme.background)
                         ) {
                             Scaffold(
-                                containerColor = Color.Transparent,
+                                containerColor = MaterialTheme.colorScheme.background,
+                                contentWindowInsets = WindowInsets.safeDrawing,
                                 topBar = {
                                     if (subScreen == SubScreen.NONE) {
                                         Column(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .background(M3Background)
+                                                .statusBarsPadding()
+                                                .background(MaterialTheme.colorScheme.background)
                                         ) {
                                             if (activeTab == MainNavTab.PHOTOS) {
                                                 M3CollectionsHeader(
@@ -408,9 +402,13 @@ class MainActivity : ComponentActivity() {
                                             } else {
                                                 M3DriveSearchBar(
                                                     searchQuery = searchQuery,
-                                                    onSearchQueryChange = { searchQuery = it },
+                                                    onSearchQueryChange = {
+                                                        searchQuery = it
+                                                        if (it.isNotBlank()) showFastSearchOverlay = true
+                                                    },
                                                     onOpenDrawer = { coroutineScope.launch { drawerState.open() } },
                                                     onProfileClick = { activeTab = MainNavTab.SETTINGS },
+                                                    onSearchClick = { showFastSearchOverlay = true },
                                                     isBotHealthy = botSwarm.any { it.isHealthy },
                                                     placeholderText = if (activeTab == MainNavTab.DRIVE) "Search in Tele Drive" else "Search in Drive"
                                                 )
@@ -428,7 +426,12 @@ class MainActivity : ComponentActivity() {
                                 },
                                 bottomBar = {
                                     if (subScreen == SubScreen.NONE) {
-                                        Column {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .navigationBarsPadding()
+                                                .background(MaterialTheme.colorScheme.surface)
+                                        ) {
                                             if (showOutofSyncToast) {
                                                 M3SyncToastBanner(
                                                     messageText = "Review out-of-sync changes",
@@ -851,7 +854,7 @@ class MainActivity : ComponentActivity() {
                                                         botHealthy = botSwarm.any { it.isHealthy }
                                                     )
                                                 }
-                                                MainNavTab.SETTINGS -> {
+                                                 MainNavTab.SETTINGS -> {
                                                     SettingsScreen(
                                                         totalStorageBytes = totalStorage,
                                                         activeFileCount = fileCount,
@@ -859,6 +862,8 @@ class MainActivity : ComponentActivity() {
                                                         language = appearanceConfig.language,
                                                         channelId = channelId,
                                                         masterBotToken = masterBotToken,
+                                                        currentThemeMode = appearanceConfig.themeMode,
+                                                        onThemeModeChange = { appearancePrefs.updateThemeMode(it) },
                                                         onOpenAppearanceStudio = {
                                                             subScreen = SubScreen.APPEARANCE_STUDIO
                                                         },
@@ -893,7 +898,12 @@ class MainActivity : ComponentActivity() {
                                                         onClearAllData = {
                                                             viewModel.clearAllVaultData()
                                                         },
-                                                        onLockVault = { viewModel.lockVault() }
+                                                        onLockVault = { viewModel.lockVault() },
+                                                       lockPolicy = lockPolicy,
+                                                       onLockPolicyChange = { viewModel.updateLockPolicy(it) },
+                                                       onOpenStorageMetrics = { showStorageMetricsDialog = true },
+                                                       privacyPreviewEnabled = appearanceConfig.privacyPreviewEnabled,
+                                                       onPrivacyPreviewChange = { appearancePrefs.togglePrivacyPreview(it) }
                                                     )
                                                 }
                                             }
@@ -905,7 +915,7 @@ class MainActivity : ComponentActivity() {
                             // Stacked Material 3 Squircle FABs (Bottom Right)
                             if (subScreen == SubScreen.NONE) {
                                 M3StackedFabs(
-                                    onPrimaryFabClick = { filePickerLauncher.launch(arrayOf("*/*")) },
+                                    onPrimaryFabClick = { showAddFileBottomSheet = true },
                                     onSecondaryFabClick = { mediaPickerLauncher.launch(arrayOf("image/*", "video/*")) },
                                     modifier = Modifier
                                         .align(Alignment.BottomEnd)
@@ -1190,6 +1200,194 @@ The developers (Ayush Mondal / AJPM / TRB FireOps) assume NO LIABILITY or respon
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE65100), contentColor = Color.White)
                             ) {
                                 Text(if (isHindi) "मैंने पढ़ लिया और सहमत हूँ" else "I Understand & Agree")
+                            }
+                        }
+                    )
+                }
+
+                // First-launch UI Style & Theme Selection Dialog (can also be re-triggered from Settings)
+                if (showUiStyleChoiceDialog) {
+                    UiStyleSelectionDialog(
+                        initialMode = appearanceConfig.themeMode,
+                        language = appearanceConfig.language,
+                        onConfirm = { chosenMode ->
+                            appearancePrefs.updateThemeMode(chosenMode)
+                            appearancePrefs.markUiStyleChosen()
+                            showUiStyleChoiceDialog = false
+                        },
+                        onDismiss = {
+                            appearancePrefs.markUiStyleChosen()
+                            showUiStyleChoiceDialog = false
+                        }
+                    )
+                }
+
+                // Google Drive / Photos style Material 3 Add File Bottom Sheet
+                if (showAddFileBottomSheet) {
+                    M3AddFileBottomSheet(
+                        onDismissRequest = { showAddFileBottomSheet = false },
+                        language = appearanceConfig.language,
+                        onCreateFolderClick = {
+                            showAddFileBottomSheet = false
+                            newFolderNameInMainActivity = ""
+                            showCreateFolderDialogInMainActivity = true
+                        },
+                        onUploadFilesClick = {
+                            showAddFileBottomSheet = false
+                            filePickerLauncher.launch(arrayOf("*/*"))
+                        },
+                        onUploadMediaClick = {
+                            showAddFileBottomSheet = false
+                            mediaPickerLauncher.launch(arrayOf("image/*", "video/*"))
+                        },
+                        onCreateNoteClick = {
+                            showAddFileBottomSheet = false
+                            newNoteTitleInMainActivity = ""
+                            newNoteContentInMainActivity = ""
+                            showCreateNoteDialogInMainActivity = true
+                        },
+                        onSyncChannelClick = {
+                            showAddFileBottomSheet = false
+                            activeTab = MainNavTab.SETTINGS
+                        },
+                        onTeleDropClick = {
+                            showAddFileBottomSheet = false
+                            activeTab = MainNavTab.TELEDROP
+                        }
+                    )
+                }
+
+                // Create Folder Dialog from Bottom Sheet
+                if (showCreateFolderDialogInMainActivity) {
+                    AlertDialog(
+                        onDismissRequest = { showCreateFolderDialogInMainActivity = false },
+                        title = { Text(if (isHindi) "नया फ़ोल्डर बनाएँ" else "New folder") },
+                        text = {
+                            OutlinedTextField(
+                                value = newFolderNameInMainActivity,
+                                onValueChange = { newFolderNameInMainActivity = it },
+                                label = { Text(if (isHindi) "फ़ोल्डर का नाम" else "Folder name") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    val name = newFolderNameInMainActivity.trim()
+                                    if (name.isNotEmpty()) {
+                                        viewModel.createFolder(name, activeFolderId)
+                                    }
+                                    showCreateFolderDialogInMainActivity = false
+                                }
+                            ) {
+                                Text(if (isHindi) "बनाएँ" else "Create")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showCreateFolderDialogInMainActivity = false }) {
+                                Text(if (isHindi) "रद्द करें" else "Cancel")
+                            }
+                        }
+                    )
+                }
+
+                // Create Text Note Dialog from Bottom Sheet
+                if (showCreateNoteDialogInMainActivity) {
+                    AlertDialog(
+                        onDismissRequest = { showCreateNoteDialogInMainActivity = false },
+                        title = { Text(if (isHindi) "नया नोट बनाएँ" else "New text document") },
+                        text = {
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                OutlinedTextField(
+                                    value = newNoteTitleInMainActivity,
+                                    onValueChange = { newNoteTitleInMainActivity = it },
+                                    label = { Text(if (isHindi) "दस्तावेज़ का शीर्षक" else "Document Title") },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                OutlinedTextField(
+                                    value = newNoteContentInMainActivity,
+                                    onValueChange = { newNoteContentInMainActivity = it },
+                                    label = { Text(if (isHindi) "सामग्री लिखें..." else "Content...") },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(120.dp)
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    val title = newNoteTitleInMainActivity.trim()
+                                    val content = newNoteContentInMainActivity
+                                    val cleanName = if (title.contains('.')) title else "${title.ifBlank { "Doc_${System.currentTimeMillis()}" }}.txt"
+                                    val cacheFile = java.io.File(context.cacheDir, cleanName)
+                                    cacheFile.writeText(content)
+                                    val uri = android.net.Uri.fromFile(cacheFile)
+                                    viewModel.uploadRealFile(context, uri, activeFolderId)
+                                    showCreateNoteDialogInMainActivity = false
+                                }
+                            ) {
+                                Text(if (isHindi) "सहेजें" else "Save")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showCreateNoteDialogInMainActivity = false }) {
+                                Text(if (isHindi) "रद्द करें" else "Cancel")
+                            }
+                        }
+                    )
+                }
+
+                // Fast Offline Search Overlay Component
+                if (showFastSearchOverlay) {
+                    com.example.ui.components.FastOfflineSearchOverlay(
+                        searchQuery = searchQuery,
+                        files = files,
+                        language = appearanceConfig.language,
+                        onQueryChange = { searchQuery = it },
+                        onFileClick = { file ->
+                            showFastSearchOverlay = false
+                            activeViewingFile = file
+                            subScreen = SubScreen.WORKSTATION_VIEWER
+                        },
+                        onClose = { showFastSearchOverlay = false }
+                    )
+                }
+
+                // Storage Metrics & Duplicate Candidate Auditor Modal Dialog
+                if (showStorageMetricsDialog) {
+                    val metricsData = remember(files, totalStorage) { viewModel.calculateStorageMetrics(context) }
+                    com.example.ui.components.StorageMetricsDialog(
+                        metrics = metricsData,
+                        language = appearanceConfig.language,
+                        onDismiss = { showStorageMetricsDialog = false }
+                    )
+                }
+
+                // Raycast/Spotlight Command Palette Dialog
+                if (showCommandPaletteDialog) {
+                    com.example.ui.components.CommandPaletteDialog(
+                        language = appearanceConfig.language,
+                        onDismiss = { showCommandPaletteDialog = false },
+                        onExecuteAction = { actionId ->
+                            showCommandPaletteDialog = false
+                            when (actionId) {
+                                "upload_file" -> filePickerLauncher.launch(arrayOf("*/*"))
+                                "upload_media" -> mediaPickerLauncher.launch(arrayOf("image/*", "video/*"))
+                                "new_folder" -> showCreateFolderDialogInMainActivity = true
+                                "create_note" -> showCreateNoteDialogInMainActivity = true
+                                "storage_metrics" -> showStorageMetricsDialog = true
+                                "fast_search" -> showFastSearchOverlay = true
+                                "appearance_studio" -> subScreen = SubScreen.APPEARANCE_STUDIO
+                                "lock_vault" -> viewModel.lockVault()
+                                "sync_telegram" -> {
+                                    viewModel.scanExistingChannelHistory(context) { _, msg ->
+                                        restorationNotification = msg
+                                    }
+                                }
                             }
                         }
                     )

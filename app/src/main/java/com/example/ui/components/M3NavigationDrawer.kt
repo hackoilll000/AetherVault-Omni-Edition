@@ -39,7 +39,7 @@ fun M3NavigationDrawerContent(
             .widthIn(max = 320.dp)
             .clip(RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp))
             .testTag("m3_navigation_drawer"),
-        color = Color(0xFFF8FAFD)
+        color = MaterialTheme.colorScheme.surface
     ) {
         Column(
             modifier = Modifier
@@ -54,15 +54,15 @@ fun M3NavigationDrawerContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Tele Drive",
+                    text = "AetherVault Drive",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = M3TextPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
             HorizontalDivider(
-                color = M3BorderSubtle,
+                color = MaterialTheme.colorScheme.outlineVariant,
                 thickness = 1.dp,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
@@ -93,7 +93,7 @@ fun M3NavigationDrawerContent(
                         Icon(
                             imageVector = item.icon,
                             contentDescription = item.title,
-                            tint = M3TextMuted,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(22.dp)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
@@ -101,14 +101,14 @@ fun M3NavigationDrawerContent(
                             text = item.title,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Medium,
-                            color = M3TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
             }
 
             HorizontalDivider(
-                color = M3BorderSubtle,
+                color = MaterialTheme.colorScheme.outlineVariant,
                 thickness = 1.dp,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
@@ -123,7 +123,7 @@ fun M3NavigationDrawerContent(
                     Icon(
                         imageVector = Icons.Outlined.Cloud,
                         contentDescription = "Storage",
-                        tint = M3TextMuted,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -131,7 +131,7 @@ fun M3NavigationDrawerContent(
                         text = "Storage",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Medium,
-                        color = M3TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
@@ -143,8 +143,8 @@ fun M3NavigationDrawerContent(
                         .fillMaxWidth()
                         .height(4.dp)
                         .clip(RoundedCornerShape(2.dp)),
-                    color = M3PrimaryBlue,
-                    trackColor = M3TonalSurface
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -153,7 +153,7 @@ fun M3NavigationDrawerContent(
                     text = mbUsedText,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Normal,
-                    color = M3TextMuted
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -166,14 +166,14 @@ fun M3NavigationDrawerContent(
                         text = "Configure Bot Token",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
-                        color = M3PrimaryBlue
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Surface(
-                    color = M3TonalSurface,
+                    color = MaterialTheme.colorScheme.surfaceContainer,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -182,13 +182,13 @@ fun M3NavigationDrawerContent(
                             text = "Created by Ayush Mondal",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            color = M3TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = "Class 9th, 14 years old in 2026 • TRB FireOps",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Normal,
-                            color = M3TextMuted
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }

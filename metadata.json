@@ -1,5 +1,5 @@
 {
-  "name": "AetherVault Omni",
+  "name": "AetherVault",
   "description": "Infinite Cloud. Zero-Knowledge. Yours Forever. Serverless personal cloud powered by private Telegram Bot Swarm and AES-256-GCM encryption.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

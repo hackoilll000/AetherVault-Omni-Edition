@@ -378,195 +378,256 @@ class TelegramBotClient(
         database: com.example.core.database.AppDatabase,
         context: android.content.Context
     ): Result<Int> = withContext(Dispatchers.IO) {
-        val url = "$customBaseUrl/bot$token/getUpdates?limit=100&timeout=2"
-        val request = Request.Builder().url(url).get().build()
         var discoveredCount = 0
+        val existingChunkMsgIds = runCatching {
+            database.chunkDao().getAllChunksList().map { it.telegramMessageId }.toSet()
+        }.getOrDefault(emptySet())
 
         try {
-            client.newCall(request).execute().use { response ->
-                val bodyStr = response.body?.string() ?: ""
-                val json = JSONObject(bodyStr)
-                if (response.isSuccessful && json.optBoolean("ok")) {
-                    val updates = json.getJSONArray("result")
-                    for (i in 0 until updates.length()) {
-                        val update = updates.getJSONObject(i)
-                        val post = update.optJSONObject("channel_post") ?: update.optJSONObject("message")
-                        if (post != null) {
-                            val msgId = post.getInt("message_id")
-                            val postChat = post.optJSONObject("chat")
-                            val postChatId = postChat?.optLong("id", 0L) ?: 0L
-
-                            val fileId = java.util.UUID.randomUUID().toString()
-
-                            // Check Document
-                            val doc = post.optJSONObject("document")
-                            if (doc != null) {
-                                val docName = doc.optString("file_name", "Document_$msgId")
-                                val docMime = doc.optString("mime_type", "application/octet-stream")
-                                val docSize = doc.optLong("file_size", 0L)
-                                val tgFileId = doc.getString("file_id")
-                                val ext = docName.substringAfterLast('.', "")
-
-                                val vaultFile = com.example.core.database.VaultFile(
-                                    id = fileId,
-                                    name = docName,
-                                    extension = ext,
-                                    mimeType = docMime,
-                                    totalSizeBytes = docSize,
-                                    isOfflinePinned = true
-                                )
-                                val chunk = com.example.core.database.FileChunk(
-                                    id = "${fileId}_0",
-                                    fileId = fileId,
-                                    versionId = "v1",
-                                    chunkIndex = 0,
-                                    telegramMessageId = msgId,
-                                    uploaderBotId = 0L,
-                                    botFileIdsJson = "{\"primary\":\"$tgFileId\"}",
-                                    chunkSizeBytes = docSize.toInt()
-                                )
-                                database.fileDao().insertFile(vaultFile)
-                                database.chunkDao().insertChunk(chunk)
-                                discoveredCount++
-                                continue
-                            }
-
-                            // Check Video
-                            val video = post.optJSONObject("video")
-                            if (video != null) {
-                                val vidName = video.optString("file_name", "Video_$msgId.mp4")
-                                val vidMime = video.optString("mime_type", "video/mp4")
-                                val vidSize = video.optLong("file_size", 0L)
-                                val tgFileId = video.getString("file_id")
-
-                                val vaultFile = com.example.core.database.VaultFile(
-                                    id = fileId,
-                                    name = vidName,
-                                    extension = "mp4",
-                                    mimeType = vidMime,
-                                    totalSizeBytes = vidSize,
-                                    isOfflinePinned = true
-                                )
-                                val chunk = com.example.core.database.FileChunk(
-                                    id = "${fileId}_0",
-                                    fileId = fileId,
-                                    versionId = "v1",
-                                    chunkIndex = 0,
-                                    telegramMessageId = msgId,
-                                    uploaderBotId = 0L,
-                                    botFileIdsJson = "{\"primary\":\"$tgFileId\"}",
-                                    chunkSizeBytes = vidSize.toInt()
-                                )
-                                database.fileDao().insertFile(vaultFile)
-                                database.chunkDao().insertChunk(chunk)
-                                discoveredCount++
-                                continue
-                            }
-
-                            // Check Photo
-                            val photoArr = post.optJSONArray("photo")
-                            if (photoArr != null && photoArr.length() > 0) {
-                                val bestPhoto = photoArr.getJSONObject(photoArr.length() - 1)
-                                val photoSize = bestPhoto.optLong("file_size", 0L)
-                                val tgFileId = bestPhoto.getString("file_id")
-                                val photoName = "Photo_$msgId.jpg"
-
-                                val vaultFile = com.example.core.database.VaultFile(
-                                    id = fileId,
-                                    name = photoName,
-                                    extension = "jpg",
-                                    mimeType = "image/jpeg",
-                                    totalSizeBytes = photoSize,
-                                    isOfflinePinned = true
-                                )
-                                val chunk = com.example.core.database.FileChunk(
-                                    id = "${fileId}_0",
-                                    fileId = fileId,
-                                    versionId = "v1",
-                                    chunkIndex = 0,
-                                    telegramMessageId = msgId,
-                                    uploaderBotId = 0L,
-                                    botFileIdsJson = "{\"primary\":\"$tgFileId\"}",
-                                    chunkSizeBytes = photoSize.toInt()
-                                )
-                                database.fileDao().insertFile(vaultFile)
-                                database.chunkDao().insertChunk(chunk)
-                                discoveredCount++
-                                continue
-                            }
-
-                            // Check Audio / Voice
-                            val audio = post.optJSONObject("audio") ?: post.optJSONObject("voice")
-                            if (audio != null) {
-                                val audName = audio.optString("file_name", "Audio_$msgId.mp3")
-                                val audMime = audio.optString("mime_type", "audio/mpeg")
-                                val audSize = audio.optLong("file_size", 0L)
-                                val tgFileId = audio.getString("file_id")
-
-                                val vaultFile = com.example.core.database.VaultFile(
-                                    id = fileId,
-                                    name = audName,
-                                    extension = "mp3",
-                                    mimeType = audMime,
-                                    totalSizeBytes = audSize,
-                                    isOfflinePinned = true
-                                )
-                                val chunk = com.example.core.database.FileChunk(
-                                    id = "${fileId}_0",
-                                    fileId = fileId,
-                                    versionId = "v1",
-                                    chunkIndex = 0,
-                                    telegramMessageId = msgId,
-                                    uploaderBotId = 0L,
-                                    botFileIdsJson = "{\"primary\":\"$tgFileId\"}",
-                                    chunkSizeBytes = audSize.toInt()
-                                )
-                                database.fileDao().insertFile(vaultFile)
-                                database.chunkDao().insertChunk(chunk)
-                                discoveredCount++
-                                continue
-                            }
-
-                            // Check Text Post
-                            val text = post.optString("text", "")
-                            if (text.isNotBlank() && !text.startsWith("#connect")) {
-                                val textName = "Server_Post_$msgId.txt"
-                                val textBytes = text.toByteArray(Charsets.UTF_8)
-                                val localCache = com.example.core.sync.CloudUploadPipeline.getLocalCachedFile(context, fileId, textName)
-                                localCache.writeText(text)
-
-                                val vaultFile = com.example.core.database.VaultFile(
-                                    id = fileId,
-                                    name = textName,
-                                    extension = "txt",
-                                    mimeType = "text/plain",
-                                    totalSizeBytes = textBytes.size.toLong(),
-                                    isOfflinePinned = true
-                                )
-                                database.fileDao().insertFile(vaultFile)
-
-                                val postDate = post.optLong("date", System.currentTimeMillis() / 1000) * 1000L
-                                val teleDrop = com.example.core.database.TeleDropItem(
-                                    itemId = "tg_msg_$msgId",
-                                    type = when {
-                                        text.startsWith("http://") || text.startsWith("https://") -> "LINK"
-                                        text.contains("\n") || text.contains("{") -> "CODE"
-                                        else -> "TEXT"
-                                    },
-                                    content = text,
-                                    sourceDevice = "Telegram Channel (#$msgId)",
-                                    createdAt = postDate
-                                )
-                                database.teleDropDao().insertItem(teleDrop)
-                                discoveredCount++
+            // 1. First probe pending getUpdates queue
+            val updatesUrl = "$customBaseUrl/bot$token/getUpdates?limit=100&timeout=2"
+            val updateReq = Request.Builder().url(updatesUrl).get().build()
+            runCatching {
+                client.newCall(updateReq).execute().use { response ->
+                    val bodyStr = response.body?.string() ?: ""
+                    val json = JSONObject(bodyStr)
+                    if (response.isSuccessful && json.optBoolean("ok")) {
+                        val updates = json.getJSONArray("result")
+                        for (i in 0 until updates.length()) {
+                            val update = updates.getJSONObject(i)
+                            val post = update.optJSONObject("channel_post") ?: update.optJSONObject("message")
+                            if (post != null) {
+                                val msgId = post.getInt("message_id")
+                                if (!existingChunkMsgIds.contains(msgId)) {
+                                    if (processDiscoveredPost(post, msgId, database, context)) {
+                                        discoveredCount++
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
+
+            // 2. Deep Channel History Scan via Sequential Backward Probe:
+            // Send a lightweight probe message to discover current latest message ID
+            val probePing = sendMessage(token, channelId, "🔄 AetherVault Server History Sync...")
+            if (probePing.isSuccess) {
+                val latestId = probePing.getOrThrow()
+                // Clean up the probe ping immediately
+                deleteMessage(token, channelId, latestId)
+
+                val startId = (latestId - 1).coerceAtLeast(1)
+                val endId = (startId - 60).coerceAtLeast(1)
+
+                for (probeId in startId downTo endId) {
+                    if (existingChunkMsgIds.contains(probeId)) continue
+
+                    val forwardUrl = "$customBaseUrl/bot$token/forwardMessage"
+                    val payload = JSONObject().apply {
+                        put("chat_id", channelId)
+                        put("from_chat_id", channelId)
+                        put("message_id", probeId)
+                        put("disable_notification", true)
+                    }
+                    val fwdRequest = Request.Builder()
+                        .url(forwardUrl)
+                        .post(payload.toString().toRequestBody(jsonMediaType))
+                        .build()
+
+                    runCatching {
+                        client.newCall(fwdRequest).execute().use { response ->
+                            val bodyStr = response.body?.string() ?: ""
+                            val json = JSONObject(bodyStr)
+                            if (response.isSuccessful && json.optBoolean("ok")) {
+                                val result = json.getJSONObject("result")
+                                val tempMsgId = result.getInt("message_id")
+                                // Delete temporary duplicate message immediately
+                                deleteMessage(token, channelId, tempMsgId)
+
+                                if (processDiscoveredPost(result, probeId, database, context)) {
+                                    discoveredCount++
+                                }
+                            }
+                        }
+                    }
+                    kotlinx.coroutines.delay(60)
+                }
+            }
+
             Result.success(discoveredCount)
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    private suspend fun processDiscoveredPost(
+        post: JSONObject,
+        originalMsgId: Int,
+        database: com.example.core.database.AppDatabase,
+        context: android.content.Context
+    ): Boolean = withContext(Dispatchers.IO) {
+        val fileId = java.util.UUID.randomUUID().toString()
+
+        // Check Document
+        val doc = post.optJSONObject("document")
+        if (doc != null) {
+            val docName = doc.optString("file_name", "Document_$originalMsgId")
+            val docMime = doc.optString("mime_type", "application/octet-stream")
+            val docSize = doc.optLong("file_size", 0L)
+            val tgFileId = doc.getString("file_id")
+            val ext = docName.substringAfterLast('.', "")
+
+            val vaultFile = com.example.core.database.VaultFile(
+                id = fileId,
+                name = docName,
+                extension = ext,
+                mimeType = docMime,
+                totalSizeBytes = docSize,
+                isOfflinePinned = true
+            )
+            val chunk = com.example.core.database.FileChunk(
+                id = "${fileId}_0",
+                fileId = fileId,
+                versionId = "v1",
+                chunkIndex = 0,
+                telegramMessageId = originalMsgId,
+                uploaderBotId = 0L,
+                botFileIdsJson = "{\"primary\":\"$tgFileId\"}",
+                chunkSizeBytes = docSize.toInt()
+            )
+            database.fileDao().insertFile(vaultFile)
+            database.chunkDao().insertChunk(chunk)
+            return@withContext true
+        }
+
+        // Check Video
+        val video = post.optJSONObject("video")
+        if (video != null) {
+            val vidName = video.optString("file_name", "Video_$originalMsgId.mp4")
+            val vidMime = video.optString("mime_type", "video/mp4")
+            val vidSize = video.optLong("file_size", 0L)
+            val tgFileId = video.getString("file_id")
+
+            val vaultFile = com.example.core.database.VaultFile(
+                id = fileId,
+                name = vidName,
+                extension = "mp4",
+                mimeType = vidMime,
+                totalSizeBytes = vidSize,
+                isOfflinePinned = true
+            )
+            val chunk = com.example.core.database.FileChunk(
+                id = "${fileId}_0",
+                fileId = fileId,
+                versionId = "v1",
+                chunkIndex = 0,
+                telegramMessageId = originalMsgId,
+                uploaderBotId = 0L,
+                botFileIdsJson = "{\"primary\":\"$tgFileId\"}",
+                chunkSizeBytes = vidSize.toInt()
+            )
+            database.fileDao().insertFile(vaultFile)
+            database.chunkDao().insertChunk(chunk)
+            return@withContext true
+        }
+
+        // Check Photo
+        val photoArr = post.optJSONArray("photo")
+        if (photoArr != null && photoArr.length() > 0) {
+            val bestPhoto = photoArr.getJSONObject(photoArr.length() - 1)
+            val photoSize = bestPhoto.optLong("file_size", 0L)
+            val tgFileId = bestPhoto.getString("file_id")
+            val photoName = "Photo_$originalMsgId.jpg"
+
+            val vaultFile = com.example.core.database.VaultFile(
+                id = fileId,
+                name = photoName,
+                extension = "jpg",
+                mimeType = "image/jpeg",
+                totalSizeBytes = photoSize,
+                isOfflinePinned = true
+            )
+            val chunk = com.example.core.database.FileChunk(
+                id = "${fileId}_0",
+                fileId = fileId,
+                versionId = "v1",
+                chunkIndex = 0,
+                telegramMessageId = originalMsgId,
+                uploaderBotId = 0L,
+                botFileIdsJson = "{\"primary\":\"$tgFileId\"}",
+                chunkSizeBytes = photoSize.toInt()
+            )
+            database.fileDao().insertFile(vaultFile)
+            database.chunkDao().insertChunk(chunk)
+            return@withContext true
+        }
+
+        // Check Audio / Voice
+        val audio = post.optJSONObject("audio") ?: post.optJSONObject("voice")
+        if (audio != null) {
+            val audName = audio.optString("file_name", "Audio_$originalMsgId.mp3")
+            val audMime = audio.optString("mime_type", "audio/mpeg")
+            val audSize = audio.optLong("file_size", 0L)
+            val tgFileId = audio.getString("file_id")
+
+            val vaultFile = com.example.core.database.VaultFile(
+                id = fileId,
+                name = audName,
+                extension = "mp3",
+                mimeType = audMime,
+                totalSizeBytes = audSize,
+                isOfflinePinned = true
+            )
+            val chunk = com.example.core.database.FileChunk(
+                id = "${fileId}_0",
+                fileId = fileId,
+                versionId = "v1",
+                chunkIndex = 0,
+                telegramMessageId = originalMsgId,
+                uploaderBotId = 0L,
+                botFileIdsJson = "{\"primary\":\"$tgFileId\"}",
+                chunkSizeBytes = audSize.toInt()
+            )
+            database.fileDao().insertFile(vaultFile)
+            database.chunkDao().insertChunk(chunk)
+            return@withContext true
+        }
+
+        // Check Text Post
+        val text = post.optString("text", "")
+        if (text.isNotBlank() && !text.startsWith("#connect") && !text.startsWith("🔒") && !text.startsWith("🔄")) {
+            val textName = "Server_Post_$originalMsgId.txt"
+            val textBytes = text.toByteArray(Charsets.UTF_8)
+            val localCache = com.example.core.sync.CloudUploadPipeline.getLocalCachedFile(context, fileId, textName)
+            runCatching { localCache.writeText(text) }
+
+            val vaultFile = com.example.core.database.VaultFile(
+                id = fileId,
+                name = textName,
+                extension = "txt",
+                mimeType = "text/plain",
+                totalSizeBytes = textBytes.size.toLong(),
+                isOfflinePinned = true
+            )
+            database.fileDao().insertFile(vaultFile)
+
+            val postDate = post.optLong("date", System.currentTimeMillis() / 1000) * 1000L
+            val teleDrop = com.example.core.database.TeleDropItem(
+                itemId = "tg_msg_$originalMsgId",
+                type = when {
+                    text.startsWith("http://") || text.startsWith("https://") -> "LINK"
+                    text.contains("\n") || text.contains("{") -> "CODE"
+                    else -> "TEXT"
+                },
+                content = text,
+                sourceDevice = "Telegram Channel (#$originalMsgId)",
+                createdAt = postDate
+            )
+            database.teleDropDao().insertItem(teleDrop)
+            return@withContext true
+        }
+
+        return@withContext false
     }
 }

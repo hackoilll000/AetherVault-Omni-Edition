@@ -2,7 +2,7 @@ package com.example.ui.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -189,7 +189,7 @@ fun M3EmptyStateIllustration(
             text = titleText,
             fontSize = 19.sp,
             fontWeight = FontWeight.Medium,
-            color = M3TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
 
@@ -199,7 +199,7 @@ fun M3EmptyStateIllustration(
             text = subtitleText,
             fontSize = 13.sp,
             fontWeight = FontWeight.Normal,
-            color = M3TextMuted,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
     }

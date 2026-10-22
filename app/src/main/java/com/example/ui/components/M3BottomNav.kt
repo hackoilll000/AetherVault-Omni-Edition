@@ -14,9 +14,7 @@ import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.StarOutline
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +52,7 @@ fun M3BottomNavigationBar(
             .fillMaxWidth()
             .height(72.dp)
             .testTag("m3_bottom_nav_bar"),
-        color = M3BottomBarBg,
+        color = MaterialTheme.colorScheme.surfaceContainer,
         tonalElevation = 3.dp
     ) {
         Row(
@@ -78,13 +76,13 @@ fun M3BottomNavigationBar(
                             .width(64.dp)
                             .height(32.dp)
                             .clip(CircleShape)
-                            .background(if (isSelected) M3ActivePill else Color.Transparent),
+                            .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = if (isSelected) item.filledIcon else item.outlinedIcon,
                             contentDescription = item.title,
-                            tint = if (isSelected) M3ActivePillText else M3TextMuted,
+                            tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(22.dp)
                         )
                     }
@@ -95,7 +93,7 @@ fun M3BottomNavigationBar(
                         text = item.title,
                         fontSize = 12.sp,
                         fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                        color = if (isSelected) M3TextPrimary else M3TextMuted
+                        color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

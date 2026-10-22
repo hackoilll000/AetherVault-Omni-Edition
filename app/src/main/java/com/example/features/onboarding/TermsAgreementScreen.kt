@@ -35,9 +35,12 @@ fun TermsAgreementScreen(
     var hasCheckedAgreement by remember { mutableStateOf(false) }
 
     Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
         bottomBar = {
             Surface(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding(),
                 tonalElevation = 8.dp,
                 color = MaterialTheme.colorScheme.surface
             ) {
@@ -55,7 +58,10 @@ fun TermsAgreementScreen(
                         Checkbox(
                             checked = hasCheckedAgreement,
                             onCheckedChange = { hasCheckedAgreement = it },
-                            colors = CheckboxDefaults.colors(checkedColor = CyanNeon),
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = MaterialTheme.colorScheme.primary,
+                                checkmarkColor = MaterialTheme.colorScheme.onPrimary
+                            ),
                             modifier = Modifier.testTag("terms_checkbox")
                         )
                         Spacer(modifier = Modifier.width(6.dp))
@@ -75,7 +81,10 @@ fun TermsAgreementScreen(
                             .fillMaxWidth()
                             .height(52.dp)
                             .testTag("accept_terms_button"),
-                        colors = ButtonDefaults.buttonColors(containerColor = CyanNeon, contentColor = Color.Black),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Icon(Icons.Default.Verified, contentDescription = null, modifier = Modifier.size(20.dp))
@@ -94,6 +103,7 @@ fun TermsAgreementScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally

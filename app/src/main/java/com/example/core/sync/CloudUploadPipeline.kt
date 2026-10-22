@@ -91,6 +91,12 @@ object CloudUploadPipeline {
                 var telegramFileId = ""
 
                 while (!uploadSuccess && attempts < 3) {
+                    if (TransferCoordinator.isCancelled(taskId)) {
+                        database.transferDao().updateStatus(taskId, "CANCELLED")
+                        localVaultFile.delete()
+                        return@withContext Result.failure(kotlinx.coroutines.CancellationException("Upload cancelled by user"))
+                    }
+
                     attempts++
                     val activeToken = validTokens[currentTokenIndex % validTokens.size]
                     val res = TelegramMultipartUploader.uploadRawFile(
@@ -110,13 +116,19 @@ object CloudUploadPipeline {
                         }
                         is TelegramUploadResult.RateLimited -> {
                             currentTokenIndex++
-                            kotlinx.coroutines.delay((res.retryAfterSeconds * 1000L).coerceAtMost(5000L))
+                            kotlinx.coroutines.delay(res.retryAfterSeconds * 1000L)
                         }
                         is TelegramUploadResult.Error -> {
                             lastErrorMessage = res.message
                             currentTokenIndex++
                         }
                     }
+                }
+
+                if (TransferCoordinator.isCancelled(taskId)) {
+                    database.transferDao().updateStatus(taskId, "CANCELLED")
+                    localVaultFile.delete()
+                    return@withContext Result.failure(kotlinx.coroutines.CancellationException("Upload cancelled by user"))
                 }
 
                 if (!uploadSuccess) {
@@ -148,6 +160,12 @@ object CloudUploadPipeline {
                 val fis = java.io.FileInputStream(localVaultFile)
                 fis.use { input ->
                     while (true) {
+                        if (TransferCoordinator.isCancelled(taskId)) {
+                            database.transferDao().updateStatus(taskId, "CANCELLED")
+                            localVaultFile.delete()
+                            return@withContext Result.failure(kotlinx.coroutines.CancellationException("Upload cancelled by user"))
+                        }
+
                         val bytesRead = input.read(buffer)
                         if (bytesRead <= 0) break
 
@@ -218,12 +236,16 @@ object CloudUploadPipeline {
             database.fileDao().insertFile(vaultFile)
             database.transferDao().updateProgress(taskId, totalChunks, totalBytes, 0L)
             database.transferDao().updateStatus(taskId, "COMPLETED")
+            TransferCoordinator.clean(taskId)
 
             onProgress?.invoke(totalChunks, totalChunks, totalBytes, totalBytes, 0L, "Complete")
             Result.success(vaultFile)
         } catch (e: Exception) {
             Log.e(TAG, "Upload failed for ${meta.name}", e)
-            database.transferDao().updateStatus(taskId, "ERROR")
+            val isCancelled = e is kotlinx.coroutines.CancellationException || TransferCoordinator.isCancelled(taskId)
+            database.transferDao().updateStatus(taskId, if (isCancelled) "CANCELLED" else "ERROR")
+            TransferCoordinator.clean(taskId)
+            localVaultFile.delete()
             Result.failure(e)
         }
     }

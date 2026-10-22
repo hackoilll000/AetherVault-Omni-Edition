@@ -102,6 +102,7 @@ fun ConnectWizardScreen(
     var restoreCodeInput by remember { mutableStateOf("") }
 
     Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
             TopAppBar(
                 title = {
@@ -142,6 +143,7 @@ fun ConnectWizardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -748,10 +750,23 @@ fun ConnectWizardScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(if (isHindi) "बायोमेट्रिक फिंगरप्रिंट अनलॉक" else "Biometric Fingerprint Quick Unlock", fontSize = 14.sp)
-                    Switch(
-                        checked = biometricEnabled,
-                        onCheckedChange = { biometricEnabled = it }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = if (isHindi) "ऐप रीस्टार्ट पर लॉग इन रहें (Persistent Login)" else "Keep Session Active Across App Restarts",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = if (isHindi) "सेटिंग्स से कभी भी पासवर्ड लॉक पॉलिसी बदलें" else "Configure inactivity lock rules anytime in Settings",
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = CyanNeon,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
 
@@ -806,7 +821,7 @@ fun ConnectWizardScreen(
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = "AETHER_VAULT_KIT|CH:$channelIdInput|BOTS:${botTokens.size}|KEY_SHA256:${masterPassword.hashCode()}",
+                            text = "AETHER_VAULT_KIT|CH:$channelIdInput|BOTS:${botTokens.size}|PBKDF2_SECURE",
                             fontFamily = FontFamily.Monospace,
                             fontSize = 11.sp,
                             modifier = Modifier.padding(10.dp)

@@ -133,7 +133,7 @@ fun DriveExplorerScreen(
                             Icon(
                                 imageVector = Icons.Default.CreateNewFolder,
                                 contentDescription = "Create Folder",
-                                tint = CyanNeon
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
 
@@ -148,7 +148,7 @@ fun DriveExplorerScreen(
                             Icon(
                                 imageVector = if (isSelectionMode) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
                                 contentDescription = "Select Files",
-                                tint = if (isSelectionMode) CyanNeon else MaterialTheme.colorScheme.onSurfaceVariant
+                                tint = if (isSelectionMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
 
@@ -160,7 +160,7 @@ fun DriveExplorerScreen(
                             Icon(
                                 imageVector = Icons.Default.Sync,
                                 contentDescription = "Sync Server",
-                                tint = CyanNeon
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
 
@@ -189,7 +189,7 @@ fun DriveExplorerScreen(
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Back",
-                                tint = CyanNeon,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -202,7 +202,7 @@ fun DriveExplorerScreen(
                         items(breadcrumbs) { crumb ->
                             Surface(
                                 shape = RoundedCornerShape(12.dp),
-                                color = if (crumb.first == currentFolderId) CyanNeon.copy(alpha = 0.2f)
+                                color = if (crumb.first == currentFolderId) MaterialTheme.colorScheme.primaryContainer
                                 else MaterialTheme.colorScheme.surfaceVariant,
                                 modifier = Modifier.clickable { onNavigateFolder(crumb.first) }
                             ) {
@@ -210,7 +210,7 @@ fun DriveExplorerScreen(
                                     text = crumb.second,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = if (crumb.first == currentFolderId) CyanNeon else MaterialTheme.colorScheme.onSurface,
+                                    color = if (crumb.first == currentFolderId) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                                 )
                             }

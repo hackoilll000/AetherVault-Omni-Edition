@@ -53,7 +53,7 @@ fun M3QuickCategoryRow(
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(M3TonalSurface)
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainer)
                     .clickable { item.onClick() }
                     .padding(vertical = 16.dp, horizontal = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -63,13 +63,13 @@ fun M3QuickCategoryRow(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(androidx.compose.ui.graphics.Color.White),
+                        .background(androidx.compose.material3.MaterialTheme.colorScheme.surface),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = item.icon,
                         contentDescription = item.title,
-                        tint = M3TextPrimary,
+                        tint = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -80,7 +80,7 @@ fun M3QuickCategoryRow(
                     text = item.title,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
-                    color = M3TextPrimary,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
             }

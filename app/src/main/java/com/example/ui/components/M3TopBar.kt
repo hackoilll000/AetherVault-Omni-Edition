@@ -31,6 +31,7 @@ fun M3DriveSearchBar(
     onSearchQueryChange: (String) -> Unit,
     onOpenDrawer: () -> Unit,
     onProfileClick: () -> Unit,
+    onSearchClick: (() -> Unit)? = null,
     isBotHealthy: Boolean = true,
     placeholderText: String = "Search in Drive",
     modifier: Modifier = Modifier
@@ -42,7 +43,7 @@ fun M3DriveSearchBar(
             .height(48.dp)
             .testTag("m3_search_bar"),
         shape = CircleShape,
-        color = M3SearchBarBg
+        color = MaterialTheme.colorScheme.surfaceContainerHigh
     ) {
         Row(
             modifier = Modifier
@@ -58,7 +59,7 @@ fun M3DriveSearchBar(
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = "Open Drawer",
-                    tint = M3TextPrimary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -68,24 +69,28 @@ fun M3DriveSearchBar(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .clickable { onSearchClick?.invoke() },
                 contentAlignment = Alignment.CenterStart
             ) {
                 if (searchQuery.isEmpty()) {
                     Text(
                         text = placeholderText,
-                        fontSize = 16.sp,
-                        color = M3TextMuted,
+                        fontSize = 15.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Normal
                     )
                 }
                 androidx.compose.foundation.text.BasicTextField(
                     value = searchQuery,
-                    onValueChange = onSearchQueryChange,
+                    onValueChange = {
+                        onSearchQueryChange(it)
+                        onSearchClick?.invoke()
+                    },
                     singleLine = true,
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        fontSize = 16.sp,
-                        color = M3TextPrimary,
+                        fontSize = 15.sp,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Normal
                     ),
                     modifier = Modifier.fillMaxWidth()
@@ -97,15 +102,15 @@ fun M3DriveSearchBar(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
-                    .background(M3ActivePillText)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
                     .clickable { onProfileClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "P",
-                    color = Color.White,
+                    text = "A",
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 15.sp
                 )
 
                 // Status Badge
@@ -141,7 +146,7 @@ fun M3CollectionsHeader(
         // Status Pill (Left)
         Surface(
             shape = CircleShape,
-            color = M3TonalSurface,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
             modifier = Modifier
                 .clickable { onOpenDrawer() }
                 .testTag("m3_status_pill")
@@ -153,15 +158,15 @@ fun M3CollectionsHeader(
                 Icon(
                     imageVector = if (isBotHealthy) Icons.Outlined.Cloud else Icons.Outlined.CloudOff,
                     contentDescription = null,
-                    tint = M3TextPrimary,
+                    tint = if (isBotHealthy) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = syncStatusText,
                     fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = M3TextPrimary
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -173,7 +178,7 @@ fun M3CollectionsHeader(
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Quick Upload",
-                        tint = M3TextPrimary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(24.dp)
                     )
                     Box(
@@ -181,7 +186,7 @@ fun M3CollectionsHeader(
                             .size(8.dp)
                             .align(Alignment.TopEnd)
                             .clip(CircleShape)
-                            .background(Color(0xFFD32F2F))
+                            .background(MaterialTheme.colorScheme.error)
                     )
                 }
             }
@@ -190,7 +195,7 @@ fun M3CollectionsHeader(
                 Icon(
                     imageVector = Icons.Outlined.Notifications,
                     contentDescription = "Activity",
-                    tint = M3TextPrimary,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -202,13 +207,13 @@ fun M3CollectionsHeader(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF2E7D32))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
                     .clickable { onProfileClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "A",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp
                 )
@@ -243,7 +248,7 @@ fun M3SecondarySubTabs(
                     text = title,
                     fontSize = 14.sp,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (isSelected) M3PrimaryBlue else M3TextMuted
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 if (isSelected) {
@@ -252,7 +257,7 @@ fun M3SecondarySubTabs(
                             .width(60.dp)
                             .height(3.dp)
                             .clip(RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp))
-                            .background(M3PrimaryBlue)
+                            .background(MaterialTheme.colorScheme.primary)
                     )
                 } else {
                     Spacer(modifier = Modifier.height(3.dp))

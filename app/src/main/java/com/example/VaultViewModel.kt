@@ -5,22 +5,34 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.crypto.AesGcmChunkCipher
+import com.example.core.crypto.LockPolicy
+import com.example.core.crypto.VaultSecurityManager
 import com.example.core.database.*
+import com.example.core.sync.TransferCoordinator
 import com.example.core.telegram.TelegramBotClient
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.UUID
 
 class VaultViewModel(application: Application) : AndroidViewModel(application) {
     private val prefs = application.getSharedPreferences("aethervault_prefs", Context.MODE_PRIVATE)
+    private val securityManager = VaultSecurityManager(application)
     private val client = TelegramBotClient()
 
     private val _isConfigured = MutableStateFlow(prefs.getBoolean("is_configured", false))
     val isConfigured: StateFlow<Boolean> = _isConfigured.asStateFlow()
 
-    private val _isUnlocked = MutableStateFlow(!prefs.getBoolean("is_configured", false))
+    // Persistent Login: Check session validity on launch
+    private val _isUnlocked = MutableStateFlow(
+        if (!prefs.getBoolean("is_configured", false)) false
+        else securityManager.isSessionValid()
+    )
     val isUnlocked: StateFlow<Boolean> = _isUnlocked.asStateFlow()
+
+    private val _lockPolicy = MutableStateFlow(securityManager.getLockPolicy())
+    val lockPolicy: StateFlow<LockPolicy> = _lockPolicy.asStateFlow()
 
     private val _isDecoy = MutableStateFlow(false)
     val isDecoy: StateFlow<Boolean> = _isDecoy.asStateFlow()
@@ -49,28 +61,44 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     private val database: AppDatabase
         get() = AppDatabase.getInstance(getApplication(), _isDecoy.value)
 
-    val allFiles: StateFlow<List<VaultFile>> = database.fileDao().getAllActiveFiles()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val allFiles: StateFlow<List<VaultFile>> = _isDecoy
+        .flatMapLatest { isDecoy -> AppDatabase.getInstance(getApplication(), isDecoy).fileDao().getAllActiveFiles() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val allFolders: StateFlow<List<VirtualFolder>> = database.folderDao().getAllFolders()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val allFolders: StateFlow<List<VirtualFolder>> = _isDecoy
+        .flatMapLatest { isDecoy -> AppDatabase.getInstance(getApplication(), isDecoy).folderDao().getAllFolders() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val allTransfers: StateFlow<List<TransferTask>> = database.transferDao().getActiveTransfers()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val allTransfers: StateFlow<List<TransferTask>> = _isDecoy
+        .flatMapLatest { isDecoy -> AppDatabase.getInstance(getApplication(), isDecoy).transferDao().getActiveTransfers() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val teleDropStream: StateFlow<List<TeleDropItem>> = database.teleDropDao().getTeleDropStream()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val teleDropStream: StateFlow<List<TeleDropItem>> = _isDecoy
+        .flatMapLatest { isDecoy -> AppDatabase.getInstance(getApplication(), isDecoy).teleDropDao().getTeleDropStream() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val botSwarm: StateFlow<List<BotSwarmEntity>> = database.botDao().getAllBots()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val botSwarm: StateFlow<List<BotSwarmEntity>> = _isDecoy
+        .flatMapLatest { isDecoy -> AppDatabase.getInstance(getApplication(), isDecoy).botDao().getAllBots() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val totalStorageUsed: StateFlow<Long> = database.fileDao().getTotalStorageUsed()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val totalStorageUsed: StateFlow<Long> = _isDecoy
+        .flatMapLatest { isDecoy -> AppDatabase.getInstance(getApplication(), isDecoy).fileDao().getTotalStorageUsed() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
 
-    val activeFileCount: StateFlow<Int> = database.fileDao().getActiveFileCount()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val activeFileCount: StateFlow<Int> = _isDecoy
+        .flatMapLatest { isDecoy -> AppDatabase.getInstance(getApplication(), isDecoy).fileDao().getActiveFileCount() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
-    val trashedFiles: StateFlow<List<VaultFile>> = database.fileDao().getTrashedFiles()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val trashedFiles: StateFlow<List<VaultFile>> = _isDecoy
+        .flatMapLatest { isDecoy -> AppDatabase.getInstance(getApplication(), isDecoy).fileDao().getTrashedFiles() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val cameraSyncStatus: StateFlow<com.example.core.sync.CameraSyncStatus> = com.example.core.sync.CameraRollSyncManager.syncStatus
@@ -129,16 +157,15 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     fun completeSetup(botTokens: List<String>, channelId: Long, masterPass: String, decoyPin: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             val firstToken = botTokens.firstOrNull() ?: ""
+            securityManager.setMasterPassword(masterPass)
+            securityManager.setDecoyPin(decoyPin)
+            securityManager.createSessionToken()
+
             prefs.edit()
                 .putBoolean("is_configured", true)
                 .putLong("channel_id", channelId)
                 .putString("master_bot_token", firstToken)
-                .putString("master_hash", masterPass.hashCode().toString())
                 .apply()
-
-            if (decoyPin != null) {
-                prefs.edit().putString("decoy_pin", decoyPin).apply()
-            }
 
             // Register bots in DB
             val db = database
@@ -215,26 +242,34 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun unlockVault(inputPass: String): Boolean {
-        val storedHash = prefs.getString("master_hash", "")
-        val storedDecoy = prefs.getString("decoy_pin", null)
-
-        if (storedDecoy != null && inputPass == storedDecoy) {
-            _isDecoy.value = true
+        val (success, isDecoy) = securityManager.verifyUnlock(inputPass, prefs)
+        if (success) {
+            _isDecoy.value = isDecoy
             _isUnlocked.value = true
             return true
         }
-
-        if (storedHash.isNullOrBlank() || inputPass.hashCode().toString() == storedHash || inputPass == "123456") {
-            _isDecoy.value = false
-            _isUnlocked.value = true
-            return true
-        }
-
         return false
     }
 
     fun lockVault() {
+        securityManager.clearSession()
         _isUnlocked.value = false
+    }
+
+    fun logout() {
+        securityManager.clearSession()
+        prefs.edit().putBoolean("is_configured", false).apply()
+        _isConfigured.value = false
+        _isUnlocked.value = false
+    }
+
+    fun updateLockPolicy(policy: LockPolicy) {
+        securityManager.setLockPolicy(policy)
+        _lockPolicy.value = policy
+    }
+
+    fun recordActivity() {
+        securityManager.recordActivity()
     }
 
     fun createFolder(name: String, colorHex: String, parentId: String? = null) {
@@ -385,8 +420,103 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
 
     fun cancelTransfer(taskId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            database.transferDao().deleteTransfer(taskId)
+            TransferCoordinator.cancel(taskId)
+            database.transferDao().updateStatus(taskId, "CANCELLED")
         }
+    }
+
+    data class StorageCategoryBreakdown(
+        val categoryName: String,
+        val fileCount: Int,
+        val totalBytes: Long,
+        val colorHex: String
+    )
+
+    data class StorageMetricsData(
+        val totalVaultBytes: Long,
+        val activeFileCount: Int,
+        val deviceAvailableBytes: Long,
+        val deviceTotalBytes: Long,
+        val categories: List<StorageCategoryBreakdown>,
+        val largestFiles: List<VaultFile>,
+        val duplicateCandidates: List<List<VaultFile>>
+    )
+
+    fun calculateStorageMetrics(context: Context): StorageMetricsData {
+        val files = allFiles.value
+        val stat = runCatching { android.os.StatFs(context.filesDir.absolutePath) }.getOrNull()
+        val deviceAvailable = stat?.availableBytes ?: 0L
+        val deviceTotal = stat?.totalBytes ?: 0L
+
+        var photoCount = 0
+        var photoBytes = 0L
+        var videoCount = 0
+        var videoBytes = 0L
+        var audioCount = 0
+        var audioBytes = 0L
+        var docCount = 0
+        var docBytes = 0L
+        var archiveCount = 0
+        var archiveBytes = 0L
+        var otherCount = 0
+        var otherBytes = 0L
+
+        files.forEach { f ->
+            val ext = f.extension.lowercase()
+            val mime = f.mimeType.lowercase()
+            when {
+                mime.startsWith("image/") || ext in listOf("jpg", "jpeg", "png", "webp", "gif", "heic") -> {
+                    photoCount++
+                    photoBytes += f.totalSizeBytes
+                }
+                mime.startsWith("video/") || ext in listOf("mp4", "mkv", "mov", "avi", "webm") -> {
+                    videoCount++
+                    videoBytes += f.totalSizeBytes
+                }
+                mime.startsWith("audio/") || ext in listOf("mp3", "m4a", "wav", "flac", "ogg", "aac") -> {
+                    audioCount++
+                    audioBytes += f.totalSizeBytes
+                }
+                mime.startsWith("text/") || ext in listOf("pdf", "doc", "docx", "txt", "md", "xls", "xlsx", "ppt", "pptx") -> {
+                    docCount++
+                    docBytes += f.totalSizeBytes
+                }
+                ext in listOf("zip", "rar", "7z", "tar", "gz") -> {
+                    archiveCount++
+                    archiveBytes += f.totalSizeBytes
+                }
+                else -> {
+                    otherCount++
+                    otherBytes += f.totalSizeBytes
+                }
+            }
+        }
+
+        val cats = listOf(
+            StorageCategoryBreakdown("Photos & Images", photoCount, photoBytes, "#0B57D0"),
+            StorageCategoryBreakdown("Videos", videoCount, videoBytes, "#BA1A1A"),
+            StorageCategoryBreakdown("Audio & Music", audioCount, audioBytes, "#7D5260"),
+            StorageCategoryBreakdown("Documents", docCount, docBytes, "#386A20"),
+            StorageCategoryBreakdown("Archives", archiveCount, archiveBytes, "#6750A4"),
+            StorageCategoryBreakdown("Other Files", otherCount, otherBytes, "#76777D")
+        ).filter { it.fileCount > 0 }
+
+        val largest = files.sortedByDescending { it.totalSizeBytes }.take(5)
+
+        val dupes = files.groupBy { it.totalSizeBytes }
+            .filter { it.key > 0 && it.value.size > 1 }
+            .values
+            .toList()
+
+        return StorageMetricsData(
+            totalVaultBytes = totalStorageUsed.value,
+            activeFileCount = activeFileCount.value,
+            deviceAvailableBytes = deviceAvailable,
+            deviceTotalBytes = deviceTotal,
+            categories = cats,
+            largestFiles = largest,
+            duplicateCandidates = dupes
+        )
     }
 
     fun uploadRealFile(context: Context, fileUri: android.net.Uri, targetFolderId: String = "root") {

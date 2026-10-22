@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.database.BotSwarmEntity
 import com.example.features.studio.AppLanguage
+import com.example.features.studio.ThemeMode
 import com.example.ui.theme.CyanNeon
 import com.example.ui.theme.IndigoHyper
 import com.example.ui.theme.VioletNeon
@@ -39,6 +40,8 @@ fun SettingsScreen(
     language: AppLanguage,
     channelId: Long,
     masterBotToken: String,
+    currentThemeMode: ThemeMode = ThemeMode.SYSTEM_AUTO,
+    onThemeModeChange: (ThemeMode) -> Unit = {},
     onOpenAppearanceStudio: () -> Unit,
     onAddBotToken: (String) -> Unit,
     onRemoveBot: (Long) -> Unit,
@@ -53,7 +56,12 @@ fun SettingsScreen(
     onRestoreFromCode: (String, (Boolean, String) -> Unit) -> Unit = { _, _ -> },
     onSyncExistingServer: ((Boolean, String) -> Unit) -> Unit = {},
     onClearAllData: () -> Unit,
-    onLockVault: () -> Unit
+    onLockVault: () -> Unit,
+    lockPolicy: com.example.core.crypto.LockPolicy = com.example.core.crypto.LockPolicy.STAY_UNLOCKED,
+    onLockPolicyChange: (com.example.core.crypto.LockPolicy) -> Unit = {},
+    onOpenStorageMetrics: () -> Unit = {},
+    privacyPreviewEnabled: Boolean = false,
+    onPrivacyPreviewChange: (Boolean) -> Unit = {}
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val isHindi = language == AppLanguage.HI
@@ -518,6 +526,80 @@ fun SettingsScreen(
                 }
             }
 
+            // Quick Theme & Display Mode Selector (System Auto / Light / Dark)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.BrightnessMedium, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = if (isHindi) "डिस्प्ले और थीम मोड" else "Display & Theme Mode",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    Text(
+                        text = if (isHindi) "लाइट मोड, डार्क मोड या सिस्टम ऑटो चुनें" else "Choose between Light, Dark, or System Auto",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // System Auto
+                        val isAuto = currentThemeMode == ThemeMode.SYSTEM_AUTO
+                        FilterChip(
+                            selected = isAuto,
+                            onClick = { onThemeModeChange(ThemeMode.SYSTEM_AUTO) },
+                            label = { Text(if (isHindi) "ऑटो" else "Auto", fontSize = 12.sp) },
+                            leadingIcon = { Icon(Icons.Default.BrightnessAuto, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        // Light Mode
+                        val isLight = currentThemeMode == ThemeMode.LIGHT
+                        FilterChip(
+                            selected = isLight,
+                            onClick = { onThemeModeChange(ThemeMode.LIGHT) },
+                            label = { Text(if (isHindi) "लाइट" else "Light", fontSize = 12.sp) },
+                            leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        // Dark Mode
+                        val isDark = currentThemeMode == ThemeMode.DARK
+                        FilterChip(
+                            selected = isDark,
+                            onClick = { onThemeModeChange(ThemeMode.DARK) },
+                            label = { Text(if (isHindi) "डार्क" else "Dark", fontSize = 12.sp) },
+                            leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+
             // Appearance Studio Entry
             Card(
                 modifier = Modifier
@@ -531,7 +613,7 @@ fun SettingsScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Palette, contentDescription = null, tint = CyanNeon)
+                    Icon(Icons.Default.Palette, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.width(14.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
@@ -546,6 +628,128 @@ fun SettingsScreen(
                         )
                     }
                     Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray)
+                }
+            }
+
+            // Storage Metrics & Duplicate Auditor Entry
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onOpenStorageMetrics() }
+                    .testTag("open_storage_metrics_button"),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Storage, contentDescription = null, tint = CyanNeon)
+                    Spacer(modifier = Modifier.width(14.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = if (isHindi) "स्टोरेज एनालिटिक्स व डुप्लिकेट फाइल्स" else "Storage Metrics & Duplicate Auditor",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = if (isHindi) "श्रेणीबद्ध विवरण, सबसे बड़ी फाइलें और डुप्लिकेट खोजें" else "Category breakdowns, top largest files & duplicate candidates",
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray)
+                }
+            }
+
+            // Security Policy & Persistent Login Settings Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Security, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = if (isHindi) "सुरक्षा व लॉगिन पॉलिसी" else "Security & Persistent Login Policy",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp
+                        )
+                    }
+                    Text(
+                        text = if (isHindi) "लॉगिन सेशन और ऑटो-लॉक व्यवहार सेट करें" else "Choose how session locking behaves across restarts and inactivity",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    com.example.core.crypto.LockPolicy.entries.forEach { policy ->
+                        val isSelected = lockPolicy == policy
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { onLockPolicyChange(policy) }
+                                .padding(vertical = 8.dp, horizontal = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = isSelected,
+                                onClick = { onLockPolicyChange(policy) }
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = if (isHindi) policy.displayNameHi else policy.displayNameEn,
+                                fontSize = 13.sp,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Privacy Preview (FLAG_SECURE) Toggle
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = if (isHindi) "प्राइवेसी स्क्रीन प्रिवेंशन (FLAG_SECURE)" else "Privacy Screen Blur (FLAG_SECURE)",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = if (isHindi) "हाल के ऐप्स में स्क्रीनशॉट और प्रिव्यू ब्लॉक करें" else "Block screenshots & app switcher previews in sensitive views",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = privacyPreviewEnabled,
+                            onCheckedChange = { onPrivacyPreviewChange(it) }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Lock Vault Immediately Button
+                    Button(
+                        onClick = onLockVault,
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer, contentColor = MaterialTheme.colorScheme.onErrorContainer),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(if (isHindi) "वॉल्ट अभी लॉक करें" else "Lock Vault Now", fontWeight = FontWeight.Bold)
+                    }
                 }
             }
 

@@ -9,10 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudDone
 import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,14 +46,14 @@ fun M3BentoGridSection(
                     text = sectionTitle,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = M3TextPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "^",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = M3TextMuted
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -65,7 +62,7 @@ fun M3BentoGridSection(
                     text = "View all",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = M3PrimaryBlue
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -104,7 +101,7 @@ fun M3BentoFolderCard(
 ) {
     Surface(
         shape = RoundedCornerShape(24.dp),
-        color = M3TonalSurface,
+        color = MaterialTheme.colorScheme.surfaceContainer,
         modifier = modifier
             .clip(RoundedCornerShape(24.dp))
             .clickable { onClick() }
@@ -116,14 +113,14 @@ fun M3BentoFolderCard(
                     .fillMaxWidth()
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White),
+                    .background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
                 // Placeholder Folder Icon / Preview
                 Icon(
                     imageVector = Icons.Outlined.Folder,
                     contentDescription = null,
-                    tint = M3PrimaryBlue,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(56.dp)
                 )
 
@@ -153,7 +150,7 @@ fun M3BentoFolderCard(
                 text = folder.name,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                color = M3TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -162,7 +159,7 @@ fun M3BentoFolderCard(
                 text = if (folder.isStarred) "Synced via Bot" else "Backup off",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Normal,
-                color = M3TextSubtle
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

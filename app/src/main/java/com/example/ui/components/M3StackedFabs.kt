@@ -38,7 +38,7 @@ fun M3StackedFabs(
                 .clip(RoundedCornerShape(14.dp))
                 .clickable { onSecondaryFabClick() }
                 .testTag("secondary_mini_fab"),
-            color = M3SecondaryFab
+            color = androidx.compose.material3.MaterialTheme.colorScheme.tertiaryContainer
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -47,7 +47,7 @@ fun M3StackedFabs(
                 Icon(
                     imageVector = Icons.Outlined.PhotoCamera,
                     contentDescription = "Quick Camera Upload",
-                    tint = M3SecondaryFabIcon,
+                    tint = androidx.compose.material3.MaterialTheme.colorScheme.onTertiaryContainer,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -61,7 +61,7 @@ fun M3StackedFabs(
                 .clip(RoundedCornerShape(20.dp))
                 .clickable { onPrimaryFabClick() }
                 .testTag("primary_large_fab"),
-            color = M3ActivePill
+            color = androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -70,7 +70,7 @@ fun M3StackedFabs(
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Upload File to Tele Drive",
-                    tint = M3ActivePillText,
+                    tint = androidx.compose.material3.MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(28.dp)
                 )
             }

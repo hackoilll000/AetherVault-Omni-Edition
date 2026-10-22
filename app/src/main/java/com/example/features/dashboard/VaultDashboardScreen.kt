@@ -158,7 +158,7 @@ fun VaultDashboardScreen(
                             Icon(
                                 imageVector = Icons.Default.Sync,
                                 contentDescription = "Sync Channel Content",
-                                tint = CyanNeon
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
 
@@ -197,7 +197,7 @@ fun VaultDashboardScreen(
                         )
                     },
                     leadingIcon = {
-                        Icon(Icons.Default.Search, contentDescription = null, tint = CyanNeon)
+                        Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {
@@ -236,13 +236,14 @@ fun VaultDashboardScreen(
                         FilterChip(
                             selected = isSelected,
                             onClick = { selectedCategory = cat },
-                            label = { Text(label, fontSize = 12.sp) },
+                            label = { Text(label, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal) },
                             leadingIcon = if (isSelected) {
                                 { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(14.dp)) }
                             } else null,
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = CyanNeon.copy(alpha = 0.2f),
-                                selectedLabelColor = CyanNeon
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         )
                     }
