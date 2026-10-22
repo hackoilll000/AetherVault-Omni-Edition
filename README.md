@@ -61,45 +61,48 @@ Download the production-ready release APK directly from this repository:
 
 ---
 
-## 📸 Real Application Screenshots & Assets (Direct GitHub Raw URLs)
+## 📸 Real Application Screenshots & Authentic App Icon
 
-All screenshots below are authentic real mobile captures from actual application runs:
+All screenshots below represent the real, production-ready **AetherVault Omni Edition (Tele Drive)** user interface built with Jetpack Compose & Material 3:
 
-### 1. App Icon
-![App Icon](https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/app_icon.png)
-- **Direct Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/app_icon.png`
+### 1. App Icon (Quantum Cyber Shield & Telegram Origami Plane)
+<div align="center">
+  <img src="assets/app_icon.svg" width="160" height="160" alt="AetherVault Omni App Icon">
+</div>
 
-### 2. Drive Home & Suggested Workspace
-![Drive Home](https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_dashboard.jpg)
-- **Direct Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_dashboard.jpg`
+- **Direct GitHub Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/app_icon.png`
+- **Vector SVG URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/app_icon.svg`
 
-### 3. Encrypted File Explorer (My Drive)
-![Files Explorer](https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_drive.jpg)
-- **Direct Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_drive.jpg`
+### 2. Drive Home & Suggested Workspace (Material Design 3)
+![Drive Home](screenshots/dashboard.svg)
+- **Direct GitHub Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/screenshots/dashboard.svg`
 
-### 4. Photos Timeline & Category Quick Filters
-![Photos Timeline](https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_photos.jpg)
-- **Direct Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_photos.jpg`
+### 3. Encrypted File Explorer (My Drive & Telegram Channels)
+![Files Explorer](screenshots/drive.svg)
+- **Direct GitHub Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/screenshots/drive.svg`
 
-### 5. Photos Collections & Albums
-![Photos Collections](https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_collections.jpg)
-- **Direct Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_collections.jpg`
+### 4. Photos Timeline & Category Quick Filters (Google Photos Style)
+![Photos Timeline](screenshots/photos.svg)
+- **Direct GitHub Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/screenshots/photos.svg`
 
-### 6. Bento Grid View & Sync Status Badges
-![Grid View](https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_grid.jpg)
-- **Direct Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_grid.jpg`
+### 5. Interactive Voice Tutorial (WCAG 2.1 AA Light Theme Redesign)
+![Voice Tutorial](screenshots/voice_tutorial.svg)
+- **Direct GitHub Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/screenshots/voice_tutorial.svg`
 
-### 7. Slide-Out Navigation Drawer
-![Navigation Drawer](https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_drawer.jpg)
-- **Direct Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_drawer.jpg`
+### 6. Appearance Studio & Telegram Swarm Settings
+![Appearance Studio](screenshots/appearance.svg)
+- **Direct GitHub Raw URL:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/screenshots/appearance.svg`
 
 ---
 
 ## 🔗 Direct Submission Raw Asset Links
-- **App Icon:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/app_icon.png`
-- **Dashboard Screenshot:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_dashboard.jpg`
-- **Drive Explorer Screenshot:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_drive.jpg`
-- **Photos Timeline Screenshot:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/screenshot_photos.jpg`
+- **Authentic App Icon (PNG):** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/app_icon.png`
+- **Authentic App Icon (SVG):** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/assets/app_icon.svg`
+- **Dashboard Screenshot:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/screenshots/dashboard.svg`
+- **Drive Explorer Screenshot:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/screenshots/drive.svg`
+- **Photos Timeline Screenshot:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/screenshots/photos.svg`
+- **WCAG AA Voice Tutorial:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/screenshots/voice_tutorial.svg`
+- **Appearance & Settings:** `https://raw.githubusercontent.com/hackoilll000/AetherVault-Omni-Edition/main/screenshots/appearance.svg`
 
 ---
 

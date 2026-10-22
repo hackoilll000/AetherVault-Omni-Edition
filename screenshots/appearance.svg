@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <linearGradient id="bgStudio" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F8FAFD"/>
+      <stop offset="100%" stop-color="#EEF2F8"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1920" fill="url(#bgStudio)"/>
+
+  <!-- Status Bar -->
+  <g fill="#1F1F1F" font-family="'Google Sans', Roboto, sans-serif" font-size="28" font-weight="600">
+    <text x="64" y="68">10:24</text>
+    <text x="910" y="68">5G  98%</text>
+  </g>
+
+  <!-- Top App Bar -->
+  <circle cx="98" cy="145" r="28" fill="#F0F4F9"/>
+  <path d="M106 133 L94 145 L106 157" stroke="#1F1F1F" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="150" y="155" font-family="'Google Sans', sans-serif" font-size="34" font-weight="600" fill="#1F1F1F">Appearance Studio</text>
+
+  <!-- Creator Banner -->
+  <rect x="48" y="210" width="984" height="120" rx="28" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <text x="80" y="260" font-family="'Google Sans', sans-serif" font-size="28" font-weight="700" fill="#1A202C">Ayush Mondal (Class 9th, 14 yrs old)</text>
+  <text x="80" y="298" font-family="'Google Sans', sans-serif" font-size="22" font-weight="500" fill="#007A8A">Lead Architect • TRB FireOps YouTube Channel (@trbfireops)</text>
+
+  <!-- Theme Selection Group -->
+  <text x="56" y="380" font-family="'Google Sans', sans-serif" font-size="30" font-weight="600" fill="#1F1F1F">Display Theme Mode</text>
+
+  <!-- Option 1: Material You Light (Active) -->
+  <rect x="48" y="410" width="984" height="110" rx="24" fill="#FFFFFF" stroke="#007A8A" stroke-width="2.5"/>
+  <circle cx="95" cy="465" r="24" fill="#E6FFFA"/>
+  <circle cx="95" cy="465" r="12" fill="#007A8A"/>
+  <text x="145" y="458" font-family="'Google Sans', sans-serif" font-size="26" font-weight="700" fill="#1A202C">Material You Light (WCAG 2.1 AA Compliant)</text>
+  <text x="145" y="492" font-family="'Google Sans', sans-serif" font-size="20" font-weight="500" fill="#4A5568">Pure white `#FFFFFF`, charcoal text, accessible teal accents</text>
+  <circle cx="980" cy="465" r="16" fill="#007A8A"/>
+  <text x="980" y="472" font-family="sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="middle">✓</text>
+
+  <!-- Option 2: Cyber Obsidian (Dark) -->
+  <rect x="48" y="540" width="984" height="110" rx="24" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <circle cx="95" cy="595" r="24" fill="#0F172A"/>
+  <circle cx="95" cy="595" r="12" fill="#00F0FF"/>
+  <text x="145" y="588" font-family="'Google Sans', sans-serif" font-size="26" font-weight="700" fill="#1A202C">Cyber Obsidian (OLED Dark Mode)</text>
+  <text x="145" y="622" font-family="'Google Sans', sans-serif" font-size="20" font-weight="500" fill="#4A5568">Deep cosmic black, neon cyan &amp; indigo hyper glow</text>
+  <circle cx="980" cy="595" r="16" fill="none" stroke="#CBD5E1" stroke-width="2"/>
+
+  <!-- Option 3: System Dynamic -->
+  <rect x="48" y="670" width="984" height="110" rx="24" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <circle cx="95" cy="725" r="24" fill="#EDF2F7"/>
+  <path d="M95 709 A16 16 0 0 0 95 741 Z" fill="#1A202C"/>
+  <text x="145" y="718" font-family="'Google Sans', sans-serif" font-size="26" font-weight="700" fill="#1A202C">Follow Android System</text>
+  <text x="145" y="752" font-family="'Google Sans', sans-serif" font-size="20" font-weight="500" fill="#4A5568">Automatically match your device's light or dark schedule</text>
+  <circle cx="980" cy="725" r="16" fill="none" stroke="#CBD5E1" stroke-width="2"/>
+
+  <!-- Legal Disclaimer Section in Settings -->
+  <text x="56" y="840" font-family="'Google Sans', sans-serif" font-size="30" font-weight="600" fill="#1F1F1F">Usage Disclaimer &amp; Notice</text>
+
+  <rect x="48" y="870" width="984" height="240" rx="28" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1.5"/>
+  <text x="80" y="920" font-family="'Google Sans', sans-serif" font-size="24" font-weight="700" fill="#92400E">⚠️ व्यक्तिगत उपयोग और शैक्षिक डिस्क्लेमर (Personal Use Only)</text>
+  <g font-family="'Google Sans', sans-serif" font-size="20" font-weight="500" fill="#78350F">
+    <text x="80" y="960">यह ऐप केवल पर्सनल यूज़ और एजुकेशनल डेमो के लिए बनाया गया है।</text>
+    <text x="80" y="995">हम टेलीग्राम की किसी भी नीति का उल्लंघन नहीं करते हैं। डेवलपर्स किसी भी</text>
+    <text x="80" y="1030">गलत उपयोग के लिए उत्तरदायी नहीं होंगे। ऐप को यूज़ करना आपकी जिम्मेदारी है।</text>
+    <text x="80" y="1075" font-weight="700" fill="#B45309">Bilingual Hindi &amp; English Terms of Use Accepted ✓</text>
+  </g>
+
+  <!-- Telegram Sync Settings Card -->
+  <text x="56" y="1170" font-family="'Google Sans', sans-serif" font-size="30" font-weight="600" fill="#1F1F1F">Telegram Swarm Configuration</text>
+
+  <rect x="48" y="1200" width="984" height="220" rx="28" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <text x="80" y="1255" font-family="'Google Sans', sans-serif" font-size="26" font-weight="700" fill="#1A202C">Bot Swarm Status: 3 Bots Connected</text>
+  <text x="80" y="1295" font-family="'Google Sans', sans-serif" font-size="20" font-weight="500" fill="#0A6C7A">Channel ID: -1002345678901 • Chat Sync: ENABLED</text>
+  <rect x="80" y="1325" width="260" height="56" rx="28" fill="#007A8A"/>
+  <text x="210" y="1361" font-family="'Google Sans', sans-serif" font-size="22" font-weight="600" fill="#FFFFFF" text-anchor="middle">Sync TG Chat Now</text>
+  <rect x="360" y="1325" width="260" height="56" rx="28" fill="#EDF2F7"/>
+  <text x="490" y="1361" font-family="'Google Sans', sans-serif" font-size="22" font-weight="600" fill="#1A202C" text-anchor="middle">Rotate Bots</text>
+</svg>

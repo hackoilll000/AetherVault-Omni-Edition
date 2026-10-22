@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080C1A"/>
+      <stop offset="50%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#060913"/>
+    </linearGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F0FF"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="planeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    <filter id="vaultGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background squircle -->
+  <rect width="512" height="512" rx="116" fill="url(#bgGrad)"/>
+  <rect x="4" y="4" width="504" height="504" rx="112" fill="none" stroke="#38BDF8" stroke-width="2" stroke-opacity="0.35"/>
+
+  <!-- Subtle Cyber Tech Grid Pattern -->
+  <g stroke="#1E293B" stroke-width="1" stroke-opacity="0.6">
+    <line x1="96" y1="0" x2="96" y2="512"/>
+    <line x1="192" y1="0" x2="192" y2="512"/>
+    <line x1="320" y1="0" x2="320" y2="512"/>
+    <line x1="416" y1="0" x2="416" y2="512"/>
+    <line x1="0" y1="96" x2="512" y2="96"/>
+    <line x1="0" y1="192" x2="512" y2="192"/>
+    <line x1="0" y1="320" x2="512" y2="320"/>
+    <line x1="0" y1="416" x2="512" y2="416"/>
+  </g>
+
+  <!-- Hexagonal Cryptographic Vault Shield -->
+  <g filter="url(#vaultGlow)">
+    <polygon points="256,76 396,156 396,316 256,396 116,316 116,156" 
+             fill="#0E1626" 
+             stroke="url(#shieldGrad)" 
+             stroke-width="14" 
+             stroke-linejoin="round"/>
+  </g>
+
+  <!-- Origami Telegram Flight Wing / Paper Plane Core -->
+  <!-- Left wing -->
+  <polygon points="180,270 350,180 250,336 230,285" fill="#00F0FF" opacity="0.95"/>
+  <!-- Top fold wing -->
+  <polygon points="230,285 350,180 295,265" fill="#6366F1"/>
+  <!-- Under fold wing -->
+  <polygon points="230,285 250,336 265,296" fill="#818CF8"/>
+
+  <!-- Glowing Cryptographic Core / Keyhole Nexus -->
+  <circle cx="256" cy="242" r="18" fill="#FFFFFF" filter="url(#vaultGlow)"/>
+  <circle cx="256" cy="242" r="8" fill="#080C1A"/>
+  <polygon points="250,246 262,246 266,270 246,270" fill="#FFFFFF"/>
+
+  <!-- Shimmering Orbit Ring -->
+  <circle cx="256" cy="256" r="165" fill="none" stroke="#00F0FF" stroke-width="2.5" stroke-dasharray="14 10" stroke-opacity="0.45"/>
+  <circle cx="373" cy="140" r="6" fill="#00F0FF"/>
+  <circle cx="139" cy="372" r="6" fill="#A855F7"/>
+</svg>

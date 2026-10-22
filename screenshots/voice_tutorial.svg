@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <filter id="modalShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="32" flood-color="#000000" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Dimmed Soft Backdrop -->
+  <rect width="1080" height="1920" fill="#000000" fill-opacity="0.45"/>
+
+  <!-- Centered Voice Tutorial Card (WCAG 2.1 AA Light Theme) -->
+  <g filter="url(#modalShadow)">
+    <rect x="70" y="320" width="940" height="1280" rx="36" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  </g>
+
+  <!-- Top Badge: 100% Free & Serverless -->
+  <rect x="110" y="370" width="310" height="52" rx="26" fill="#E6FFFA" stroke="#007A8A" stroke-width="1.5"/>
+  <circle cx="136" cy="396" r="8" fill="#006D77"/>
+  <text x="156" y="404" font-family="'Google Sans', Roboto, sans-serif" font-size="20" font-weight="700" fill="#006D77">100% FREE &amp; SERVERLESS</text>
+
+  <!-- Step Counter (1 / 5) -->
+  <rect x="850" y="370" width="120" height="52" rx="26" fill="#EDF2F7"/>
+  <text x="910" y="404" font-family="'Google Sans', Roboto, sans-serif" font-size="22" font-weight="700" fill="#0A6C7A" text-anchor="middle">1 / 5</text>
+
+  <!-- Title: Rich Charcoal Black (#1A202C) -->
+  <text x="110" y="480" font-family="'Google Sans', Roboto, sans-serif" font-size="44" font-weight="700" fill="#1A202C">Interactive Voice Tutorial</text>
+
+  <!-- Subheading: Deep Teal (#0A6C7A) -->
+  <text x="110" y="530" font-family="'Google Sans', Roboto, sans-serif" font-size="28" font-weight="600" fill="#0A6C7A">Step 1: Welcome to AetherVault Omni</text>
+
+  <!-- Pulsing Soundwave Visualizer Box -->
+  <rect x="110" y="570" width="860" height="150" rx="24" fill="#F0F9FF" stroke="#BAE6FD" stroke-width="1.5"/>
+  <g fill="#007A8A">
+    <rect x="180" y="625" width="8" height="40" rx="4"/>
+    <rect x="210" y="610" width="8" height="70" rx="4"/>
+    <rect x="240" y="595" width="8" height="100" rx="4"/>
+    <rect x="270" y="605" width="8" height="80" rx="4"/>
+    <rect x="300" y="620" width="8" height="50" rx="4"/>
+    <rect x="330" y="630" width="8" height="30" rx="4"/>
+    <rect x="360" y="615" width="8" height="60" rx="4"/>
+    <rect x="390" y="600" width="8" height="90" rx="4"/>
+    <rect x="420" y="590" width="8" height="110" rx="4"/>
+    <rect x="450" y="610" width="8" height="70" rx="4"/>
+    <rect x="480" y="625" width="8" height="40" rx="4"/>
+    <rect x="510" y="605" width="8" height="80" rx="4"/>
+    <rect x="540" y="595" width="8" height="100" rx="4"/>
+    <rect x="570" y="615" width="8" height="60" rx="4"/>
+    <rect x="600" y="625" width="8" height="40" rx="4"/>
+    <rect x="630" y="600" width="8" height="90" rx="4"/>
+    <rect x="660" y="620" width="8" height="50" rx="4"/>
+    <rect x="690" y="635" width="8" height="20" rx="4"/>
+  </g>
+  <text x="750" y="650" font-family="'Google Sans', sans-serif" font-size="22" font-weight="600" fill="#0369A1">VOICE ACTIVE</text>
+
+  <!-- Body Text: Dark Slate Gray (#4A5568) - Crisp & Opaque -->
+  <g font-family="'Google Sans', Roboto, sans-serif" font-size="28" font-weight="500" fill="#4A5568">
+    <text x="110" y="780">AetherVault turns Telegram into an infinite, fast, personal</text>
+    <text x="110" y="825">cloud storage vault without monthly subscription fees.</text>
+    <text x="110" y="870">Every single photo, video, document, or archive is locally</text>
+    <text x="110" y="915">encrypted on-device with AES-256-GCM before upload.</text>
+  </g>
+
+  <!-- Voice Guide Alert Box -->
+  <rect x="110" y="970" width="860" height="130" rx="20" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.5"/>
+  <circle cx="155" cy="1035" r="24" fill="#3B82F6"/>
+  <text x="155" y="1043" font-family="'Google Sans', sans-serif" font-size="24" font-weight="700" fill="#FFFFFF" text-anchor="middle">i</text>
+  <text x="200" y="1025" font-family="'Google Sans', sans-serif" font-size="24" font-weight="700" fill="#1E3A8A">Personal Use Architecture</text>
+  <text x="200" y="1060" font-family="'Google Sans', sans-serif" font-size="22" font-weight="500" fill="#1E40AF">Serverless • Zero monthly bills • Sharded over Telegram Swarm</text>
+
+  <!-- Key Highlights Checkmarks -->
+  <g font-family="'Google Sans', sans-serif" font-size="26" font-weight="600" fill="#1A202C">
+    <circle cx="135" cy="1155" r="14" fill="#007A8A"/>
+    <text x="135" y="1161" font-size="18" fill="#FFFFFF" text-anchor="middle">✓</text>
+    <text x="165" y="1162">No subscription fees or third-party servers</text>
+
+    <circle cx="135" cy="1215" r="14" fill="#007A8A"/>
+    <text x="135" y="1221" font-size="18" fill="#FFFFFF" text-anchor="middle">✓</text>
+    <text x="165" y="1222">Direct Telegram Channel Message &amp; Chat Sync</text>
+
+    <circle cx="135" cy="1275" r="14" fill="#007A8A"/>
+    <text x="135" y="1281" font-size="18" fill="#FFFFFF" text-anchor="middle">✓</text>
+    <text x="165" y="1282">WCAG 2.1 AA Compliant High-Contrast Light Theme</text>
+  </g>
+
+  <!-- Buttons: Interactive Elements -->
+  <!-- "Next Step" Button: Solid Vibrant Blue/Teal (#007A8A) with Bold White Text -->
+  <rect x="110" y="1340" width="860" height="90" rx="24" fill="#007A8A"/>
+  <text x="540" y="1396" font-family="'Google Sans', Roboto, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF" text-anchor="middle">Next Step ➔</text>
+
+  <!-- "Replay" Button: Outlined Dark Teal Border with Matching Text & Icon -->
+  <rect x="110" y="1455" width="415" height="80" rx="24" fill="none" stroke="#007A8A" stroke-width="2.5"/>
+  <text x="317" y="1505" font-family="'Google Sans', Roboto, sans-serif" font-size="26" font-weight="700" fill="#007A8A" text-anchor="middle">↻ Replay Audio</text>
+
+  <!-- "Skip Tutorial" Button -->
+  <rect x="555" y="1455" width="415" height="80" rx="24" fill="#F1F5F9"/>
+  <text x="762" y="1505" font-family="'Google Sans', Roboto, sans-serif" font-size="26" font-weight="600" fill="#475569" text-anchor="middle">Skip Tutorial</text>
+
+  <!-- Creator Attribution Line -->
+  <text x="540" y="1575" font-family="'Google Sans', sans-serif" font-size="20" font-weight="600" fill="#64748B" text-anchor="middle">Engineered by Ayush Mondal (Class 9th, 14 yrs) • TRB FireOps</text>
+</svg>

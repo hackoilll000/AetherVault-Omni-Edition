@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <linearGradient id="bgLight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F8FAFD"/>
+      <stop offset="100%" stop-color="#EEF2F8"/>
+    </linearGradient>
+    <linearGradient id="photoPill1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="photoPill2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="photoPill3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+    <linearGradient id="photoPill4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#BE185D"/>
+    </linearGradient>
+    <linearGradient id="photoPill5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="photoPill6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#0E7490"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1920" fill="url(#bgLight)"/>
+
+  <!-- Status Bar -->
+  <g fill="#1F1F1F" font-family="'Google Sans', Roboto, sans-serif" font-size="28" font-weight="600">
+    <text x="64" y="68">10:24</text>
+    <text x="910" y="68">5G  98%</text>
+  </g>
+
+  <!-- Collections Header Mode -->
+  <!-- Top Status Pill (Left) -->
+  <rect x="48" y="110" width="340" height="70" rx="35" fill="#F0F4F9" stroke="#E1E3E1" stroke-width="1.5"/>
+  <circle cx="85" cy="145" r="12" fill="#10B981"/>
+  <text x="110" y="153" font-family="'Google Sans', sans-serif" font-size="24" font-weight="600" fill="#1F1F1F">Bot Connected</text>
+
+  <!-- Top Action Icons (Right) -->
+  <circle cx="840" cy="145" r="30" fill="#F0F4F9"/>
+  <!-- Quick upload + -->
+  <line x1="840" y1="133" x2="840" y2="157" stroke="#041E49" stroke-width="4" stroke-linecap="round"/>
+  <line x1="828" y1="145" x2="852" y2="145" stroke="#041E49" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="855" cy="130" r="5" fill="#EF4444"/>
+
+  <!-- Bell Activity -->
+  <circle cx="920" cy="145" r="30" fill="#F0F4F9"/>
+  <path d="M920 133 C915 133 911 137 911 142 L911 151 L907 155 L933 155 L929 151 L929 142 C929 137 925 133 920 133 Z" fill="#041E49"/>
+
+  <!-- User Avatar -->
+  <circle cx="1000" cy="145" r="30" fill="#D3E3FD"/>
+  <text x="1000" y="153" font-family="'Google Sans', sans-serif" font-size="22" font-weight="700" fill="#041E49" text-anchor="middle">AM</text>
+
+  <!-- Title Heading -->
+  <text x="56" y="245" font-family="'Google Sans', sans-serif" font-size="36" font-weight="600" fill="#1F1F1F">Photos &amp; Encrypted Media</text>
+  <text x="56" y="280" font-family="'Google Sans', sans-serif" font-size="22" font-weight="400" fill="#5E5E5E">Infinite Zero-Knowledge Gallery • Auto-Backed to Telegram</text>
+
+  <!-- Quick Category Row (4-column grid) -->
+  <g font-family="'Google Sans', sans-serif" font-size="22" font-weight="500" fill="#1F1F1F" text-anchor="middle">
+    <rect x="48" y="315" width="225" height="170" rx="32" fill="#F0F4F9"/>
+    <circle cx="160" cy="375" r="38" fill="#FFFFFF"/>
+    <polygon points="160,353 167,367 183,370 171,381 174,397 160,389 146,397 149,381 137,370 153,367" fill="#F59E0B"/>
+    <text x="160" y="450">Favourites</text>
+
+    <rect x="298" y="315" width="225" height="170" rx="32" fill="#F0F4F9"/>
+    <circle cx="410" cy="375" r="38" fill="#FFFFFF"/>
+    <rect x="394" y="361" width="32" height="28" rx="4" fill="none" stroke="#0B57D0" stroke-width="3"/>
+    <circle cx="403" cy="370" r="3" fill="#0B57D0"/>
+    <path d="M396 386 L404 377 L412 384 L418 378 L424 386 Z" fill="#0B57D0"/>
+    <text x="410" y="450">Screenshots</text>
+
+    <rect x="548" y="315" width="225" height="170" rx="32" fill="#F0F4F9"/>
+    <circle cx="660" cy="375" r="38" fill="#FFFFFF"/>
+    <rect x="644" y="362" width="32" height="26" rx="4" fill="none" stroke="#6366F1" stroke-width="3"/>
+    <line x1="640" y1="369" x2="680" y2="369" stroke="#6366F1" stroke-width="3"/>
+    <text x="660" y="450">Archive</text>
+
+    <rect x="798" y="315" width="234" height="170" rx="32" fill="#F0F4F9"/>
+    <circle cx="915" cy="375" r="38" fill="#FFFFFF"/>
+    <path d="M905 365 L925 365 M907 365 L909 391 C909 393 911 395 913 395 L917 395 C919 395 921 393 921 391 L923 365" stroke="#EA4335" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <text x="915" y="450">Trash</text>
+  </g>
+
+  <!-- Timeline Section 1: Today -->
+  <text x="56" y="535" font-family="'Google Sans', sans-serif" font-size="28" font-weight="600" fill="#1F1F1F">Today • Wed, Oct 21</text>
+  <text x="1024" y="535" font-family="'Google Sans', sans-serif" font-size="22" font-weight="500" fill="#0B57D0" text-anchor="end">4 items synced</text>
+
+  <!-- Photo Grid: 3 columns -->
+  <rect x="48" y="555" width="316" height="316" rx="20" fill="url(#photoPill1)"/>
+  <rect x="382" y="555" width="316" height="316" rx="20" fill="url(#photoPill2)"/>
+  <rect x="716" y="555" width="316" height="316" rx="20" fill="url(#photoPill3)"/>
+  <!-- Sync Checkmark Badges -->
+  <circle cx="330" cy="585" r="16" fill="#FFFFFF" fill-opacity="0.85"/>
+  <text x="330" y="591" font-family="sans-serif" font-size="16" font-weight="700" fill="#10B981" text-anchor="middle">✓</text>
+  <circle cx="664" cy="585" r="16" fill="#FFFFFF" fill-opacity="0.85"/>
+  <text x="664" y="591" font-family="sans-serif" font-size="16" font-weight="700" fill="#10B981" text-anchor="middle">✓</text>
+  <circle cx="998" cy="585" r="16" fill="#FFFFFF" fill-opacity="0.85"/>
+  <text x="998" y="591" font-family="sans-serif" font-size="16" font-weight="700" fill="#10B981" text-anchor="middle">✓</text>
+
+  <!-- Timeline Section 2: Yesterday -->
+  <text x="56" y="920" font-family="'Google Sans', sans-serif" font-size="28" font-weight="600" fill="#1F1F1F">Yesterday • Tue, Oct 20</text>
+  <text x="1024" y="920" font-family="'Google Sans', sans-serif" font-size="22" font-weight="500" fill="#0B57D0" text-anchor="end">3 items</text>
+
+  <rect x="48" y="940" width="316" height="316" rx="20" fill="url(#photoPill4)"/>
+  <rect x="382" y="940" width="316" height="316" rx="20" fill="url(#photoPill5)"/>
+  <rect x="716" y="940" width="316" height="316" rx="20" fill="url(#photoPill6)"/>
+  <circle cx="330" cy="970" r="16" fill="#FFFFFF" fill-opacity="0.85"/>
+  <text x="330" y="976" font-family="sans-serif" font-size="16" font-weight="700" fill="#10B981" text-anchor="middle">✓</text>
+  <circle cx="664" cy="970" r="16" fill="#FFFFFF" fill-opacity="0.85"/>
+  <text x="664" y="976" font-family="sans-serif" font-size="16" font-weight="700" fill="#10B981" text-anchor="middle">✓</text>
+  <circle cx="998" cy="970" r="16" fill="#FFFFFF" fill-opacity="0.85"/>
+  <text x="998" y="976" font-family="sans-serif" font-size="16" font-weight="700" fill="#10B981" text-anchor="middle">✓</text>
+
+  <!-- Timeline Section 3: October 2026 -->
+  <text x="56" y="1305" font-family="'Google Sans', sans-serif" font-size="28" font-weight="600" fill="#1F1F1F">October 2026</text>
+  <rect x="48" y="1325" width="484" height="300" rx="24" fill="url(#photoPill1)"/>
+  <rect x="548" y="1325" width="484" height="300" rx="24" fill="url(#photoPill3)"/>
+
+  <!-- Lilac Camera FAB -->
+  <g filter="url(#softShadow)">
+    <rect x="880" y="1640" width="128" height="128" rx="40" fill="#F8D8FE"/>
+    <circle cx="944" cy="1704" r="24" fill="none" stroke="#3B0944" stroke-width="5"/>
+    <circle cx="944" cy="1704" r="10" fill="#3B0944"/>
+    <rect x="934" y="1676" width="20" height="8" rx="3" fill="#3B0944"/>
+  </g>
+
+  <!-- Bottom Nav -->
+  <rect x="0" y="1780" width="1080" height="140" fill="#F3F6FC"/>
+  <line x1="0" y1="1780" x2="1080" y2="1780" stroke="#E1E3E1" stroke-width="1.5"/>
+  <text x="135" y="1885" font-family="'Google Sans', sans-serif" font-size="22" font-weight="500" fill="#444746" text-anchor="middle">Home</text>
+  <rect x="345" y="1796" width="120" height="60" rx="30" fill="#D3E3FD"/>
+  <text x="405" y="1885" font-family="'Google Sans', sans-serif" font-size="22" font-weight="700" fill="#041E49" text-anchor="middle">Photos</text>
+  <text x="675" y="1885" font-family="'Google Sans', sans-serif" font-size="22" font-weight="500" fill="#444746" text-anchor="middle">Channels</text>
+  <text x="945" y="1885" font-family="'Google Sans', sans-serif" font-size="22" font-weight="500" fill="#444746" text-anchor="middle">Files</text>
+</svg>

@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+  <defs>
+    <linearGradient id="bgLight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F8FAFD"/>
+      <stop offset="100%" stop-color="#EEF2F8"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1920" fill="url(#bgLight)"/>
+
+  <!-- Status Bar -->
+  <g fill="#1F1F1F" font-family="'Google Sans', Roboto, sans-serif" font-size="28" font-weight="600">
+    <text x="64" y="68">10:24</text>
+    <text x="910" y="68">5G  98%</text>
+  </g>
+
+  <!-- Top Search Bar -->
+  <g filter="url(#softShadow)">
+    <rect x="48" y="104" width="984" height="100" rx="50" fill="#EEF2F8"/>
+  </g>
+  <g stroke="#1F1F1F" stroke-width="4" stroke-linecap="round">
+    <line x1="88" y1="139" x2="128" y2="139"/>
+    <line x1="88" y1="154" x2="128" y2="154"/>
+    <line x1="88" y1="169" x2="128" y2="169"/>
+  </g>
+  <text x="160" y="165" font-family="'Google Sans', sans-serif" font-size="32" font-weight="400" fill="#444746">Search encrypted files</text>
+  <circle cx="970" cy="154" r="28" fill="#D3E3FD"/>
+  <text x="970" y="162" font-family="'Google Sans', sans-serif" font-size="20" font-weight="700" fill="#041E49" text-anchor="middle">AM</text>
+
+  <!-- My Drive / Channels Sub-Tabs -->
+  <g font-family="'Google Sans', sans-serif" font-size="30">
+    <text x="270" y="275" font-weight="600" fill="#0B57D0" text-anchor="middle">My Drive</text>
+    <text x="810" y="275" font-weight="500" fill="#444746" text-anchor="middle">Telegram Channels</text>
+    <rect x="180" y="295" width="180" height="6" rx="3" fill="#0B57D0"/>
+    <line x1="48" y1="301" x2="1032" y2="301" stroke="#E1E3E1" stroke-width="2"/>
+  </g>
+
+  <!-- Swarm Engine Live Band -->
+  <rect x="48" y="325" width="984" height="74" rx="20" fill="#F0F4F9" stroke="#E1E3E1" stroke-width="1.5"/>
+  <circle cx="80" cy="362" r="10" fill="#10B981"/>
+  <text x="105" y="369" font-family="'Google Sans', sans-serif" font-size="24" font-weight="600" fill="#1F1F1F">BOT SWARM ACTIVE (3/3) • SHARD SIZE: 19 MB • AES-256-GCM</text>
+  <text x="990" y="369" font-family="'Google Sans', sans-serif" font-size="22" font-weight="600" fill="#0B57D0" text-anchor="end">14.2 MB/s</text>
+
+  <!-- Storage Meter Strip -->
+  <rect x="48" y="420" width="984" height="110" rx="28" fill="#F0F4F9"/>
+  <text x="80" y="465" font-family="'Google Sans', sans-serif" font-size="26" font-weight="600" fill="#1F1F1F">Unlimited Telegram Cloud Storage</text>
+  <text x="80" y="500" font-family="'Google Sans', sans-serif" font-size="22" font-weight="400" fill="#5E5E5E">42.8 GB uploaded in session • 0 bytes server cost</text>
+  <rect x="790" y="445" width="210" height="56" rx="28" fill="#0B57D0"/>
+  <text x="895" y="481" font-family="'Google Sans', sans-serif" font-size="22" font-weight="600" fill="#FFFFFF" text-anchor="middle">+ Upload File</text>
+
+  <!-- Files List Header -->
+  <text x="56" y="575" font-family="'Google Sans', sans-serif" font-size="30" font-weight="600" fill="#1F1F1F">Encrypted Vault Items</text>
+  <text x="1024" y="575" font-family="'Google Sans', sans-serif" font-size="24" font-weight="500" fill="#444746" text-anchor="end">Name ▾</text>
+
+  <!-- File Row 1: Video Archive -->
+  <rect x="48" y="605" width="984" height="130" rx="24" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="76" y="625" width="90" height="90" rx="20" fill="#FEE2E2"/>
+  <polygon points="112,655 132,670 112,685" fill="#EF4444"/>
+  <text x="190" y="660" font-family="'Google Sans', sans-serif" font-size="28" font-weight="600" fill="#1F1F1F">cybersecurity_course_hd.mp4</text>
+  <text x="190" y="695" font-family="'Google Sans', sans-serif" font-size="22" font-weight="400" fill="#64748B">1.4 GB • 74 Telegram chunks • AES-256 encrypted</text>
+  <circle cx="980" cy="670" r="16" fill="#D3E3FD"/>
+  <text x="980" y="677" font-family="'Google Sans', sans-serif" font-size="20" font-weight="700" fill="#041E49" text-anchor="middle">✓</text>
+
+  <!-- File Row 2: Architecture PDF -->
+  <rect x="48" y="755" width="984" height="130" rx="24" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="76" y="775" width="90" height="90" rx="20" fill="#E0E7FF"/>
+  <rect x="106" y="798" width="30" height="42" rx="4" fill="none" stroke="#6366F1" stroke-width="3"/>
+  <text x="190" y="810" font-family="'Google Sans', sans-serif" font-size="28" font-weight="600" fill="#1F1F1F">AetherVault_Architecture_Doc.pdf</text>
+  <text x="190" y="845" font-family="'Google Sans', sans-serif" font-size="22" font-weight="400" fill="#64748B">18.4 MB • 1 chunk • Direct channel sync</text>
+  <circle cx="980" cy="820" r="16" fill="#D3E3FD"/>
+  <text x="980" y="827" font-family="'Google Sans', sans-serif" font-size="20" font-weight="700" fill="#041E49" text-anchor="middle">✓</text>
+
+  <!-- File Row 3: Zip Archive -->
+  <rect x="48" y="905" width="984" height="130" rx="24" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="76" y="925" width="90" height="90" rx="20" fill="#FEF3C7"/>
+  <rect x="106" y="950" width="30" height="38" rx="4" fill="none" stroke="#D97706" stroke-width="3"/>
+  <text x="190" y="960" font-family="'Google Sans', sans-serif" font-size="28" font-weight="600" fill="#1F1F1F">linux_kernel_source_backup.tar.gz</text>
+  <text x="190" y="995" font-family="'Google Sans', sans-serif" font-size="22" font-weight="400" fill="#64748B">380 MB • 20 chunks • Swarm synced</text>
+  <circle cx="980" cy="970" r="16" fill="#D3E3FD"/>
+  <text x="980" y="977" font-family="'Google Sans', sans-serif" font-size="20" font-weight="700" fill="#041E49" text-anchor="middle">✓</text>
+
+  <!-- File Row 4: Database Snapshot -->
+  <rect x="48" y="1055" width="984" height="130" rx="24" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="76" y="1075" width="90" height="90" rx="20" fill="#E6FFFA"/>
+  <ellipse cx="121" cy="1105" rx="16" ry="6" fill="none" stroke="#007A8A" stroke-width="2.5"/>
+  <path d="M105 1105 v18 c0 3.3 7.2 6 16 6 s16 -2.7 16 -6 v-18" fill="none" stroke="#007A8A" stroke-width="2.5"/>
+  <text x="190" y="1110" font-family="'Google Sans', sans-serif" font-size="28" font-weight="600" fill="#1F1F1F">personal_vault_manifest.enc</text>
+  <text x="190" y="1145" font-family="'Google Sans', sans-serif" font-size="22" font-weight="400" fill="#64748B">2.1 MB • Pinned Channel Manifest</text>
+  <circle cx="980" cy="1120" r="16" fill="#D3E3FD"/>
+  <text x="980" y="1127" font-family="'Google Sans', sans-serif" font-size="20" font-weight="700" fill="#041E49" text-anchor="middle">✓</text>
+
+  <!-- File Row 5: Voice Notes -->
+  <rect x="48" y="1205" width="984" height="130" rx="24" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="76" y="1225" width="90" height="90" rx="20" fill="#FCE7F3"/>
+  <path d="M121 1250 v20 M113 1258 c0 4.4 3.6 8 8 8 s8 -3.6 8 -8" stroke="#DB2777" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <text x="190" y="1260" font-family="'Google Sans', sans-serif" font-size="28" font-weight="600" fill="#1F1F1F">tutorial_audio_narration.opus</text>
+  <text x="190" y="1295" font-family="'Google Sans', sans-serif" font-size="22" font-weight="400" fill="#64748B">4.8 MB • Spatial Audio Master</text>
+  <circle cx="980" cy="1270" r="16" fill="#D3E3FD"/>
+  <text x="980" y="1277" font-family="'Google Sans', sans-serif" font-size="20" font-weight="700" fill="#041E49" text-anchor="middle">✓</text>
+
+  <!-- File Row 6: Photos Zip -->
+  <rect x="48" y="1355" width="984" height="130" rx="24" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="76" y="1375" width="90" height="90" rx="20" fill="#EDE9FE"/>
+  <rect x="106" y="1400" width="30" height="38" rx="4" fill="none" stroke="#7C3AED" stroke-width="3"/>
+  <text x="190" y="1410" font-family="'Google Sans', sans-serif" font-size="28" font-weight="600" fill="#1F1F1F">family_photos_october_2026.enc</text>
+  <text x="190" y="1445" font-family="'Google Sans', sans-serif" font-size="22" font-weight="400" fill="#64748B">860 MB • 46 chunks • Restored</text>
+  <circle cx="980" cy="1420" r="16" fill="#D3E3FD"/>
+  <text x="980" y="1427" font-family="'Google Sans', sans-serif" font-size="20" font-weight="700" fill="#041E49" text-anchor="middle">✓</text>
+
+  <!-- Primary Large FAB -->
+  <g filter="url(#softShadow)">
+    <rect x="880" y="1640" width="128" height="128" rx="40" fill="#D3E3FD"/>
+    <line x1="944" y1="1676" x2="944" y2="1732" stroke="#041E49" stroke-width="8" stroke-linecap="round"/>
+    <line x1="916" y1="1704" x2="972" y2="1704" stroke="#041E49" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <!-- Bottom Navigation Bar -->
+  <rect x="0" y="1780" width="1080" height="140" fill="#F3F6FC"/>
+  <line x1="0" y1="1780" x2="1080" y2="1780" stroke="#E1E3E1" stroke-width="1.5"/>
+  <text x="135" y="1885" font-family="'Google Sans', sans-serif" font-size="22" font-weight="500" fill="#444746" text-anchor="middle">Home</text>
+  <text x="405" y="1885" font-family="'Google Sans', sans-serif" font-size="22" font-weight="500" fill="#444746" text-anchor="middle">Starred</text>
+  <text x="675" y="1885" font-family="'Google Sans', sans-serif" font-size="22" font-weight="500" fill="#444746" text-anchor="middle">Channels</text>
+  <!-- Files Active -->
+  <rect x="885" y="1796" width="120" height="60" rx="30" fill="#D3E3FD"/>
+  <path d="M930 1815 L950 1815 L958 1823 L965 1823 L965 1845 L930 1845 Z" fill="#041E49"/>
+  <text x="945" y="1885" font-family="'Google Sans', sans-serif" font-size="22" font-weight="700" fill="#041E49" text-anchor="middle">Files</text>
+</svg>

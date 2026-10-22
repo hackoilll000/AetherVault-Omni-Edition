@@ -16,3 +16,9 @@
 local.properties
 .env
 debug.keystore
+.aistudio/
+public/assets/
+*.jpg
+*.jpeg
+Screenshot_*.png
+IMG-*.png
