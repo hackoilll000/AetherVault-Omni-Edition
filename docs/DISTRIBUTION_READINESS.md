@@ -39,7 +39,7 @@
 | Req ID | Requirement | Official Standard Source | Status | Evidence / Verification |
 | :--- | :--- | :--- | :--- | :--- |
 | `OR-01` | Open Source Repository Reference | Orion Catalog Spec | `PASS` | `https://github.com/hackoilll000/AetherVault-Omni-Edition` |
-| `OR-02` | License Verification | OSI Approved License | `PASS` | MIT License declared and validated in `LICENSE`. |
+| `OR-02` | License Verification | Source-Available License Spec | `PASS` | AetherVault Source-Available Personal & Educational License v1.0 declared in `LICENSE`. |
 | `OR-03` | Package & Version Alignment | Orion Catalog Metadata | `PASS` | `distribution/metadata/orion-store/metadata.json`. |
 | `OR-04` | APK Direct Release Link | Orion Catalog Spec | `PASS` | GitHub Release URL with SHA-256 checksum verified. |
 | `OR-05` | Authentic Screenshots | Visual Catalog Rules | `PASS` | Screenshots in `distribution/assets/screenshots/`. |
@@ -48,7 +48,7 @@
 
 | Req ID | Requirement | Official Standard Source | Status | Evidence / Verification |
 | :--- | :--- | :--- | :--- | :--- |
-| `FD-01` | 100% Free & Open Source Code | F-Droid Inclusion Policy | `PASS` | Zero proprietary binary blobs or closed-source SDKs. |
+| `FD-01` | Source-Available Codebase | F-Droid Inclusion Policy | `NEEDS MANUAL REVIEW` | Source code visible & buildable; non-commercial license restriction requires custom repository or exception review. |
 | `FD-02` | Buildable from Source | F-Droid Build Server Rules | `PASS` | Standard Gradle build (`gradle assembleRelease`). |
 | `FD-03` | Anti-Features Review | F-Droid Anti-Feature Policy | `PASS` | No tracking, no ads, no telemetry collection without opt-in. |
 | `FD-04` | Metadata Recipe Format | F-Droid Metadata Format | `PASS` | `distribution/metadata/fdroid/com.aistudio.aethervault.yml`. |

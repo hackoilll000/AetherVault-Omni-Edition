@@ -36,4 +36,4 @@ When creating a bug report, please include:
 - Do not alter core AES-256-GCM encryption or Telegram Bot API pipeline logic without thorough security review.
 
 ## License
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the AetherVault Source-Available Personal & Educational License v1.0 (see `LICENSE`).

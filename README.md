@@ -9,7 +9,7 @@
 [![Backend](https://img.shields.io/badge/Backend-Telegram_Bot_Swarm-blueviolet?style=for-the-badge&logo=telegram)](https://core.telegram.org/bots/api)
 [![YouTube Channel](https://img.shields.io/badge/YouTube-TRB_FireOps-red?style=for-the-badge&logo=youtube)](https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0)
 [![Release APK](https://img.shields.io/badge/Download-Release_APK-orange?style=for-the-badge&logo=android)](releases/AetherVault-Omni-v1.0.0-Debug.apk)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-Source--Available_Personal_Use_Only-red?style=for-the-badge)](LICENSE)
 
 ---
 
@@ -126,12 +126,19 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on code style, branch
 
 ---
 
-## 📄 License & Attribution
+## 📄 License, Branding & Usage Policy
 
-- **Creator:** Ayush Mondal (AJPM)
-- **YouTube:** [TRB FireOps (@trbfireops)](https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0)
-- **Published:** October 2026
-- **License:** Distributed under the MIT License. See `LICENSE` for more information.
+- **Creator & Lead Architect:** Ayush Mondal (AJPM / TRB FireOps)
+- **Official Channel:** [TRB FireOps (@trbfireops)](https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0)
+- **Publication Date:** October 2026
+- **License Type:** **AetherVault Source-Available Personal & Educational License v1.0** (See [LICENSE](LICENSE))
+
+### Summary of Rights & Restrictions:
+- **Permitted Uses:** You are free to view, study, audit, compile, and run the source code on your personal devices strictly for personal, educational, security-audit, and non-commercial research purposes.
+- **Strict Restrictions:**
+  - **No Commercial Use / Monetization:** Selling, sublicensing, or generating commercial revenue from this software or derived works is strictly prohibited.
+  - **No Store Uploads / Redistribution:** Re-uploading or distributing compiled APKs, AABs, or source code to Google Play Store, Orion Store, F-Droid, Apple App Store, APKPure, Telegram channels, or third-party marketplaces is prohibited without express prior written consent from Ayush Mondal (TRB FireOps).
+  - **Trademark & Brand Protection:** The names `AetherVault`, `AetherVault Omni Edition`, `Tele Drive`, the logos, app icons, and developer identity (`Ayush Mondal`, `TRB FireOps`) are protected trademarks/brand assets. Unauthorized re-branding, impersonation, or claims of official affiliation are strictly forbidden.
 
 ---
 *Engineered with precision by Ayush Mondal (AJPM) • Powered by Telegram Bot Swarm & AES-256-GCM.*

@@ -1,7 +1,7 @@
 Categories:
   - System
   - Security
-License: MIT
+License: Source-Available-v1.0
 AuthorName: Ayush Mondal
 SourceCode: https://github.com/hackoilll000/AetherVault-Omni-Edition
 IssueTracker: https://github.com/hackoilll000/AetherVault-Omni-Edition/issues
@@ -9,7 +9,7 @@ IssueTracker: https://github.com/hackoilll000/AetherVault-Omni-Edition/issues
 AutoName: AetherVault
 Summary: Zero-Knowledge Encrypted Telegram Cloud Storage Vault
 Description: |-
-  AetherVault is an open-source, zero-knowledge encrypted Android cloud file manager
+  AetherVault is a source-available, zero-knowledge encrypted Android cloud file manager
   powered by private Telegram server storage workflows. Uses AES-256-GCM and PBKDF2.
 
 Builds:
