@@ -608,6 +608,10 @@ class MainActivity : ComponentActivity() {
                                                                 onDone(res.success)
                                                             }
                                                         )
+                                                    },
+                                                    onOpenMediaPlayer = { mediaFile ->
+                                                        activeViewingFile = mediaFile
+                                                        subScreen = SubScreen.MEDIA_PLAYER
                                                     }
                                                 )
                                             }
@@ -636,7 +640,9 @@ class MainActivity : ComponentActivity() {
                                                         },
                                                         onFileClick = { file ->
                                                             activeViewingFile = file
-                                                            subScreen = SubScreen.WORKSTATION_VIEWER
+                                                            val isMedia = file.mimeType.startsWith("video/") || file.mimeType.startsWith("audio/") ||
+                                                                file.extension.lowercase() in listOf("mp4", "mkv", "webm", "3gp", "mov", "mp3", "wav", "m4a", "ogg", "flac")
+                                                            subScreen = if (isMedia) SubScreen.MEDIA_PLAYER else SubScreen.WORKSTATION_VIEWER
                                                         },
                                                         onDownloadToDevice = { targetFile ->
                                                             isRestoringDownload = true
@@ -720,7 +726,8 @@ class MainActivity : ComponentActivity() {
                                                         language = appearanceConfig.language,
                                                         onPhotoClick = { file ->
                                                             activeViewingFile = file
-                                                            subScreen = SubScreen.WORKSTATION_VIEWER
+                                                            val isMedia = file.mimeType.startsWith("video/") || file.extension.lowercase() in listOf("mp4", "mkv", "webm", "3gp", "mov")
+                                                            subScreen = if (isMedia) SubScreen.MEDIA_PLAYER else SubScreen.WORKSTATION_VIEWER
                                                         },
                                                         onFreeUpSpaceClick = { showFreeUpSpaceDialog = true },
                                                         onUploadMediaClick = {
@@ -772,7 +779,9 @@ class MainActivity : ComponentActivity() {
                                                         onNavigateFolder = { activeFolderId = it },
                                                         onFileClick = { file ->
                                                             activeViewingFile = file
-                                                            subScreen = SubScreen.WORKSTATION_VIEWER
+                                                            val isMedia = file.mimeType.startsWith("video/") || file.mimeType.startsWith("audio/") ||
+                                                                file.extension.lowercase() in listOf("mp4", "mkv", "webm", "3gp", "mov", "mp3", "wav", "m4a", "ogg", "flac")
+                                                            subScreen = if (isMedia) SubScreen.MEDIA_PLAYER else SubScreen.WORKSTATION_VIEWER
                                                         },
                                                         onCreateFolder = { name, colorHex ->
                                                             viewModel.createFolder(name, colorHex)
@@ -898,6 +907,7 @@ class MainActivity : ComponentActivity() {
                                                                 restorationNotification = msg
                                                             }
                                                         },
+                                                        onAttachFile = { showAddFileBottomSheet = true },
                                                         channelId = channelId,
                                                         botHealthy = botSwarm.any { it.isHealthy }
                                                     )
@@ -963,8 +973,8 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
 
-                            // Stacked Material 3 Squircle FABs (Bottom Right)
-                            if (subScreen == SubScreen.NONE) {
+                            // Stacked Material 3 Squircle FABs (Only on Drive explorer tab)
+                            if (subScreen == SubScreen.NONE && activeTab == MainNavTab.DRIVE) {
                                 M3StackedFabs(
                                     onPrimaryFabClick = { showAddFileBottomSheet = true },
                                     onSecondaryFabClick = { mediaPickerLauncher.launch(arrayOf("image/*", "video/*")) },
@@ -1402,7 +1412,9 @@ The developers (Ayush Mondal / AJPM / TRB FireOps) assume NO LIABILITY or respon
                         onFileClick = { file ->
                             showFastSearchOverlay = false
                             activeViewingFile = file
-                            subScreen = SubScreen.WORKSTATION_VIEWER
+                            val isMedia = file.mimeType.startsWith("video/") || file.mimeType.startsWith("audio/") ||
+                                file.extension.lowercase() in listOf("mp4", "mkv", "webm", "3gp", "mov", "mp3", "wav", "m4a", "ogg", "flac")
+                            subScreen = if (isMedia) SubScreen.MEDIA_PLAYER else SubScreen.WORKSTATION_VIEWER
                         },
                         onClose = { showFastSearchOverlay = false }
                     )

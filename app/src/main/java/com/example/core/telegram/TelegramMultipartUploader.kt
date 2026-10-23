@@ -21,11 +21,45 @@ object TelegramMultipartUploader {
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(60, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(120, TimeUnit.SECONDS)
         .writeTimeout(120, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
         .build()
 
     private val octetMediaType = "application/octet-stream".toMediaTypeOrNull()
+
+    fun formatChatId(channelId: Long): String {
+        return formatChatId(channelId.toString())
+    }
+
+    fun formatChatId(rawInput: String): String {
+        val clean = rawInput.trim()
+        if (clean.isBlank()) return ""
+        val digits = clean.filter { it.isDigit() || it == '-' }
+        if (digits.isBlank() || digits == "-") return ""
+
+        return when {
+            digits.startsWith("-100") -> digits
+            digits.startsWith("100") -> "-$digits"
+            digits.startsWith("-") -> {
+                val num = digits.removePrefix("-")
+                if (num.startsWith("100")) "-$num" else "-100$num"
+            }
+            else -> "-100$digits"
+        }
+    }
+
+    private fun parseTelegramError(code: Int, bodyStr: String): String {
+        val json = runCatching { JSONObject(bodyStr) }.getOrNull()
+        val desc = json?.optString("description") ?: bodyStr.take(150)
+        return when (code) {
+            400 -> "Telegram 400 Bad Request: $desc. Ensure channel ID is correct and bot is added to the channel."
+            403 -> "Telegram 403 Forbidden: $desc. Bot is not an Administrator or lacks 'Post Messages' rights in this channel."
+            413 -> "Telegram 413 Payload Too Large: Standard Telegram Bot API limit is 50MB per upload. File must be chunked."
+            429 -> "Telegram 429 Rate Limit (FLOOD_WAIT): $desc."
+            else -> "Telegram HTTP $code: $desc"
+        }
+    }
 
     /**
      * Uploads an unencrypted original file directly to Telegram with original filename and MIME type.
@@ -39,13 +73,7 @@ object TelegramMultipartUploader {
         caption: String = ""
     ): TelegramUploadResult {
         val url = "https://api.telegram.org/bot$botToken/sendDocument"
-
-        val formattedChatId = if (channelId > 0) {
-            val s = channelId.toString()
-            if (s.startsWith("100")) "-$s" else "-100$s"
-        } else {
-            channelId.toString()
-        }
+        val formattedChatId = formatChatId(channelId)
 
         val mediaType = mimeType.toMediaTypeOrNull() ?: octetMediaType
 
@@ -81,8 +109,8 @@ object TelegramMultipartUploader {
                         val retryAfter = json?.optJSONObject("parameters")?.optInt("retry_after", 5) ?: 5
                         return TelegramUploadResult.RateLimited(retryAfter)
                     }
-                    val errorDesc = runCatching { JSONObject(bodyStr).optString("description") }.getOrNull() ?: bodyStr
-                    return TelegramUploadResult.Error("HTTP ${response.code}: $errorDesc", response.code)
+                    val formattedError = parseTelegramError(response.code, bodyStr)
+                    return TelegramUploadResult.Error(formattedError, response.code)
                 }
 
                 val json = JSONObject(bodyStr)
@@ -141,13 +169,7 @@ object TelegramMultipartUploader {
         totalChunks: Int
     ): TelegramUploadResult {
         val url = "https://api.telegram.org/bot$botToken/sendDocument"
-
-        val formattedChatId = if (channelId > 0) {
-            val s = channelId.toString()
-            if (s.startsWith("100")) "-$s" else "-100$s"
-        } else {
-            channelId.toString()
-        }
+        val formattedChatId = formatChatId(channelId)
 
         val multipartBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)

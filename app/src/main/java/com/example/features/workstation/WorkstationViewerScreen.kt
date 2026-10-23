@@ -62,7 +62,8 @@ fun WorkstationViewerScreen(
     onShareTicket: (VaultFile) -> Unit,
     onDownloadToDevice: (VaultFile) -> Unit = {},
     onShareDecrypted: (VaultFile) -> Unit = {},
-    onEnsureFileCached: ((VaultFile, (Boolean) -> Unit) -> Unit)? = null
+    onEnsureFileCached: ((VaultFile, (Boolean) -> Unit) -> Unit)? = null,
+    onOpenMediaPlayer: ((VaultFile) -> Unit)? = null
 ) {
     val isHindi = language == AppLanguage.HI
     val context = LocalContext.current
@@ -146,6 +147,13 @@ fun WorkstationViewerScreen(
                         isCompact = true,
                         testTag = "workstation_download_button"
                     )
+
+                    // Open in Media3 Stream Player if video or audio
+                    if ((isVideo || isAudio) && onOpenMediaPlayer != null) {
+                        IconButton(onClick = { onOpenMediaPlayer(file) }) {
+                            Icon(Icons.Default.PlayCircle, contentDescription = "Stream with Media3", tint = CyanNeon)
+                        }
+                    }
 
                     // Share button
                     IconButton(onClick = { onShareDecrypted(file) }) {

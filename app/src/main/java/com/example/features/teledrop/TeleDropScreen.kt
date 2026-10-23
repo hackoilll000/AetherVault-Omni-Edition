@@ -42,6 +42,7 @@ fun TeleDropScreen(
     onSendSnippet: (content: String, type: String) -> Unit,
     onDeleteItem: (String) -> Unit,
     onSyncChannel: (() -> Unit)? = null,
+    onAttachFile: (() -> Unit)? = null,
     isSyncing: Boolean = false,
     channelId: Long = 0L,
     botHealthy: Boolean = true
@@ -199,15 +200,36 @@ fun TeleDropScreen(
         bottomBar = {
             Surface(
                 color = M3Surface,
-                tonalElevation = 4.dp,
-                modifier = Modifier.fillMaxWidth()
+                tonalElevation = 6.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
             ) {
                 Row(
                     modifier = Modifier
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                         .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    // Dedicated Attachment '+' Action Button
+                    if (onAttachFile != null) {
+                        IconButton(
+                            onClick = onAttachFile,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(M3SearchBarBg)
+                                .testTag("teledrop_attach_button")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Attach File",
+                                tint = M3PrimaryBlue
+                            )
+                        }
+                    }
+
                     // Quick paste from clipboard
                     IconButton(
                         onClick = {
@@ -220,22 +242,24 @@ fun TeleDropScreen(
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 }
                             }
-                        }
+                        },
+                        modifier = Modifier.size(40.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ContentPaste,
                             contentDescription = "Paste Clipboard",
-                            tint = M3PrimaryBlue
+                            tint = M3TextMuted
                         )
                     }
 
+                    // Message / Link Input Field
                     OutlinedTextField(
                         value = inputSnippetText,
                         onValueChange = { inputSnippetText = it },
                         placeholder = {
                             Text(
-                                if (isHindi) "टेलीग्राम चैनल में संदेश / लिंक भेजें..."
-                                else "Send message to Telegram Channel...",
+                                if (isHindi) "संदेश या लिंक दर्ज करें..."
+                                else "Send message or link...",
                                 fontSize = 13.sp,
                                 color = M3TextMuted
                             )
@@ -252,7 +276,8 @@ fun TeleDropScreen(
                             unfocusedBorderColor = Color.Transparent
                         )
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+
+                    // Send Button
                     IconButton(
                         onClick = {
                             if (inputSnippetText.isNotBlank()) {
@@ -272,7 +297,12 @@ fun TeleDropScreen(
                             .background(M3PrimaryBlue)
                             .testTag("teledrop_send_button")
                     ) {
-                        Icon(Icons.Default.Send, contentDescription = "Send", tint = Color.White, modifier = Modifier.size(18.dp))
+                        Icon(
+                            Icons.Default.Send,
+                            contentDescription = "Send",
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                 }
             }
