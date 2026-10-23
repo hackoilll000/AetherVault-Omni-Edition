@@ -118,7 +118,10 @@ fun ConnectWizardScreen(
                             com.example.core.sensory.SensoryFeedbackEngine.trigger(context, com.example.core.sensory.HapticStyle.LIGHT_TICK)
                             showVoiceTutorial = true
                         },
-                        colors = ButtonDefaults.filledTonalButtonColors(containerColor = CyanNeon.copy(alpha = 0.2f), contentColor = CyanNeon),
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
                         shape = RoundedCornerShape(8.dp),
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                         modifier = Modifier.padding(end = 6.dp)
@@ -155,33 +158,34 @@ fun ConnectWizardScreen(
                     .fillMaxWidth()
                     .height(6.dp)
                     .clip(RoundedCornerShape(3.dp)),
-                color = CyanNeon
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
             )
 
             // Owner & Terms Agreement Banner
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = CyanNeon.copy(alpha = 0.12f)),
-                border = androidx.compose.foundation.BorderStroke(1.dp, CyanNeon)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
             ) {
                 Row(
                     modifier = Modifier.padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.VerifiedUser, contentDescription = null, tint = CyanNeon, modifier = Modifier.size(24.dp))
+                    Icon(Icons.Default.VerifiedUser, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
                             text = if (isHindi) "क्रिएटर: TRB FireOps (@trbfireops)" else "Creator: TRB FireOps (@trbfireops)",
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp,
-                            color = CyanNeon
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
                             text = if (isHindi) "शून्य-ज्ञान एन्क्रिप्शन नियम एवं शर्तों से सहमत होकर आगे बढ़ें।"
                             else "Zero-Knowledge Cloud Terms & Agreement verified. Root & Non-Root enabled.",
                             fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -205,8 +209,8 @@ fun ConnectWizardScreen(
                 // Restore from Migration / Backup Code Card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = CyanNeon.copy(alpha = 0.1f)),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, CyanNeon.copy(alpha = 0.5f))
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f))
                 ) {
                     Row(
                         modifier = Modifier
@@ -220,7 +224,7 @@ fun ConnectWizardScreen(
                                 text = if (isHindi) "पुराने बॉट का बैकअप कोड है?" else "Have a Migration / Backup Code?",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp,
-                                color = CyanNeon
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                             Text(
                                 text = if (isHindi) "कोड डालें और सारा पुराना डेटा तुरंत वापस लाएं"
@@ -231,7 +235,10 @@ fun ConnectWizardScreen(
                         }
                         Button(
                             onClick = { showRestoreCodeDialog = true },
-                            colors = ButtonDefaults.buttonColors(containerColor = CyanNeon, contentColor = Color.Black),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                contentColor = MaterialTheme.colorScheme.onSecondary
+                            ),
                             shape = RoundedCornerShape(8.dp),
                             contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
                         ) {
@@ -286,8 +293,8 @@ fun ConnectWizardScreen(
                 AnimatedVisibility(visible = detectedClipboardToken != null) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = CyanNeon.copy(alpha = 0.15f)),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, CyanNeon)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f)),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary.copy(alpha = 0.4f))
                     ) {
                         Row(
                             modifier = Modifier
@@ -295,19 +302,20 @@ fun ConnectWizardScreen(
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.ContentPaste, contentDescription = null, tint = CyanNeon)
+                            Icon(Icons.Default.ContentPaste, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
                             Spacer(modifier = Modifier.width(10.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = if (isHindi) "क्लिपबोर्ड में टोकन मिला!" else "Bot Token Detected in Clipboard!",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 13.sp,
-                                    color = CyanNeon
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer
                                 )
                                 Text(
                                     text = detectedClipboardToken?.take(18) + "...",
                                     fontFamily = FontFamily.Monospace,
-                                    fontSize = 11.sp
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             Button(
@@ -317,47 +325,14 @@ fun ConnectWizardScreen(
                                         detectedClipboardToken = null
                                     }
                                 },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.tertiary,
+                                    contentColor = MaterialTheme.colorScheme.onTertiary
+                                ),
                                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                             ) {
                                 Text(if (isHindi) "पेस्ट करें" else "Use Token")
                             }
-                        }
-                    }
-                }
-
-                // Restore Vault Option from Migration Code
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, CyanNeon.copy(alpha = 0.4f))
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = if (isHindi) "🔄 क्या आपके पास बैकअप / माइग्रेशन कोड है?" else "🔄 Have a Vault Backup / Migration Code?",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = if (isHindi) "1-टैप में पिछले बॉट/सर्वर का सारा डेटा रीस्टोर करें" else "Instantly restore all files & folders from backup code",
-                                fontSize = 10.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Button(
-                            onClick = { showRestoreCodeDialog = true },
-                            colors = ButtonDefaults.buttonColors(containerColor = CyanNeon, contentColor = Color.Black),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                        ) {
-                            Text(if (isHindi) "रीस्टोर करें" else "Restore", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -373,7 +348,7 @@ fun ConnectWizardScreen(
                             Icon(
                                 imageVector = if (isTokenMasked) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                                 contentDescription = "Toggle Token Masking",
-                                tint = CyanNeon
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     },
@@ -487,7 +462,7 @@ fun ConnectWizardScreen(
                     Column(modifier = Modifier.padding(14.dp)) {
                         Text("1. Create a New Private Channel in Telegram", fontWeight = FontWeight.Bold)
                         Text("2. Add your Bot as Administrator (with Post & Pin rights)", fontSize = 13.sp)
-                        Text("3. Type #connect in the channel!", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = CyanNeon)
+                        Text("3. Type #connect in the channel!", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     }
                 }
 
@@ -537,7 +512,7 @@ fun ConnectWizardScreen(
                 if (connectStatusText.isNotBlank()) {
                     Text(
                         text = connectStatusText,
-                        color = if (connectStatusText.startsWith("✓")) CyanNeon else MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (connectStatusText.startsWith("✓")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -561,7 +536,7 @@ fun ConnectWizardScreen(
                             Icon(
                                 imageVector = if (isChannelMasked) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                                 contentDescription = "Toggle Channel ID Masking",
-                                tint = CyanNeon
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     },
@@ -656,16 +631,17 @@ fun ConnectWizardScreen(
                 if (existingVaultDetected) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = CyanNeon.copy(alpha = 0.15f))
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
                     ) {
                         Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.CloudDownload, contentDescription = null, tint = CyanNeon)
+                            Icon(Icons.Default.CloudDownload, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = if (isHindi) "मौजूदा क्लाउड वॉल्ट मिला! पासवर्ड डालने पर 1-क्लिक में सारा डेटा रिस्टोर होगा।"
                                 else "Existing Cloud Vault Found! Entering your Master Password will restore all your files instantly.",
                                 fontSize = 12.sp,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
                     }
@@ -742,7 +718,7 @@ fun ConnectWizardScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(4.dp),
-                    color = if (strength > 0.8f) CyanNeon else IndigoHyper
+                    color = if (strength > 0.8f) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
                 )
 
                 Row(
@@ -765,7 +741,7 @@ fun ConnectWizardScreen(
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = CyanNeon,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -908,7 +884,7 @@ private fun DiagnosticCheckItem(title: String, passed: Boolean?) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             when (passed) {
-                true -> Icon(Icons.Default.CheckCircle, contentDescription = null, tint = CyanNeon, modifier = Modifier.size(22.dp))
+                true -> Icon(Icons.Default.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
                 false -> Icon(Icons.Default.Error, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(22.dp))
                 null -> CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
             }

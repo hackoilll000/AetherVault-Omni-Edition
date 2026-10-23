@@ -1002,7 +1002,7 @@ class MainActivity : ComponentActivity() {
                                         text = shareTicketUrl ?: "",
                                         fontFamily = FontFamily.Monospace,
                                         fontSize = 10.sp,
-                                        color = CyanNeon,
+                                        color = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.padding(10.dp)
                                     )
                                 }
@@ -1043,20 +1043,20 @@ class MainActivity : ComponentActivity() {
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Surface(
-                                    color = CyanNeon.copy(alpha = 0.15f),
+                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
                                     shape = RoundedCornerShape(8.dp)
                                 ) {
                                     Row(
                                         modifier = Modifier.padding(12.dp),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Icon(Icons.Default.Verified, contentDescription = null, tint = CyanNeon)
+                                        Icon(Icons.Default.Verified, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
                                             text = if (isHindi) "3.4 GB फोन स्टोरेज खाली होगा" else "3.4 GB space can be freed up",
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 13.sp,
-                                            color = CyanNeon
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
                                         )
                                     }
                                 }
@@ -1085,7 +1085,7 @@ class MainActivity : ComponentActivity() {
                                 Icon(
                                     imageVector = if (isOk) Icons.Default.CloudDone else Icons.Default.CloudOff,
                                     contentDescription = null,
-                                    tint = if (isOk) CyanNeon else MaterialTheme.colorScheme.error,
+                                    tint = if (isOk) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))

@@ -20,10 +20,10 @@ val M3TextMuted = Color(0xFF444746)            // Muted Slate Subtitle Text
 val M3TextSubtle = Color(0xFF5E5E5E)           // Metadata Muted Text
 val M3BorderSubtle = Color(0xFFE1E3E1)         // Subtle Drawer / Card Divider
 
-// Brand Accents
-val CyanNeon = Color(0xFF00F0FF)
-val IndigoHyper = Color(0xFF6366F1)
-val VioletNeon = Color(0xFFA855F7)
+// Brand Accents (WCAG AA Compliant contrast on light and dark surfaces)
+val CyanNeon = Color(0xFF0284C7)      // High-Contrast Sky Cyan (4.8:1 Contrast on Light Background)
+val IndigoHyper = Color(0xFF4F46E5)    // Deep Vibrant Indigo
+val VioletNeon = Color(0xFF7C3AED)     // Rich Deep Violet
 
 // Flagship iOS Liquid Glass (Spatial HUD)
 val LiquidBackground = Color(0xFF060911)

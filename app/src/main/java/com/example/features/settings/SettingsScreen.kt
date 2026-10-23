@@ -271,10 +271,10 @@ fun SettingsScreen(
                         shape = RoundedCornerShape(10.dp)
                     ) {
                         if (isSyncingServer) {
-                            CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = CyanNeon)
+                            CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(8.dp))
                         } else {
-                            Icon(Icons.Default.CloudSync, contentDescription = null, modifier = Modifier.size(16.dp), tint = CyanNeon)
+                            Icon(Icons.Default.CloudSync, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(8.dp))
                         }
                         Text(
@@ -286,14 +286,14 @@ fun SettingsScreen(
                     if (serverSyncResult.isNotBlank()) {
                         Spacer(modifier = Modifier.height(6.dp))
                         Surface(
-                            color = CyanNeon.copy(alpha = 0.12f),
+                            color = MaterialTheme.colorScheme.primaryContainer,
                             shape = RoundedCornerShape(8.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
                                 text = serverSyncResult,
                                 fontSize = 11.sp,
-                                color = CyanNeon,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.padding(10.dp)
                             )
                         }
@@ -319,14 +319,14 @@ fun SettingsScreen(
                             fontSize = 15.sp
                         )
                         Surface(
-                            color = CyanNeon.copy(alpha = 0.2f),
+                            color = MaterialTheme.colorScheme.primaryContainer,
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
                                 text = "FREE & UNLIMITED",
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = CyanNeon,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                             )
                         }
@@ -434,7 +434,10 @@ fun SettingsScreen(
                                 }
                             },
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = CyanNeon, contentColor = Color.Black),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
                             shape = RoundedCornerShape(10.dp),
                             enabled = !isGeneratingCode
                         ) {
@@ -455,7 +458,7 @@ fun SettingsScreen(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(10.dp)
                         ) {
-                            Icon(Icons.Default.ContentPaste, contentDescription = null, modifier = Modifier.size(16.dp), tint = CyanNeon)
+                            Icon(Icons.Default.ContentPaste, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(if (isHindi) "कोड पेस्ट करें" else "Enter Code", fontSize = 12.sp)
                         }
@@ -498,7 +501,10 @@ fun SettingsScreen(
                                 }
                             },
                             enabled = !isRebindingBot && newBotTokenInput.isNotBlank(),
-                            colors = ButtonDefaults.buttonColors(containerColor = CyanNeon, contentColor = Color.Black),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             if (isRebindingBot) {
