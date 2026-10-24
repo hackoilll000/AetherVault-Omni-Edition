@@ -9,13 +9,16 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
-    name: Build Android APK
+    name: Build & Verify Android Artifact
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Source
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -23,31 +26,54 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'gradle'
 
-      - name: Grant Execute Permission for Gradle
-        run: chmod +x gradlew || true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Build Debug APK
-        run: gradle assembleDebug
+      - name: Validate Multi-Store Compliance
+        run: python3 scripts/validate_distribution.py
 
-      - name: Upload APK Artifact
+      - name: Execute Local JVM & Robolectric Tests
+        run: gradle :app:testDebugUnitTest --no-daemon
+
+      - name: Assemble Debug Universal APK
+        run: gradle assembleDebug --no-daemon
+
+      - name: Calculate Release SHA-256 Checksum
+        run: |
+          mkdir -p release_apk
+          cp app/build/outputs/apk/debug/app-debug.apk release_apk/AetherVault-Omni-v2.4-debug.apk
+          sha256sum release_apk/AetherVault-Omni-v2.4-debug.apk > release_apk/AetherVault-Omni-v2.4-debug.apk.sha256
+          cat release_apk/AetherVault-Omni-v2.4-debug.apk.sha256
+
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: AetherVault-Omni-v1.0.0-Debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: AetherVault-Omni-Universal-Debug-APK
+          path: release_apk/
 
-      - name: Create GitHub Release
+      - name: Publish Official GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: app/build/outputs/apk/debug/app-debug.apk
+          files: |
+            release_apk/AetherVault-Omni-v2.4-debug.apk
+            release_apk/AetherVault-Omni-v2.4-debug.apk.sha256
           name: AetherVault Omni Edition ${{ github.ref_name }}
           body: |
-            ## 🚀 AetherVault Omni Edition Release
-            - **Developer:** Ayush Mondal (AJPM)
-            - **YouTube:** [TRB FireOps (@trbfireops)](https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0)
-            - **Features:** Encrypted Telegram Cloud Vault, Bot Swarm, Zero-Knowledge AES-256-GCM, Liquid Glass UI.
+            ## 🚀 AetherVault Omni Edition Release (${{ github.ref_name }})
+            
+            ### 🌐 Store & Download Links
+            - **Official Orion Store Listing:** [View on Orion Store](https://rookieenough.github.io/Orion-Data/redirect.html?id=aethervault-omni-edition&icon=https%3A%2F%2Fraw.githubusercontent.com%2Fhackoilll000%2FAetherVault-Omni-Edition%2Fmain%2Fassets%2Fapp_icon.png)
+            - **Developer:** Ayush Mondal (TRB FireOps)
+            - **YouTube Community:** [@trbfireops](https://youtube.com/@trbfireops?si=LFRe4g7RiicR2EN0)
+            
+            ### 🛠️ Key Improvements in this Release
+            - **Android Media3 ExoPlayer Engine:** Full partial-content byte-range streaming via `TelegramStreamProxy` (`206 Partial Content`).
+            - **Resilient Remote Fetch:** Chunked OkHttp streaming (19 MB safe parts) and Telegram Bot API ingestion.
+            - **WASM & Blob Interception:** Intercepts WebAssembly binary artifacts and routes them to native storage.
+            - **UI Refactoring:** Complete resolution of bottom dock and floating FAB overlap.
+            - **Security & Integrity:** PBKDF2 + AES-256-GCM zero-knowledge encrypted chunks with SHA-256 verification.
           draft: false
           prerelease: false
         env:

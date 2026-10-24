@@ -5,6 +5,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   validate-and-build:
@@ -20,20 +21,25 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle Cache
-        uses: actions/setup-gradle@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Run Multi-Store Metadata Validator
         run: python3 scripts/validate_distribution.py
 
       - name: Execute Unit & Robolectric Tests
-        run: gradle :app:testDebugUnitTest
+        run: gradle :app:testDebugUnitTest --no-daemon
 
       - name: Assemble Debug Universal APK
-        run: gradle assembleDebug
+        run: gradle assembleDebug --no-daemon
+
+      - name: Verify Output Binary
+        run: |
+          test -f app/build/outputs/apk/debug/app-debug.apk || exit 1
+          echo "Debug APK verified successfully: $(ls -lh app/build/outputs/apk/debug/app-debug.apk)"
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: AetherVault-Debug-APK
+          name: AetherVault-Distribution-Debug-APK
           path: app/build/outputs/apk/debug/app-debug.apk

@@ -1,0 +1,32 @@
+name: Feature Proposal
+description: Suggest an improvement or new architectural capability
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please describe the proposed feature and why it fits AetherVault Omni Edition's zero-knowledge cloud architecture.
+
+  - type: input
+    id: feature-title
+    attributes:
+      label: Feature Summary
+      placeholder: e.g. Support AV1 hardware decoding in Media3 player
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: Problem Statement
+      description: What challenge or user limitation does this feature resolve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution / Technical Design
+      description: How should this be implemented in Kotlin, Jetpack Compose, or storage adapters?
+    validations:
+      required: true

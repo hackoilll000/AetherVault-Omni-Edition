@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="40" viewBox="0 0 220 40" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F19" />
+      <stop offset="100%" stop-color="#161F30" />
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F0FF" />
+      <stop offset="100%" stop-color="#7000FF" />
+    </linearGradient>
+  </defs>
+
+  <!-- Border & Background -->
+  <rect x="0.5" y="0.5" width="219" height="39" rx="8" fill="url(#bg)" stroke="#1F2E47" stroke-width="1" />
+
+  <!-- Orion Hex/Store Icon -->
+  <g transform="translate(12, 10)">
+    <polygon points="10,0 18,5 18,15 10,20 2,15 2,5" fill="none" stroke="url(#cyanGrad)" stroke-width="1.8" />
+    <circle cx="10" cy="10" r="3" fill="#00F0FF" />
+  </g>
+
+  <!-- Badge Text -->
+  <text x="42" y="15" fill="#8E9CB2" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="9" font-weight="600" letter-spacing="0.5">AVAILABLE ON</text>
+  <text x="42" y="27" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="0.3">ORION STORE</text>
+</svg>
