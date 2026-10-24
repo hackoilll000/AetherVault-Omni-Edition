@@ -62,6 +62,8 @@ fun MediaPlayerScreen(
         val localFile = CloudUploadPipeline.getLocalCachedFile(context, file.id, file.name)
         if (localFile.exists() && localFile.length() > 0) {
             localFile.toURI().toString()
+        } else if (file.sha256Hash.startsWith("http://") || file.sha256Hash.startsWith("https://")) {
+            file.sha256Hash
         } else {
             TelegramStreamProxy.registerStream(context, file, botToken)
         }

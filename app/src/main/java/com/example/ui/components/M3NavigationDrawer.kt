@@ -72,7 +72,7 @@ fun M3NavigationDrawerContent(
                 M3DrawerMenuItem("Recent", Icons.Outlined.Schedule) { onSelectMenu("Recent") },
                 M3DrawerMenuItem("Telegram Sync & Chat", Icons.Outlined.Forum) { onSelectMenu("TelegramChat") },
                 M3DrawerMenuItem("Uploads", Icons.Outlined.CloudUpload) { onSelectMenu("Uploads") },
-                M3DrawerMenuItem("Remote Fetch & Transfer", Icons.Outlined.CloudDownload) { onSelectMenu("RemoteFetch") },
+                M3DrawerMenuItem("Universal Link Manager", Icons.Outlined.CloudDownload) { onSelectMenu("RemoteFetch") },
                 M3DrawerMenuItem("Bot Studio", Icons.Outlined.Code) { onSelectMenu("BotStudio") },
                 M3DrawerMenuItem("Appearance Studio", Icons.Outlined.Palette) { onSelectMenu("AppearanceStudio") },
                 M3DrawerMenuItem("In-App Debug Center", Icons.Outlined.BugReport) { onSelectMenu("DebugCenter") },

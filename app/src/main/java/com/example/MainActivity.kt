@@ -41,6 +41,7 @@ import com.example.features.botstudio.*
 import com.example.features.diagnostics.*
 import com.example.features.media.*
 import com.example.features.remotefetch.*
+import com.example.features.linkmanager.*
 import com.example.features.drive.DriveExplorerScreen
 import com.example.features.onboarding.ConnectWizardScreen
 import com.example.features.onboarding.TermsAgreementScreen
@@ -137,6 +138,23 @@ class MainActivity : ComponentActivity() {
     private lateinit var botProjectManager: BotProjectManager
     private lateinit var remoteFetchWorker: RemoteFetchWorker
     private lateinit var diagnosticManager: DiagnosticManager
+    private lateinit var universalLinkCoordinator: UniversalLinkCoordinator
+    private val sharedUrlState = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIncomingIntent(intent)
+    }
+
+    private fun handleIncomingIntent(intent: Intent?) {
+        if (intent?.action == Intent.ACTION_SEND && intent.type == "text/plain") {
+            val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
+            if (!sharedText.isNullOrBlank()) {
+                sharedUrlState.value = sharedText.trim()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -145,6 +163,8 @@ class MainActivity : ComponentActivity() {
         botProjectManager = BotProjectManager(this)
         remoteFetchWorker = RemoteFetchWorker(this)
         diagnosticManager = DiagnosticManager(this)
+        universalLinkCoordinator = UniversalLinkCoordinator(this, diagnosticManager)
+        handleIncomingIntent(intent)
         VaultCrashHandler.init(this)
         runCatching {
             val serviceIntent = Intent(this, TelegramSyncForegroundService::class.java)
@@ -157,6 +177,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val appearanceConfig by appearancePrefs.configFlow.collectAsStateWithLifecycle()
+            val incomingSharedUrl by sharedUrlState.collectAsStateWithLifecycle()
             val isConfigured by viewModel.isConfigured.collectAsStateWithLifecycle()
             val isUnlocked by viewModel.isUnlocked.collectAsStateWithLifecycle()
             val channelId by viewModel.channelId.collectAsStateWithLifecycle()
@@ -178,6 +199,12 @@ class MainActivity : ComponentActivity() {
             var activeViewingFile by remember { mutableStateOf<VaultFile?>(null) }
             var activeFolderId by remember { mutableStateOf("root") }
             var searchQuery by remember { mutableStateOf("") }
+
+            LaunchedEffect(incomingSharedUrl) {
+                if (!incomingSharedUrl.isNullOrBlank()) {
+                    subScreen = SubScreen.REMOTE_FETCH
+                }
+            }
 
             // Share ticket and restoration dialog states
             var shareTicketUrl by remember { mutableStateOf<String?>(null) }
@@ -525,10 +552,25 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
                                         SubScreen.REMOTE_FETCH -> {
-                                            RemoteFetchScreen(
-                                                worker = remoteFetchWorker,
+                                            UniversalLinkManagerScreen(
+                                                coordinator = universalLinkCoordinator,
+                                                initialSharedUrl = incomingSharedUrl,
                                                 language = appearanceConfig.language,
-                                                onBack = { subScreen = SubScreen.NONE }
+                                                onBack = {
+                                                    sharedUrlState.value = null
+                                                    subScreen = SubScreen.NONE
+                                                },
+                                                onStreamMedia = { resource ->
+                                                    val mediaFile = VaultFile(
+                                                        id = "direct_stream_${System.currentTimeMillis()}",
+                                                        name = if (resource.title.isNotBlank()) resource.title else "Direct Media Stream",
+                                                        mimeType = resource.mimeType,
+                                                        totalSizeBytes = resource.fileSizeBytes ?: 0L,
+                                                        sha256Hash = resource.normalizedUrl
+                                                    )
+                                                    activeViewingFile = mediaFile
+                                                    subScreen = SubScreen.MEDIA_PLAYER
+                                                }
                                             )
                                         }
                                         SubScreen.DEBUG_CENTER -> {
